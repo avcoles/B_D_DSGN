@@ -1,5 +1,4 @@
 import Reveal from './Reveal.jsx'
-import { designPrinciples } from '../data/designPrinciples.js'
 
 /**
  * Design principles (part one of the audit: the reasoned read).
@@ -14,9 +13,7 @@ import { designPrinciples } from '../data/designPrinciples.js'
  * side by side, which lets the left edge be scanned for all seven without
  * reading a single rationale.
  */
-export default function DesignPrinciples() {
-  const { principles } = designPrinciples
-
+export default function DesignPrinciples({ principles }) {
   return (
     <div className="grid gap-4">
       <h2 className="display mt-6 text-[2rem] sm:text-[2.75rem]">Design Principles</h2>

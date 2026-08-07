@@ -36,8 +36,6 @@ export default function Typography({ data, className }) {
             >
               {face.sample}
             </p>
-
-            <p className="text-[0.75rem] leading-relaxed text-[var(--ink-2)]">{face.note}</p>
           </Stage>
         ))}
       </div>

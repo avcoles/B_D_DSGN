@@ -19,12 +19,12 @@ export default function Buttons({ data, className }) {
           ))}
         </div>
 
-        <div
-          className="grid gap-2 border-t pt-4 sm:grid-cols-3"
-          style={{ borderColor: 'var(--rule)' }}
-        >
+        {/* Stacked, not columned. This box sits in a two-column slot now, so
+            three side-by-side notes came out at 98px each and wrapped their own
+            labels. One per row uses the full measure instead. */}
+        <div className="grid gap-3 border-t pt-4" style={{ borderColor: 'var(--rule)' }}>
           {data.variants.map((v) => (
-            <div key={v.role} className="grid gap-1">
+            <div key={v.role} className="flex items-baseline justify-between gap-3">
               <span className="spec-mono">{v.role}</span>
               <span className="text-[0.8125rem] text-[var(--ink-2)]">{v.note}</span>
             </div>

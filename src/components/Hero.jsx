@@ -1,5 +1,6 @@
 import PreviewPanel from './PreviewPanel.jsx'
 import Overview from './Overview.jsx'
+import FitText from './FitText.jsx'
 
 /**
  * Hero — live preview on the left, metadata rail on the right.
@@ -33,8 +34,12 @@ export default function Hero({ t }) {
             {t.kicker}
           </span>
 
-          <h1 className="display text-[3rem] sm:text-[3.5rem]">
-            {t.title}
+          {/* Full width so FitText measures against the rail rather than
+              against its own shrink-to-fit box. */}
+          <h1 className="display w-full">
+            <FitText max={56} min={24}>
+              {t.title}
+            </FitText>
             <span className="mt-1.5 block text-[1.0625rem] font-extralight tracking-[-0.03em] text-dim-gray">
               {t.subtitle}
             </span>

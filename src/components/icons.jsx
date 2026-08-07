@@ -63,6 +63,18 @@ export const ArrowUpRight = (p) => (
   </svg>
 )
 
+export const ChevronLeft = (p) => (
+  <svg {...base} {...p}>
+    <path d="M10 3.5L5.5 8l4.5 4.5" />
+  </svg>
+)
+
+export const ChevronRight = (p) => (
+  <svg {...base} {...p}>
+    <path d="M6 3.5L10.5 8 6 12.5" />
+  </svg>
+)
+
 /* --- Tech stack badges --------------------------------------------------- */
 
 export const Curve = (p) => (

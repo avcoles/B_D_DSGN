@@ -1,6 +1,5 @@
 import Reveal from './Reveal.jsx'
 import { Cube, Curve, Grid, Mouse } from './icons.jsx'
-import { techStack } from '../data/techStack.js'
 
 const ICONS = { Curve, Cube, Mouse, Grid }
 
@@ -13,13 +12,13 @@ const ICONS = { Curve, Cube, Mouse, Grid }
  * them is the point: it keeps a sentence and a measurement from sitting in the
  * same visual register, which is the rule the audit skill cares most about.
  */
-export default function TechStack() {
+export default function TechStack({ items }) {
   return (
     <div className="grid gap-4">
       <h2 className="display mt-6 text-[2rem] sm:text-[2.75rem]">Tech Stack</h2>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {techStack.map((t) => {
+        {items.map((t) => {
           const Icon = ICONS[t.icon]
 
           return (

@@ -1,0 +1,600 @@
+/* ============================================================
+   Ensemble - design system
+   ============================================================ */
+
+@font-face {
+  font-family: "NHG";
+  src: local("Helvetica Neue"), local("Helvetica"), local("Arial");
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  /* --- brand palette (from --color-* in source) --- */
+  --color-black: #000;
+  --color-cream: #ede4dd;
+  --color-red: #ff0001;
+  --color-grey: #5a5a5a;
+
+  /* --- easing curves (source exposes a large set; these are the ones used) --- */
+  --ease: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-out-strong: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
+
+  /* --- geometry --- */
+  --aspect-large: 9 / 12;
+  --aspect-small: 242 / 240;
+  --gutter: 1rem;
+  --rule: 5px;
+
+  /* Theme switcher sits in its own layer (the header is blend-difference,
+     which would invert the swatch colours). These reserve its footprint in
+     the nav row so the links never run underneath it. */
+  --switcher-w: 3.875rem;  /* 3 x 1.125rem swatch + 2 x 0.25rem gap */
+  --switcher-gap: 2.5rem;  /* breathing room between "Bag (0)" and the dots */
+
+  /* --- themed surfaces, overridden per data-theme --- */
+  --bg: var(--color-cream);
+  --fg: var(--color-black);
+  --menu-bg: var(--color-black);
+  --menu-fg: #fff;
+  --selection-bg: var(--color-red);
+  --selection-fg: #fff;
+  --cursor-color: var(--color-red);
+  --footer-muted: var(--color-grey);
+}
+
+/* Theme: cream (default) is above. */
+html[data-theme="dark"] {
+  --bg: var(--color-black);
+  --fg: var(--color-cream);
+  --menu-bg: var(--color-cream);
+  --menu-fg: var(--color-black);
+  --cursor-color: var(--color-red);
+  --footer-muted: #7a7a7a;
+}
+
+html[data-theme="red"] {
+  --bg: var(--color-cream);
+  --fg: var(--color-red);
+  --menu-bg: var(--color-red);
+  --menu-fg: #fff;
+  --selection-bg: var(--color-black);
+  --selection-fg: var(--color-cream);
+  --cursor-color: var(--color-red);
+  --footer-muted: var(--color-red);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+/* Lenis smooth-scroll requirements */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+body {
+  font-family: "NHG", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
+  transition: background-color 0.4s var(--ease-in-out), color 0.4s var(--ease-in-out);
+  overflow-x: hidden;
+}
+
+::selection { background: var(--selection-bg); color: var(--selection-fg); }
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+svg { display: block; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Hide the native cursor once the custom one is active */
+html.has-custom-cursor,
+html.has-custom-cursor * { cursor: none !important; }
+
+/* ============================================================
+   Layout primitives — 8 col mobile / 16 col desktop
+   ============================================================ */
+.px { padding-inline: var(--gutter); }
+@media (min-width: 1024px) { .px { padding-inline: 1.5rem; } }
+
+.grid16 {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .grid16 { grid-template-columns: repeat(16, minmax(0, 1fr)); }
+}
+
+/* ============================================================
+   link-hover — underline wipes in from the left.
+   Exact rule from source: transform .5s var(--ease), scaleX(0) -> scaleX(1)
+   ============================================================ */
+.link-hover { position: relative; }
+.link-hover::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -0.1em;
+  height: max(2px, 0.1em);
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: 0;
+  transition: transform 0.5s var(--ease);
+}
+.link-hover:hover::after { transform: scaleX(1); transform-origin: 0; }
+.link-hover[data-selected]::after { transform: none; }
+
+/* ============================================================
+   WORDMARK
+   The Ensemble logotype is live text rather than outlined paths, so each
+   letter is its own element and can rise independently the way the original
+   artwork's paths did. The parent clips them while they are still below.
+   ============================================================ */
+.wordmark {
+  display: flex;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.82;
+  overflow: hidden;
+}
+.wordmark .ltr {
+  display: block;
+  transform: translateY(110%);
+  will-change: transform;
+}
+.wordmark .reg {
+  align-self: flex-start;
+  font-size: 0.3em;
+  margin-left: 0.1em;
+  letter-spacing: 0;
+}
+
+/* ============================================================
+   PRELOADER
+   Six stacked images cycling, wordmark reveal, 0->100 counter.
+   ============================================================ */
+#preloader {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center; gap: 2rem;
+  background: var(--color-black);
+  color: var(--color-cream);
+}
+#preloader-images { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+#preloader-images img {
+  position: absolute;
+  aspect-ratio: var(--aspect-large);
+  width: 30vw;
+  object-fit: cover;
+  opacity: 0;
+}
+@media (min-width: 768px) { #preloader-images img { width: 12vw; } }
+#preloader-images img.active { opacity: 1; }
+
+#preloader-inner { position: relative; }
+#preloader-mark { overflow: hidden; }
+#preloader-mark .wordmark {
+  color: var(--color-cream);
+  position: relative;
+  margin-inline: auto;
+  mix-blend-mode: difference;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+@media (min-width: 768px) { #preloader-mark .wordmark { font-size: 4.5rem; } }
+
+#preloader-count {
+  position: absolute;
+  top: 200%; left: 80%;
+  overflow: hidden;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+@media (min-width: 768px) { #preloader-count { top: -40%; left: 105%; } }
+#preloader-count span { display: block; text-align: right; color: var(--color-cream); }
+
+/* ============================================================
+   HEADER — fixed, mix-blend-difference so it inverts over content
+   ============================================================ */
+#header {
+  position: fixed; top: 0; left: 0; z-index: 3;
+  display: flex; width: 100%;
+  align-items: center; justify-content: space-between;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+#header > div {
+  margin-inline: auto;
+  display: flex; width: 100%;
+  align-items: center; justify-content: space-between;
+  padding: 2rem 1rem;
+}
+@media (min-width: 1024px) { #header > div { padding-inline: 1.5rem; } }
+/* From 768px up the theme switcher is visible — hold a gap open for it so the
+   nav links stop short of the dots rather than sliding under them. */
+@media (min-width: 768px) {
+  #header > div { padding-right: calc(1rem + var(--switcher-gap) + var(--switcher-w)); }
+}
+@media (min-width: 1024px) {
+  #header > div { padding-right: calc(1.5rem + var(--switcher-gap) + var(--switcher-w)); }
+}
+#header .brand { margin-right: 0.5rem; }
+@media (min-width: 1024px) { #header .brand { margin-right: 1.5rem; } }
+#header .brand-mark {
+  display: block;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
+  line-height: 1;
+}
+@media (min-width: 768px) { #header .brand-mark { font-size: 1.5rem; } }
+#header nav { display: flex; align-items: center; gap: 0.75rem; }
+@media (min-width: 768px) { #header nav { gap: 4rem; } }
+#header ul {
+  display: flex; gap: 2rem;
+  list-style: none;
+  letter-spacing: -0.025em;
+  font-size: 1rem;
+}
+@media (min-width: 768px) {
+  #header ul { align-items: center; gap: 4rem; font-size: 1.5rem; }
+}
+.only-desktop { display: none; }
+@media (min-width: 768px) { .only-desktop { display: block; } }
+.only-mobile { display: block; }
+@media (min-width: 768px) { .only-mobile { display: none; } }
+
+/* ============================================================
+   THEME SWITCHER — three dots, animated marker
+   ============================================================ */
+#theme-switcher {
+  /* top = header padding (2rem) + half the 1.75rem link row - half the 1.125rem
+     swatch, so the dots sit on the same optical line as "Shop" / "Bag (0)". */
+  position: fixed; top: 2.3125rem; right: 1rem; z-index: 4;
+  display: none;
+  width: var(--switcher-w);
+}
+@media (min-width: 768px) { #theme-switcher { display: block; } }
+/* Track the header's own gutter so the dots line up with its right edge. */
+@media (min-width: 1024px) { #theme-switcher { right: 1.5rem; } }
+.swatches { position: relative; display: flex; gap: 0.25rem; }
+.swatch {
+  display: inline-block; border-radius: 9999px;
+  height: 1.125rem; width: 1.125rem;
+  transition: all 0.2s var(--ease-out);
+}
+.swatch:hover { transform: scale(1.1); }
+.swatch[data-set="dark"]  { background: var(--color-black); box-shadow: inset 0 0 0 0.05em var(--color-black); }
+.swatch[data-set="cream"] { background: var(--color-cream); box-shadow: inset 0 0 0 0.05em var(--color-black); }
+.swatch[data-set="red"]   { background: var(--color-red);   box-shadow: inset 0 0 0 0.05em var(--color-red); }
+.marker {
+  position: absolute; top: 0; left: 0; z-index: 10;
+  pointer-events: none; border-radius: 9999px;
+  height: 0.25rem; width: 0.25rem;
+  background: var(--color-cream);
+  transition: transform 0.4s var(--ease-out-strong);
+}
+html[data-theme="cream"] .marker { background: var(--color-black); }
+
+/* ============================================================
+   MENU OVERLAY — clip-path wipe
+   ============================================================ */
+#menu {
+  position: fixed; inset: 0; z-index: 2;
+  display: flex; height: 100dvh; width: 100%;
+  align-items: center; justify-content: center;
+  background: var(--menu-bg);
+  color: var(--menu-fg);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+  opacity: 0;
+  visibility: hidden;
+  transition: clip-path 0.8s var(--ease), opacity 0.4s var(--ease);
+}
+#menu.open {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  opacity: 1;
+  visibility: visible;
+}
+#menu > div {
+  display: flex; height: 100dvh; width: 100%;
+  flex-direction: column; justify-content: space-between;
+  padding: 2rem 1rem;
+}
+@media (min-width: 1024px) { #menu > div { padding-inline: 1.5rem; } }
+#menu ul {
+  margin-top: 5rem;
+  display: flex; width: 100%; flex-direction: column;
+  list-style: none;
+  font-size: 3.75rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+#menu li { overflow: hidden; }
+#menu li a { display: block; width: fit-content; padding-block: 0.5rem; }
+#menu .swatches { gap: 1.25rem; margin-top: 2rem; }
+#menu .swatch { height: 4.25rem; width: 4.25rem; }
+#menu .marker { height: 0.5rem; width: 0.5rem; }
+.menu-footer {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.menu-footer > *:first-child { grid-column: span 8; }
+.menu-footer .menu-brand {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1.25rem;
+}
+.menu-footer p { grid-column: span 4; font-size: 0.875rem; }
+.menu-footer p:last-child { text-align: right; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero { margin-top: 6.5rem; margin-bottom: 1.5rem; }
+/* Letters are spread edge to edge so the logotype fills the column the way
+   the original artwork did, whatever the exact glyph widths come out to. */
+#hero-mark {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  justify-content: space-between;
+  /* Sized so the glyphs nearly fill the column on their own; space-between then
+     only has a few px to distribute, which keeps the logotype tight rather than
+     tracked out. Leaves ~2% headroom in case the font falls back to something
+     wider than Helvetica. */
+  font-size: 16.2vw;
+}
+@media (min-width: 1024px) { #hero-mark { font-size: 16.9vw; } }
+#hero-line {
+  margin-bottom: 1.5rem;
+  height: var(--rule);
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: currentColor;
+}
+#hero-content {
+  margin-bottom: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  column-gap: 1.5rem;
+  row-gap: 2.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+@media (min-width: 768px) {
+  #hero-content { grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 1.5rem; }
+}
+#hero-content .c1 { grid-column: span 3; }
+#hero-content .c2 { grid-column: span 5; }
+#hero-content .c3 { grid-column: span 3; display: flex; height: 100%; flex-direction: column; justify-content: space-between; }
+#hero-content .c4 { grid-column: span 5; display: flex; justify-content: flex-end; }
+#hero-content .c5 { grid-column: span 8; }
+@media (min-width: 768px) {
+  #hero-content .c1 { grid-column: span 4; }
+  #hero-content .c2 { grid-column: span 8; }
+  #hero-content .c3 { grid-column: span 3; }
+  #hero-content .c4 { grid-column: span 1; }
+  #hero-content .c5 { display: none; }
+}
+#hero-content h1, #hero-content h2 { text-transform: uppercase; font-size: inherit; font-weight: inherit; }
+#hero-content h2 { margin-bottom: 1rem; }
+#hero-paragraph {
+  font-size: 0.875rem;
+  line-height: 1rem;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+@media (min-width: 768px) { #hero-paragraph { max-width: 60%; } }
+#hero-content .c3 a { text-transform: uppercase; max-width: fit-content; }
+#hero-shipping-returns-link { display: none; }
+@media (min-width: 768px) { #hero-shipping-returns-link { display: inline-block; } }
+
+/* Hero reveal animation targets */
+.reveal-line { display: block; overflow: hidden; }
+.reveal-line > * { display: block; transform: translateY(110%); }
+
+/* ============================================================
+   PRODUCT CARDS
+   ============================================================ */
+.product-grid {
+  margin-bottom: 8.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+@media (min-width: 1024px) {
+  .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; }
+}
+
+.card { display: block; }
+.card .media {
+  position: relative;
+  overflow: hidden;
+}
+.card .media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+.card .media img.front { aspect-ratio: var(--aspect-large); }
+/* Back image sits on top, revealed on hover */
+.card .media .back {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-in-out);
+}
+.card:hover .media .back { opacity: 1; }
+
+.card .meta {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  line-height: 1.25rem;
+}
+@media (min-width: 768px) { .card .meta { flex-direction: row; } }
+.card .tag {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.card .tag::before {
+  content: "";
+  width: 0.5em; height: 0.5em;
+  border-radius: 9999px;
+  background: currentColor;
+}
+
+/* Editorial rows — mixed column spans, bottom-aligned.
+   Cells sit on a shared baseline in the source, which is what gives
+   the rows their staggered, editorial rhythm. */
+.editorial { margin-bottom: 8.5rem; align-items: end; }
+
+/* Per-cell aspect ratios, read off the source markup.
+   aspect-small = 242/240, aspect-square = 1/1, "auto" = intrinsic. */
+.editorial .card .media.asp-small img.front  { aspect-ratio: var(--aspect-small); }
+.editorial .card .media.asp-square img.front { aspect-ratio: 1 / 1; }
+.editorial .card .media.asp-auto img.front   { aspect-ratio: var(--aspect-large); }
+.editorial .card .media.asp-small img.back,
+.editorial .card .media.asp-square img.back,
+.editorial .card .media.asp-auto img.back { object-fit: cover; }
+
+/* Reveal-on-scroll for cards */
+[data-inview] { opacity: 0; transform: translateY(2.5rem); }
+[data-inview].is-inview {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.9s var(--ease-out-strong), transform 0.9s var(--ease-out-strong);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer { margin-inline: auto; margin-bottom: 2.5rem; font-size: 0.875rem; }
+.footer-rule { margin-bottom: 1.5rem; height: var(--rule); width: 100%; background: currentColor; }
+.footer-top {
+  margin-bottom: 1.5rem;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+@media (min-width: 768px) { .footer-top { flex-direction: row; gap: 2rem; } }
+.footer-statement {
+  flex: 1;
+  font-size: 2.75rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+@media (min-width: 768px) { .footer-statement { font-size: 6vw; } }
+.footer-statement p:last-child { color: var(--footer-muted); }
+.footer-year {
+  font-size: 45vw;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+@media (min-width: 768px) { .footer-year { font-size: 12.75vw; } }
+.footer-blurb { margin-top: 8rem; margin-bottom: 1rem; }
+@media (min-width: 768px) { .footer-blurb { margin-top: 16rem; } }
+.footer-blurb p {
+  max-width: 52ch;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+@media (min-width: 768px) { .footer-blurb p { font-size: 1.5rem; } }
+footer hr { margin-bottom: 1.5rem; height: 2px; width: 100%; background: currentColor; border: 0; }
+.footer-cols {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  column-gap: 1.5rem;
+  row-gap: 5rem;
+  font-weight: 700;
+}
+.fc-brand { order: 9; grid-column: span 16; }
+.fc-addr  { grid-column: span 8; }
+.fc-priv  { grid-column: span 8; }
+.fc-links { order: -1; grid-column: span 16; display: flex; justify-content: space-evenly; }
+@media (min-width: 768px) {
+  .fc-brand { order: -1; grid-column: span 4; }
+  .fc-addr  { grid-column: span 3; }
+  .fc-priv  { grid-column: span 4; }
+  .fc-links { order: 9; grid-column: span 5; }
+}
+.fc-brand .stack { display: flex; flex-direction: column; }
+.fc-links > div { flex: 1; display: flex; flex-direction: column; gap: 0.75rem; }
+.fc-links a { max-width: fit-content; }
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+#cursor {
+  pointer-events: none;
+  position: fixed; top: 0; left: 0; z-index: 9999;
+  transition: opacity 0.2s var(--ease-in-out);
+  will-change: transform;
+  opacity: 0;
+}
+#cursor .dot {
+  margin-top: -0.25rem;
+  margin-left: -0.25rem;
+  height: 0.5rem; width: 0.5rem;
+  border-radius: 9999px;
+  background: var(--cursor-color);
+  transition: width 0.2s var(--ease-in-out), height 0.2s var(--ease-in-out),
+              margin 0.2s var(--ease-in-out), opacity 0.2s var(--ease-in-out);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; text-transform: uppercase; color: transparent;
+  white-space: nowrap;
+}
+#cursor.is-text .dot {
+  height: 5rem; width: 5rem;
+  margin-top: -2.5rem; margin-left: -2.5rem;
+  color: var(--color-cream);
+}
+html[data-theme="cream"] #cursor.is-text .dot { color: var(--color-cream); }
+
+/* ============================================================
+   PAGE-EXIT LAYER
+   ============================================================ */
+#layer {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--menu-bg);
+  color: var(--menu-fg);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+}
+#layer.show { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transition: clip-path 0.8s var(--ease); }
+#layer > div { max-width: 14rem; }
+#layer .wordmark { width: 100%; justify-content: space-between; font-size: 16.2vw; }
+@media (min-width: 1024px) { #layer .wordmark { font-size: 16.9vw; } }
+#layer .ltr { transform: none; }   /* static decoration, never animated in */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  [data-inview] { opacity: 1; transform: none; }
+}

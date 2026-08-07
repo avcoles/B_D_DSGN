@@ -11,15 +11,6 @@
    ========================================================================== */
 
 .spec {
-  --paper: #faf8f5;
-  --paper-deep: #f1ece4;
-  --card: #fff;
-  --ink: #1a1713;
-  --ink-2: #554d42;
-  --ink-3: #928878;
-  --rule: rgba(26, 23, 19, 0.12);
-  --accent: #c2500f;
-  --accent-soft: #f7ebe1;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   background: var(--paper);
@@ -27,22 +18,22 @@
   letter-spacing: normal; /* the chrome tightens tracking globally; undo it */
 }
 
+/* The display face. Serif on one page, grotesk on another, so the family comes
+   from the project rather than from here. */
 .spec-serif {
-  font-family: 'Instrument Serif', serif;
+  font-family: var(--spec-display);
   font-weight: 400;
   color: var(--ink);
   letter-spacing: -0.02em;
 }
 
-.spec-sans {
-  font-family: 'Inter', system-ui, sans-serif;
-}
-
+/* The label face. Auralis sets a mono at wide tracking; a single-family page
+   sets its own grotesk at near-normal tracking. */
 .spec-mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--spec-label);
   font-size: 0.625rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--spec-label-tracking);
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -59,10 +50,10 @@
   padding: 10px 16px;
   cursor: pointer;
   border: 1px solid transparent;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--spec-label);
   font-size: 0.625rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--spec-label-tracking);
   text-transform: uppercase;
   transition:
     transform 160ms var(--ease),

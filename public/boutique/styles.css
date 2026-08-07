@@ -1,0 +1,318 @@
+/* ==========================================================================
+   Studio Boutique — rebuild
+   The whole site is one proportional scale: the root font-size is the
+   viewport divided by a design width, so 1rem is always 10 design-pixels.
+   ========================================================================== */
+
+/* Both faces load from Google Fonts, linked in the document head.
+   Cormorant Garamond runs small for its point size and carries long
+   descenders, so display sizes are set larger here than a Marcellus-era
+   value and the reveal masks are given descender room. */
+
+:root{
+  --font-disp:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --font-sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+
+  --size:402;                 /* design width, swapped per breakpoint */
+  --clamp:13px;
+
+  --white:#fff;
+  --black:#000;
+  --brown:rgb(93 83 70);
+  --bone:#efeeec;
+
+  --background:var(--white);
+  --text:var(--black);
+
+  --columns:12;
+  --gap:1rem;
+  --padding:1rem;
+
+  --ease:cubic-bezier(.65,0,.35,1);
+  --dur:.6s;
+}
+
+html{
+  font-size:calc(10 * 100vw / var(--size));
+  font-family:var(--font-sans);
+  line-height:1.2;
+  background:var(--background);
+  color:var(--text);
+  font-kerning:none;
+  font-feature-settings:"kern" off,"liga","clig";
+  -webkit-text-size-adjust:none;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:rgb(0 0 0 / 0);
+  scrollbar-width:none;
+}
+html::-webkit-scrollbar{display:none}
+
+@media (min-width:650px){ :root{--size:1500; --columns:24; --gap:2rem; --padding:2rem} }
+@media (min-width:1920px){ :root{--size:1740} }
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-size:2rem;letter-spacing:-.02em;background:var(--brown);overscroll-behavior:none}
+img,svg,video,picture{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+p{margin:0}
+h1,h2,h3,h4{margin:0;font-weight:400}
+ul{margin:0;padding:0;list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+hr{border:0;border-bottom:1px solid;margin:0}
+
+/* --------------------------------------------------------------------------
+   Type
+   -------------------------------------------------------------------------- */
+/* Cormorant Garamond is a Garamond revival and sets its caps far looser than
+   the grotesque-ish display face this replaced. 500 (Medium) is a real axis
+   position on the variable file, not a synthetic bold, and it gives the large
+   uppercase settings enough stroke to hold at these sizes. */
+.h1{font-family:var(--font-disp);font-weight:500;font-size:7rem;line-height:.8;letter-spacing:-.045em}
+.h2{font-family:var(--font-disp);font-weight:500;font-size:4rem;line-height:1.02;letter-spacing:-.035em;text-transform:uppercase}
+.h3{font-family:var(--font-sans);font-size:2.8rem;line-height:1.02;letter-spacing:-.02em}
+.text-14{font-size:1.4rem}
+.text-28{font-size:2.8rem;line-height:1.1}
+.font-disp{font-family:var(--font-disp)}
+.font-sans{font-family:var(--font-sans)}
+.font-medium{font-weight:500}
+.uppercase{text-transform:uppercase}
+
+@media (min-width:650px){
+  .h1{font-size:16.2rem;letter-spacing:-.035em}
+  .h2{font-size:7rem;letter-spacing:-.04em}
+  .h3{font-size:3rem}
+  .text-28{font-size:3rem}
+}
+
+/* --------------------------------------------------------------------------
+   Layout
+   -------------------------------------------------------------------------- */
+.site-max{width:100%;margin-inline:auto;padding-inline:var(--padding)}
+.site-grid{display:grid;grid-template-columns:repeat(var(--columns),minmax(0,1fr));column-gap:var(--gap)}
+
+.col-4{grid-column:span 4 / span 4}
+.col-5{grid-column:span 5 / span 5}
+.col-6{grid-column:span 6 / span 6}
+.col-7{grid-column:span 7 / span 7}
+.col-8{grid-column:span 8 / span 8}
+.col-10{grid-column:span 10 / span 10}
+.col-12{grid-column:span 12 / span 12}
+.col-14{grid-column:span 14 / span 14}
+.col-21{grid-column:span 21 / span 21}
+.col-24{grid-column:span 24 / span 24}
+.start-13{grid-column-start:13}
+.start-15{grid-column-start:15}
+.start-17{grid-column-start:17}
+.text-right{text-align:right}
+.opacity-35{opacity:.35}
+.opacity-50{opacity:.5}
+
+/* Reveal masks — the source wraps each line in a clipping box and slides the
+   line up from below. Same structure, so the motion is a one-liner. */
+.line-mask{display:block;overflow:clip;text-align:start}
+/* Line breaks are authored, not computed, so a set split for the desktop
+   measure orphans words at 375px. Statement headings carry both splits and
+   show the one that fits. */
+.lines-wide{display:block}
+.lines-narrow{display:none}
+@media (max-width:649px){
+  .lines-wide{display:none}
+  .lines-narrow{display:block}
+}
+.line{display:block;text-align:start;will-change:transform}
+.js-ready .line{transform:translateY(105%)}
+.js-ready .is-revealed .line{transform:translateY(0);transition:transform 1s var(--ease)}
+
+/* Arrow links */
+.arrow-link{display:inline-block;position:relative}
+.arrow-link .arrow{display:inline-block;transition:transform var(--dur) var(--ease)}
+.arrow-link:hover .arrow{transform:translateX(.6rem)}
+.uline{position:relative;display:inline-block}
+.uline::after{content:"";position:absolute;left:0;bottom:-.2rem;height:1px;width:100%;
+  background:currentColor;transform:scaleX(0);transform-origin:right;
+  transition:transform var(--dur) var(--ease)}
+.uline:hover::after{transform:scaleX(1);transform-origin:left}
+
+/* Media boxes */
+.media{position:relative;overflow:hidden}
+.media > .frame{position:relative;width:100%;height:100%;overflow:hidden;
+  transition:transform 1.2s var(--ease)}
+.media img,.media video{position:absolute;inset:0;width:100%;height:120%;top:-10%;object-fit:cover}
+.group:hover .frame{transform:scale(1.02)}
+.aspect-11-8{aspect-ratio:1108/937}
+.aspect-6-5{aspect-ratio:381/322}
+.aspect-3-2{aspect-ratio:785/523}
+.aspect-9-10{aspect-ratio:623/686}
+.aspect-3-2b{aspect-ratio:3/2}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+/* white at rest: the page now opens on the full-bleed dark hero, so this is
+   the correct colour before any scrolling happens or if JS never runs */
+.header{position:fixed;top:0;left:0;right:0;z-index:999;padding-block:2rem;color:var(--white)}
+.header__inner{align-items:flex-start}
+.nav-a{grid-column:span 6 / span 6}
+.nav-b{grid-column:span 4 / span 4}
+.nav-c{grid-column:span 2 / span 2}
+.col-2{grid-column:span 2 / span 2}
+.header .logo-word{font-size:1.6rem;letter-spacing:-.01em}
+.logo-mark{display:block;width:4rem;aspect-ratio:1;flex:none}
+.logo-mark svg{width:100%;height:auto;fill:currentColor}
+.header nav{display:flex;flex-direction:column;align-items:flex-start;gap:.2rem}
+.header nav a{font-size:1.6rem;line-height:1.35}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+.sections{position:relative;z-index:1;background:var(--white);overflow:clip}
+.app{overflow-x:clip}
+
+/* Full-bleed hero: pinned to the top of the viewport while the sheet below
+   scrolls up over it. The old build offset the hero 15.5rem down with a
+   transform to freeze one frame of a preload animation; that offset is gone,
+   so the media now runs edge to edge from the very top of the page. */
+.hero{position:sticky;top:0;z-index:0;display:flex;flex-direction:column;
+  justify-content:space-between;height:100svh;overflow:hidden;background:#1b1b1c}
+.sections__over{position:relative;z-index:1;background:var(--white)}
+.hero__spacer{height:36vh;min-height:15rem;max-height:36rem}
+.hero__meta{padding-bottom:2rem;margin-bottom:auto;position:relative;z-index:1;color:var(--white)}
+.hero__rule{position:relative;z-index:1;height:1px;width:100%;background:rgb(255 255 255 / .1);
+  transform-origin:left}
+.hero__meta-grid{padding-block:2rem;row-gap:4rem}
+.hero__media{position:absolute;inset:0;height:100%;background:#1b1b1c;z-index:0}
+/* .6 suited the darker still this replaced. The video is a bright interior, and
+   going full-bleed moved the eyebrow over a brighter part of the frame again;
+   .44 keeps every hero label above 4.5:1 on the worst frame in the clip. */
+.hero__media > div{width:100%;height:100%;overflow:hidden;opacity:.44}
+.hero__media video,.hero__media img{position:static;width:100%;height:100%;top:0;object-fit:cover}
+.hero__title{position:relative;z-index:1;color:var(--white);text-transform:uppercase;
+  padding-bottom:3rem;padding-inline:1rem}
+.hero__title .row{display:flex;justify-content:space-between;margin-bottom:1rem}
+/* second line sits inboard of the flush row above it, so the block reads as a
+   staggered editorial stack rather than three left-aligned words */
+.hero__title > .line-mask .line{text-indent:24%}
+.hero__lead{max-width:54.3rem}
+.hero__lead .line-mask:first-child{text-indent:6rem}
+.hero__eyebrow{max-width:15rem}
+
+/* --------------------------------------------------------------------------
+   Intro
+   -------------------------------------------------------------------------- */
+.intro{background:var(--white);padding-block:3rem 38rem;overflow:hidden;position:relative}
+.intro__claim{max-width:125rem;padding-bottom:20rem}
+.intro__video{position:relative;overflow:hidden;aspect-ratio:3/2}
+.intro__rule{border-color:rgb(0 0 0 / .1);margin-bottom:3.5rem;padding-bottom:3.5rem}
+.intro__cols{row-gap:2rem;align-items:flex-start}
+.intro__label{max-width:18rem}
+.intro__body p + p{margin-top:2rem}
+
+/* --------------------------------------------------------------------------
+   Featured projects
+   -------------------------------------------------------------------------- */
+.projects{padding-bottom:37rem;overflow:hidden}
+.projects__head{row-gap:2rem;align-items:flex-end}
+.projects__title{margin-left:-1rem}
+.projects__rule{border-color:rgb(0 0 0 / .2);padding-bottom:3rem;margin-bottom:3rem}
+.projects__grid{row-gap:4rem;align-items:flex-start}
+.project-card__meta{display:flex;justify-content:space-between;margin-top:1.5rem}
+.project-card__meta .category{opacity:.35;text-align:right}
+.project-offset{margin-top:calc(-100% * 12 / 15)}
+
+/* --------------------------------------------------------------------------
+   Blog
+   -------------------------------------------------------------------------- */
+.blog{padding-bottom:33rem}
+.blog__claim{padding-bottom:7rem}
+.blog__claim .h2{max-width:145rem}
+.blog__rule{border-color:rgb(0 0 0 / .1);margin-bottom:2.5rem;padding-bottom:2.5rem}
+.blog__grid{row-gap:6rem;align-items:flex-start}
+.blog-card__date{opacity:.35;margin-bottom:2.5rem}
+.blog-card h3{max-width:42.3rem}
+
+/* --------------------------------------------------------------------------
+   Studio
+   -------------------------------------------------------------------------- */
+.studio__title{font-family:var(--font-disp);font-weight:500;line-height:.8;letter-spacing:-.035em;
+  font-size:6.8rem;display:flex;justify-content:space-between;text-transform:uppercase}
+/* Cormorant Garamond's uppercase Q drops a long tail well past the baseline,
+   and line-height .8 leaves the reveal mask no room for it. Extend the clip
+   box downward rather than loosening the leading, and push the resting
+   translate past the taller box so no sliver shows before the reveal. */
+.studio__title .line-mask{padding-bottom:.2em}
+.js-ready .studio__title .line{transform:translateY(145%)}
+/* must outrank the 145% resting rule above, which ties with the generic
+   .js-ready .is-revealed .line on specificity and would otherwise win on order */
+.js-ready .studio__title.is-revealed .line{transform:translateY(0)}
+
+.studio__rule{border-color:rgb(0 0 0 / .1);margin-bottom:2.5rem;padding-bottom:2.5rem}
+.studio__grid{padding-bottom:28rem;row-gap:6rem;align-items:flex-start}
+.studio__photo{position:relative;overflow:hidden;aspect-ratio:462/610}
+.studio__text{position:relative;padding-right:0}
+.studio__text .label{position:absolute;top:0;left:0;font-size:1.4rem;line-height:1.5;
+  font-weight:500;opacity:.35}
+.studio__text .h3{text-indent:6rem}
+.studio__link{display:inline-block;margin-top:7rem}
+
+/* 16rem, not the original 21.1rem: "Boutique" is twice the width of "Dado",
+   so the flex space-between line only spans the measure at the smaller size. */
+@media (min-width:650px){ .studio__title{font-size:16rem} }
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.footer{background:var(--brown);color:var(--white);padding-top:3rem;padding-bottom:4rem}
+.footer__top{padding-bottom:25rem;align-items:flex-start}
+.footer__rule{border-color:rgb(255 255 255 / .1);width:100%}
+.footer__cols{row-gap:6rem;padding-top:3rem;margin-bottom:28rem;align-items:flex-start}
+.footer__cols nav{gap:2rem}
+.footer__cols p.label{font-size:1.4rem;opacity:.5;margin-bottom:5rem}
+.footer nav{display:flex;flex-direction:column;gap:2rem}
+.footer__signup{padding-block:2rem;position:relative}
+.footer__signup input{width:100%;background:none;border:0;border-bottom:1px solid rgb(255 255 255 / .2);
+  padding:1rem 4rem 1rem 0;color:inherit;font:inherit}
+.footer__signup input::placeholder{color:rgb(255 255 255 / .4)}
+.footer__signup button{position:absolute;right:0;top:2rem;padding:1rem}
+.footer__legal{row-gap:.5rem}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+@media (max-width:649px){
+  .col-4,.col-5,.col-7,.col-8,.col-10,.col-14,.col-21,.col-24{grid-column:span 12 / span 12}
+  /* the source keeps sitemap and socials side by side on mobile */
+  .footer__cols .col-4{grid-column:span 6 / span 6}
+  .footer__legal .col-4{grid-column:span 4 / span 4}
+  .footer__legal .col-6{grid-column:span 12 / span 12}
+  .start-13,.start-15,.start-17{grid-column-start:auto}
+  .project-offset{margin-top:0}
+  .text-right{text-align:left}
+  .header nav{display:none}
+  .hero__title .row{display:block}
+  /* Below 650px the three words stack full-width, so the longest of them sets
+     the size. "Comfort" clears 7rem; the tighter tracking bought the room. */
+  .hero__title > .line-mask .line{text-indent:0}
+  /* the 6rem opening indent costs a third of the measure at this width */
+  .hero__lead .line-mask:first-child{text-indent:0}
+  .text-28{font-size:2.65rem}
+  /* 4rem only fits ~18 characters here, which chops the statement blocks into
+     too many lines; 3.4rem takes ~21 and still outranks .h3 */
+  .h2{font-size:3.4rem}
+  .hero__eyebrow{display:none}
+  .studio__text .h3{text-indent:0}
+  .intro{padding-bottom:10rem}
+  .intro__claim{padding-bottom:3rem}
+  .projects{padding-bottom:10rem}
+  .blog{padding-bottom:26rem}
+  .studio__grid{padding-bottom:9rem}
+  .footer__top{padding-bottom:15rem}
+  .footer__cols{margin-bottom:5rem}
+  .studio__title{display:block}
+  .studio__photo{order:2}
+  .studio__text{order:1}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .js-ready .line{transform:none}
+  *,*::before,*::after{transition-duration:.001ms !important}
+}

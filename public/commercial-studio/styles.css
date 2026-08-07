@@ -1,0 +1,700 @@
+/* ==========================================================================
+   Commercial Studio — rebuild
+   Token layer mirrors the source's Webflow variable system.
+   ========================================================================== */
+
+/* Both faces load from Google Fonts via a <link> in index.html:
+   Hanken Grotesk for UI, Instrument Serif for display. */
+
+/* --------------------------------------------------------------------------
+   Tokens
+   -------------------------------------------------------------------------- */
+:root{
+  /* fluid helper: interpolate between 20rem and 160rem viewports */
+  --vw-min:20;
+  --vw-max:160;
+
+  /* swatches */
+  --swatch-light:#f2f0e6;
+  --swatch-light-card:#eae7db;
+  --swatch-dark:#1d1d1d;
+  --swatch-dark-card:#262626;
+  --swatch-brand:#ff4101;
+
+  /* theme (light default) */
+  --theme-bg:var(--swatch-light);
+  --theme-bg-2:var(--swatch-light-card);
+  --theme-text:var(--swatch-dark);
+  --theme-text-faded:rgb(29 29 29 / .7);
+  --theme-border:rgb(29 29 29 / .1);
+  --theme-fill-subtle:rgb(29 29 29 / .05);
+  --theme-fill-subtle-hover:rgb(29 29 29 / .1);
+  --theme-btn-primary-bg:var(--swatch-brand);
+  --theme-btn-primary-text:var(--swatch-light);
+  --theme-btn-secondary-bg:var(--swatch-dark);
+  --theme-btn-secondary-bg-hover:var(--swatch-dark-card);
+  --theme-btn-secondary-text:var(--swatch-light);
+  --theme-nav-logo:var(--swatch-dark);
+
+  /* typography */
+  --font-primary:"Hanken Grotesk",Arial,sans-serif;
+  --font-secondary:"Instrument Serif","Times New Roman",serif;
+  --fw-regular:400;
+  --fw-medium:500;
+  --fw-light:300;
+
+  --fs-h1:clamp(2.5rem, 1.92829rem + 2.85857vw, 6.502rem);
+  --fs-h2:clamp(2rem, 1.57171rem + 2.14143vw, 4.998rem);
+  --fs-h3:clamp(1.25rem, 1.17829rem + .35857vw, 1.752rem);
+  --fs-h4:clamp(1.125rem, 1.08914rem + .17929vw, 1.376rem);
+  --fs-h5:clamp(.9375rem, .91957rem + .08964vw, 1.063rem);
+  --fs-text-large:clamp(1.0625rem, 1.04457rem + .08964vw, 1.188rem);
+  --fs-text-main:clamp(.9375rem, .91957rem + .08964vw, 1.063rem);
+  --fs-text-small:clamp(.8125rem, .79457rem + .08964vw, .938rem);
+
+  --lh-small:1;
+  --lh-medium:1.2;
+  --lh-large:1.3;
+  --lh-huge:1.5;
+  --ls-normal:0em;
+  --ls-tight:-.02em;
+
+  /* The source sizes every text block in `ch` via a data-number attribute.
+     Substituting fonts changes what `ch` resolves to, so these hold the
+     source faces' measured character widths and keep the original pixel
+     columns. Instrument Serif's own ch matches Serrif Compressed's exactly;
+     Saans' is wider than the serif's, hence the separate value. */
+  --ch-serif:.4583em;
+  --ch-sans:.5561em;
+
+  /* optical trim: removes half-leading plus the font's own ascender slack */
+  --trim-top-primary:.4em;
+  --trim-bottom-primary:.34em;
+  --trim-top-secondary:.39em;
+  --trim-bottom-secondary:.34em;
+
+  /* spacing */
+  --space-0-25:.25rem;
+  --space-0-75:.75rem;
+  --space-1-25:clamp(1.125rem, 1.08914rem + .17929vw, 1.376rem);
+  --space-2:clamp(1.875rem, 1.83914rem + .17929vw, 2.126rem);
+  --space-2-5:clamp(2.25rem, 2.17829rem + .35857vw, 2.752rem);
+  --space-3:clamp(2.5rem, 2.35757rem + .71214vw, 3.497rem);
+  --space-4:clamp(3.5rem, 3.35757rem + .71214vw, 4.497rem);
+  --space-5:clamp(4rem, 3.71414rem + 1.42929vw, 6.001rem);
+
+  --section-none:0px;
+  --section-tiny:clamp(1.75rem, 1.39243rem + 1.78786vw, 4.253rem);
+  --section-small:clamp(3rem, 2.14243rem + 4.28786vw, 9.003rem);
+  --section-main:clamp(4rem, 3.14243rem + 4.28786vw, 10.003rem);
+  --section-large:clamp(5.5rem, 4.21414rem + 6.42929vw, 14.501rem);
+  --section-huge:clamp(9rem, 6.42829rem + 12.85857vw, 27.002rem);
+  --section-page-top:clamp(2rem, 1.71414rem + 1.42929vw, 4.001rem);
+
+  /* layout */
+  --site-margin:clamp(1rem, .71414rem + 1.42929vw, 3.001rem);
+  --site-gutter:.5rem;
+  --site-columns:12;
+  --max-width-main:160rem;
+  --max-width-small:60rem;
+  --column-width:calc((min(var(--max-width-main), 100vw - var(--site-margin) * 2) - (var(--site-gutter) * (var(--site-columns) - 1))) / var(--site-columns));
+
+  /* radii */
+  --radius-small:.5rem;
+  --radius-main:1rem;
+  --radius-large:1.5rem;
+  --radius-round:100vw;
+  --border-width:.0625rem;
+
+  /* motion */
+  --ease:cubic-bezier(.65,0,0,1);
+  --dur-quarter:.15s;
+  --dur-half:.3s;
+  --dur:.6s;
+  --dur-onehalf:.9s;
+  --dur-double:1.2s;
+  /* Heading reveal runs longer and on a softer curve than the UI easing: an
+     expo-out glide rather than the sharp in-out the rest of the site uses. */
+  --dur-reveal:1.5s;
+  --stagger-line:.16s;
+  --ease-reveal:cubic-bezier(.16,1,.3,1);
+
+  --anim:var(--dur) var(--ease);
+  --anim-half:var(--dur-half) var(--ease);
+  --anim-quarter:var(--dur-quarter) var(--ease);
+  --anim-ease:.2s ease;
+}
+
+.u-theme-dark{
+  --theme-bg:var(--swatch-dark);
+  --theme-bg-2:var(--swatch-dark-card);
+  --theme-text:var(--swatch-light);
+  --theme-text-faded:rgb(242 240 230 / .7);
+  --theme-border:rgb(242 240 230 / .1);
+  --theme-fill-subtle:rgb(242 240 230 / .05);
+  --theme-fill-subtle-hover:rgb(242 240 230 / .1);
+  --theme-btn-secondary-bg:var(--swatch-light);
+  --theme-btn-secondary-text:var(--swatch-dark);
+  --theme-nav-logo:var(--swatch-light);
+  color:var(--theme-text);
+}
+
+/* --------------------------------------------------------------------------
+   Reset / base
+   -------------------------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--theme-bg);scrollbar-width:none;-webkit-text-size-adjust:100%}
+html::-webkit-scrollbar{display:none}
+body{
+  margin:0;min-height:100%;
+  background:var(--theme-bg);
+  color:var(--theme-text);
+  font-family:var(--font-primary);
+  font-size:var(--fs-text-main);
+  font-weight:var(--fw-regular);
+  line-height:var(--lh-large);
+  letter-spacing:-.006em;
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+  scrollbar-width:none;
+}
+img,svg{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3,h4,h5,h6,p{margin:0}
+::selection{background:color-mix(in srgb,var(--swatch-brand),white 70%);color:var(--swatch-dark)}
+:focus-visible{outline:.125rem solid var(--swatch-brand);outline-offset:.1875rem}
+
+.page_wrap{display:flex;flex-direction:column;min-height:100svh;overflow:clip}
+
+/* --------------------------------------------------------------------------
+   Text trim
+   Strips half-leading plus font-specific slack so blocks align to cap height.
+   -------------------------------------------------------------------------- */
+.trim{--lh:var(--lh-large);--trim-t:var(--trim-top-primary);--trim-b:var(--trim-bottom-primary);display:flow-root}
+.trim::before{content:"";display:table;margin-bottom:calc(var(--trim-t) - .5em - (var(--lh) - 1) * .5em)}
+.trim::after{content:"";display:table;margin-top:calc(var(--trim-b) - .5em - (var(--lh) - 1) * .5em)}
+
+/* --------------------------------------------------------------------------
+   Type styles
+   -------------------------------------------------------------------------- */
+.u-text-h1,.u-text-h2{
+  font-family:var(--font-secondary);
+  font-weight:var(--fw-light);
+  letter-spacing:var(--ls-tight);
+  line-height:var(--lh-small);
+  --lh:var(--lh-small);
+  --trim-t:var(--trim-top-secondary);
+  --trim-b:var(--trim-bottom-secondary);
+}
+.u-text-h1{font-size:var(--fs-h1)}
+.u-text-h2{font-size:var(--fs-h2)}
+.u-text-h3{font-size:var(--fs-h3);font-weight:var(--fw-medium);line-height:var(--lh-medium);--lh:var(--lh-medium)}
+.u-text-h5{font-size:var(--fs-h5);font-weight:var(--fw-medium);line-height:var(--lh-large);--lh:var(--lh-large)}
+.u-text-main{font-size:var(--fs-text-main);line-height:var(--lh-large);--lh:var(--lh-large)}
+.u-text-small{font-size:var(--fs-text-small);line-height:var(--lh-large);--lh:var(--lh-large)}
+.u-weight-medium{font-weight:var(--fw-medium)}
+.u-color-faded{color:var(--theme-text-faded)}
+.u-line-height-huge{line-height:var(--lh-huge);--lh:var(--lh-huge)}
+.u-wrap-pretty{text-wrap:pretty}
+.u-line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.u-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* --------------------------------------------------------------------------
+   Layout primitives
+   -------------------------------------------------------------------------- */
+.u-section{position:relative}
+.u-container{
+  position:relative;z-index:1;
+  width:calc(100% - var(--site-margin) * 2);
+  max-width:var(--max-width-main);
+  margin-inline:var(--site-margin);
+}
+.u-container.is-stack{display:flex;flex-direction:column;justify-content:center;gap:var(--space-5)}
+.u-grid-12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--site-gutter)}
+.u-spacer{position:relative;width:100%;flex-shrink:0}
+.u-spacer[data-size="tiny"]{height:var(--section-tiny)}
+.u-spacer[data-size="small"]{height:var(--section-small)}
+.u-spacer[data-size="main"]{height:var(--section-main)}
+.u-spacer[data-size="large"]{height:var(--section-large)}
+.u-cover-absolute{position:absolute;inset:0}
+.u-overlay{position:absolute;inset:0;background:rgb(0 0 0 / .2);z-index:1}
+
+.u-image-wrapper{position:relative;overflow:clip;background:var(--theme-bg-2)}
+.u-image-wrapper.is-cover{position:absolute;inset:0}
+.u-image-wrapper.is-transparent{background:transparent}
+.u-image-wrapper.is-wide-3-2{aspect-ratio:3/2}
+.u-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.is-wide-3-2 .u-image{position:relative;inset:auto}
+
+.u-margin-top-3{margin-top:var(--space-3)}
+.u-margin-top-4{margin-top:var(--space-4)}
+.u-margin-top-5{margin-top:var(--space-5)}
+.u-margin-bottom-0{margin-bottom:0}
+.u-margin-bottom-1-25{margin-bottom:var(--space-1-25)}
+.u-margin-bottom-2{margin-bottom:var(--space-2)}
+
+/* Group fade: dim siblings while one is hovered */
+[data-hover-fade] > *{transition:opacity var(--anim-quarter)}
+[data-hover-fade]:hover > *{opacity:.2}
+[data-hover-fade]:hover > *:hover{opacity:1}
+
+/* --------------------------------------------------------------------------
+   Heading with hanging label
+   -------------------------------------------------------------------------- */
+.header_title{max-width:min(100%, calc(var(--ch) * var(--ch-serif)))}
+.u-measure-serif{max-width:min(100%, calc(var(--ch) * var(--ch-serif)))}
+.u-measure-sans{max-width:min(100%, calc(var(--ch) * var(--ch-sans)))}
+.header_label{
+  display:inline-block;
+  font-family:var(--font-primary);
+  font-size:var(--fs-h5);
+  font-weight:var(--fw-medium);
+  letter-spacing:normal;
+  line-height:var(--lh-large);
+  margin-top:.5rem;
+  vertical-align:top;
+}
+.header_indent{margin-left:2em}
+
+/* Split-text reveal primitives */
+/* The clip only exists to hide a word while it travels up into place. Headings
+   set at line-height 1, so the box is shorter than the face's descenders and a
+   permanent clip would shave every g, y and p. Masked during the reveal only. */
+.split-word{display:inline-block;vertical-align:top}
+.split-word.is-masked{overflow:clip}
+
+/* Line-by-line reveal.
+   The words keep their own inline boxes, so the heading wraps exactly as it
+   would unsplit and the bracketed label still hangs beside the first line.
+   Only the stagger is grouped: every word carries the index of the line it
+   landed on, and the delay is derived from that, so a line rises as one piece.
+   JS writes --line; it recomputes on resize, since re-wrapping moves words
+   between lines. Runs on CSS alone and does not wait for GSAP. */
+[data-split-lines] .split-inner{
+  transform:translateY(110%);
+  transition:transform var(--dur-reveal) var(--ease-reveal);
+  transition-delay:calc(var(--line, 0) * var(--stagger-line));
+}
+[data-split-lines].is-revealed .split-inner{transform:none}
+
+@media (prefers-reduced-motion: reduce){
+  [data-split-lines] .split-inner{transform:none;transition:none}
+}
+.split-inner{display:inline-block;will-change:transform}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.button{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  gap:var(--space-0-25);border-radius:var(--radius-round);
+  font-size:var(--fs-text-main);font-weight:var(--fw-medium);
+  cursor:pointer;
+}
+.button_text{
+  position:relative;z-index:1;display:flex;align-items:center;
+  padding-inline:1.25rem;height:2.75rem;
+  color:var(--theme-btn-primary-text);
+}
+.button_bg{position:absolute;inset:0;z-index:-1;border-radius:var(--radius-round);background:var(--theme-btn-primary-bg);transition:background-color var(--anim-ease)}
+/* The mask must be a block: overflow and height are ignored on an inline box,
+   which would leave the second copy of the label sitting visible below. */
+.button_text_mask{position:relative;display:block;overflow:clip;height:1.3em}
+.button_text_mask span{display:block;transition:transform var(--anim)}
+.button_text_mask span.is-2{position:absolute;inset:0;transform:translateY(100%)}
+.button_icon{
+  position:relative;z-index:1;display:grid;place-items:center;
+  width:2.75rem;height:2.75rem;border-radius:var(--radius-round);
+  color:var(--theme-btn-primary-text);
+}
+.button_icon_bg{position:absolute;inset:0;z-index:-1;border-radius:var(--radius-round);background:var(--theme-btn-primary-bg);transition:background-color var(--anim-ease)}
+.button_icon svg{width:.8125rem;height:.8125rem}
+.button_bg_wrap{position:absolute;inset:-1.5px;z-index:0;border-radius:var(--radius-round);pointer-events:none}
+
+.button:hover .button_bg,.button:hover .button_icon_bg{background:color-mix(in srgb,var(--swatch-brand),black 10%)}
+.button:hover .button_text_mask span:not(.is-2){transform:translateY(-100%)}
+.button:hover .button_text_mask span.is-2{transform:translateY(0)}
+
+.button.is-secondary .button_text{color:var(--theme-btn-secondary-text)}
+.button.is-secondary .button_bg{background:var(--theme-btn-secondary-bg)}
+.button.is-secondary:hover .button_bg{background:var(--theme-btn-secondary-bg-hover)}
+
+/* Text link with sliding underline */
+.button_text_link{
+  position:relative;display:inline-flex;align-items:center;gap:var(--space-0-25);
+  font-size:var(--fs-h5);font-weight:var(--fw-medium);line-height:var(--lh-large);
+}
+.button_text_link::after{
+  content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;
+  background:currentColor;transform-origin:right;transform:scaleX(0);
+  transition:transform var(--anim);
+}
+.button_text_link:hover::after{transform-origin:left;transform:scaleX(1)}
+.button_text_link svg{width:.8125rem;height:.8125rem}
+
+/* Round arrow button */
+.button_arrow{
+  position:relative;display:grid;place-items:center;
+  width:2.5rem;height:2.5rem;border-radius:var(--radius-round);
+  background:var(--theme-fill-subtle);
+  transition:background-color var(--anim-ease);
+}
+.button_arrow:hover{background:var(--theme-fill-subtle-hover)}
+.button_arrow svg{width:.875rem;height:.875rem}
+.button_arrow[data-dir="left"] svg{transform:rotate(180deg)}
+
+.clickable_wrap{position:absolute;inset:0}
+.clickable_wrap a{display:block;width:100%;height:100%}
+
+/* --------------------------------------------------------------------------
+   Glass panel (nav pill, gallery thumb rail)
+   -------------------------------------------------------------------------- */
+.glass_fill{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1}
+.glass_shadow-a{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;
+  box-shadow:inset 3px 4.5px 1.5px -3px rgb(179 179 179 / .5);mix-blend-mode:plus-lighter}
+.glass_shadow-b{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;
+  box-shadow:inset -3px -4.5px 1.5px -3px rgb(179 179 179 / .3);mix-blend-mode:overlay}
+.glass_shadow-c{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;
+  box-shadow:inset 0 0 33px 0 rgb(242 242 242 / .3);mix-blend-mode:darken}
+
+/* --------------------------------------------------------------------------
+   Nav
+   -------------------------------------------------------------------------- */
+.nav{position:fixed;inset:0;z-index:100;pointer-events:none}
+.nav_bg{position:absolute;inset:0;background:rgb(0 0 0 / .2);opacity:0;visibility:hidden;
+  transition:opacity var(--anim),visibility var(--anim)}
+.nav[data-nav-status="active"] .nav_bg{opacity:1;visibility:visible;pointer-events:auto}
+
+.nav_bar_wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;padding:0 var(--site-margin) 2rem;pointer-events:none}
+.nav_bar{width:100%;max-width:26rem;pointer-events:none}
+
+.nav_bar_top{position:relative;border-radius:var(--radius-large);overflow:hidden;margin-bottom:.5rem;
+  transform:scale(.7,0);transform-origin:bottom center;
+  transition:transform var(--dur-half) var(--ease) var(--dur-quarter)}
+.nav_bar_top_inner{display:flex;flex-direction:column;align-items:flex-start;gap:1.25rem;
+  background:var(--swatch-light);color:var(--swatch-dark);border-radius:var(--radius-large);
+  padding:1.5rem 2rem;overflow:hidden}
+.nav[data-nav-status="active"] .nav_bar_top{transform:scale(1,1);transition-delay:0s}
+
+.nav_link_primary_list{width:100%}
+.nav_link_primary_list,.nav_link_secondary_list,.nav_bar_top_inner > *{opacity:0;
+  transition:opacity var(--anim-quarter)}
+.nav[data-nav-status="active"] .nav_bar_top_inner > *{opacity:1;transition-delay:var(--dur-half)}
+.nav_link_primary_item{position:relative;padding:1rem 0;border-bottom:1px solid var(--theme-border);
+  pointer-events:auto}
+.nav_link_text{font-size:var(--fs-h3);font-weight:var(--fw-medium)}
+.nav_link_secondary_list{display:flex;flex-wrap:wrap;margin-left:-.5rem}
+.nav_link_secondary_item{padding:.5rem;pointer-events:auto}
+
+.nav_bar_bottom{position:relative;display:flex;justify-content:flex-end;align-items:stretch;height:3.25rem}
+.nav_logo_wrap{position:absolute;left:0;top:0;display:flex;align-items:center;justify-content:center;
+  width:3.25rem;height:3.25rem;color:var(--theme-nav-logo);pointer-events:auto;
+  transition:color var(--anim-ease),transform var(--anim) .05s}
+.nav_logo{position:relative;display:block;width:3.25rem;height:3.25rem}
+.nav_logo svg{width:100%;height:100%}
+.nav_logo:hover{animation:logo-rotate-scale var(--dur) var(--ease) forwards}
+@keyframes logo-rotate-scale{0%{rotate:0deg;scale:1}50%{scale:.75}100%{rotate:360deg;scale:1}}
+
+.nav_bar_inner{
+  position:relative;z-index:1;display:flex;justify-content:space-between;align-items:stretch;
+  width:22.25rem;padding:.25rem;border-radius:var(--radius-round);
+  /* Matches the logo beside it, which already sits on --theme-nav-logo (dark).
+     The label and the hamburger both draw from currentColor. */
+  backdrop-filter:blur(7.5px);color:var(--swatch-dark);pointer-events:auto;
+  transition:width var(--anim);
+}
+.nav_bar_inner_bg{position:absolute;inset:0;z-index:7;border-radius:inherit;background:var(--swatch-light);
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.nav_menu{position:relative;z-index:10;display:flex;align-items:center;gap:1rem;
+  padding:1rem;border-radius:var(--radius-round);
+  transition:gap var(--anim),color var(--anim-ease)}
+.nav_menu_hamburger{position:relative;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;width:1.75rem;height:5px}
+.nav_menu_hamburger span{display:block;width:100%;height:1px;background:currentColor;
+  transition:transform var(--anim)}
+.nav_menu_hamburger span:first-child{transform:translateY(-2px)}
+.nav_menu_hamburger span:last-child{transform:translateY(2px)}
+.nav[data-nav-status="active"] .nav_menu_hamburger span:first-child{transform:translateY(0) rotate(45deg)}
+.nav[data-nav-status="active"] .nav_menu_hamburger span:last-child{transform:translateY(0) rotate(-45deg)}
+.nav_bar_button{position:relative;z-index:10}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+.hero_home_wrap{height:100svh;min-height:40rem;color:var(--swatch-light);overflow:clip}
+.hero_home_inner{position:relative;height:100%;display:flex}
+/* Sits above the heading at z-index 3 to dim it. Transparent at rest but still
+   hit-testable, so it swallowed the mouseenter the sector links need. */
+.hero_home_overlay{position:absolute;inset:0;z-index:3;background:rgb(0 0 0 / .5);opacity:0;
+  pointer-events:none;transition:opacity var(--anim)}
+.hero_home_contain{height:100%;justify-content:flex-start}
+.hero_home_text{
+  --ch:24;
+  max-width:min(100%, calc(var(--ch) * var(--ch-serif)));
+  margin-inline:auto;text-align:center;
+}
+.hero_home_text_span{position:relative;display:inline-block;text-decoration:underline;
+  text-underline-offset:.06em;text-decoration-thickness:from-font;
+  transition:opacity var(--anim-ease)}
+.hero_home_wrap[data-hero-hover] .hero_home_text_span{opacity:.2}
+.hero_home_wrap[data-hero-hover] .hero_home_text_span:hover,
+.hero_home_wrap[data-hero-hover] .hero_home_text_span.is-active{opacity:1}
+
+.hero_home_visual_wrap{position:absolute;left:0;right:0;top:-10%;bottom:-10%;z-index:0}
+.hero_home_visual{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity var(--anim)}
+.hero_home_visual.is-active{opacity:1}
+
+/* --------------------------------------------------------------------------
+   Intro
+   -------------------------------------------------------------------------- */
+.intro_layout{grid-template-rows:auto}
+.intro_visual{position:relative;grid-column:1 / 6;overflow:hidden}
+.intro_content_wrap{grid-column:6 / -1;display:flex;flex-direction:column;justify-content:space-between;
+  gap:var(--space-4)}
+/* 38ch, the source measure. Resolves through --ch-sans, so the pixel column
+   holds regardless of which sans is actually rendering it. */
+.intro_rich{--ch:38;max-width:min(100%, calc(var(--ch) * var(--ch-sans)));margin-bottom:var(--space-2)}
+.intro_rich p{margin-bottom:var(--space-2)}
+.intro_rich p:last-child{margin-bottom:0}
+.intro_visual_small{position:relative;margin-left:auto;width:25%;
+  max-width:14rem;aspect-ratio:4/5;overflow:hidden}
+.parallax_img_wrap{position:absolute;left:0;right:0;top:-20%;bottom:-20%;z-index:0;will-change:transform}
+
+/* --------------------------------------------------------------------------
+   Featured projects
+   -------------------------------------------------------------------------- */
+.featured_wrap{min-height:105svh;display:flex;flex-direction:column;justify-content:flex-start;
+  color:var(--swatch-light);overflow:clip}
+.featured_contain{flex:0 0 auto}
+.featured_layout{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:var(--space-3);text-align:center;will-change:transform}
+.featured_list{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  column-gap:.75rem;row-gap:1.25rem;
+  width:calc(100% - var(--site-gutter) * 2)}
+.featured_item{position:relative;display:flex;align-items:flex-start;gap:var(--space-0-25);
+  opacity:1;transition:opacity var(--anim-ease)}
+.featured_wrap[data-featured-hover] .featured_item{opacity:.2}
+.featured_wrap[data-featured-hover] .featured_item.is-active{opacity:1}
+.featured_item_title{font-size:var(--fs-h2)}
+.featured_item_label{color:var(--theme-text-faded);font-size:var(--fs-h5);font-weight:var(--fw-medium)}
+
+.featured_bg_wrap{position:absolute;inset:0;z-index:0}
+.featured_bg_item{position:absolute;inset:0;opacity:0;transition:opacity var(--anim)}
+.featured_bg_item.is-active{opacity:1}
+.featured_bg_overlay{position:absolute;left:0;right:0;top:0;height:50%;z-index:3;opacity:.85;
+  background:linear-gradient(rgb(0 0 0),rgb(0 0 0 / 0))}
+
+/* --------------------------------------------------------------------------
+   Process slider
+   -------------------------------------------------------------------------- */
+.process_slider_contain.is-stack{gap:var(--section-main)}
+/* Clips the track horizontally for the drag. The step numerals are trimmed to
+   cap height, which lifts their ink above the box, so pad the clip open at the
+   top and pull the same amount back out of the layout. */
+.process_slider_list_wrap{overflow:hidden;cursor:grab;padding-top:2.5rem;margin-top:-2.5rem}
+.process_slider_list_wrap.is-dragging{cursor:grabbing}
+.process_slider_list{display:flex;will-change:transform}
+.process_slider_item{
+  flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;
+  gap:var(--space-2-5);
+  width:calc(28rem + 4rem + 1px);
+  padding-inline:2rem;border-left:1px solid var(--theme-border);
+}
+.process_slider_number{display:block;font-family:var(--font-secondary);font-size:var(--fs-h1);
+  font-weight:var(--fw-light);letter-spacing:var(--ls-tight);line-height:var(--lh-small);
+  --lh:var(--lh-small);--trim-t:var(--trim-top-secondary);--trim-b:var(--trim-bottom-secondary);
+  margin-bottom:var(--space-5)}
+.process_slider_title{margin-bottom:1.25rem}
+.process_slider_text{--ch:33;max-width:min(100%, calc(var(--ch) * var(--ch-sans)));margin-bottom:var(--space-2)}
+
+/* --------------------------------------------------------------------------
+   Logo wall
+   -------------------------------------------------------------------------- */
+.logo-wall_list{--logo-size:calc((100vw - var(--site-margin) * 2) * .12);
+  --stagger-a:.836;--stagger-b:.333;
+  display:flex;align-items:flex-start;justify-content:space-between}
+.logo-wall_item{position:relative;flex:0 0 var(--logo-size);height:var(--logo-size)}
+.logo-wall_item:nth-child(2),.logo-wall_item:nth-child(4){margin-top:calc(var(--logo-size) * var(--stagger-a))}
+.logo-wall_item:nth-child(3),.logo-wall_item:nth-child(5){margin-top:calc(var(--logo-size) * var(--stagger-b))}
+.logo-wall_logo{position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;background:var(--theme-bg-2)}
+.logo-wall_target{position:absolute;inset:25% 0;display:flex;align-items:center;justify-content:center;
+  will-change:transform}
+.logo-wall_target img{width:60%;height:auto;object-fit:contain}
+
+/* --------------------------------------------------------------------------
+   Testimonial
+   -------------------------------------------------------------------------- */
+.testimonial-slider_layout{border-top:1px solid var(--theme-border);padding-top:var(--space-5)}
+.testimonial-slider_col-1{grid-column:1 / 4;display:flex;flex-direction:column;align-items:flex-start}
+.testimonial-slider_col-2{grid-column:5 / -1;position:relative}
+.testimonial-slider_meta{position:relative;min-height:2.25rem}
+.testimonial-slider_meta_item{position:absolute;inset:0;opacity:0;transition:opacity var(--anim)}
+.testimonial-slider_meta_item.is-active{opacity:1;position:relative}
+.testimonial-slider_text{margin-bottom:.75rem}
+.testimonial-slider_nav{display:flex;gap:var(--space-0-25);margin-top:var(--space-2-5)}
+.testimonial-slider_quotes{position:relative;display:grid}
+.testimonial-slider_item{grid-area:1 / 1;opacity:0;transition:opacity var(--anim);pointer-events:none}
+.testimonial-slider_item.is-active{opacity:1;pointer-events:auto}
+
+.testimonial-slider_quote-marks{position:absolute;left:-2.625rem;top:0;width:1.75rem;height:1.6875rem}
+.testimonial-slider_quote{max-width:100%}
+
+/* --------------------------------------------------------------------------
+   Gallery
+   -------------------------------------------------------------------------- */
+.gallery_wrap{height:100svh;overflow:clip}
+.gallery_slider{position:relative;height:100%;border-radius:var(--radius-small);cursor:grab}
+.gallery_slider.is-dragging{cursor:grabbing}
+.gallery_slider_list{position:relative;height:100%;display:grid}
+.gallery_slide{grid-area:1/1/-1/-1;position:relative;display:grid;place-items:center;
+  height:100%;overflow:hidden;opacity:0;z-index:0}
+.gallery_slide.is-current{opacity:1;z-index:2}
+/* Held visible above the incoming slide for the length of the sweep, so the
+   next image is uncovered rather than crossfaded to. */
+.gallery_slide.is-leaving{opacity:1;z-index:3}
+/* Library-free path: GSAP tweens the transform when it is loaded, these
+   transitions carry the same move when it is not. */
+.gallery_slide.is-sweeping,
+.gallery_slide.is-sweeping .gallery_slide_img{
+  transition:transform var(--dur-double) var(--ease-reveal)}
+.gallery_slide_img{width:100%;height:100%;object-fit:cover;will-change:transform}
+.gallery_slider_nav{position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:2;
+  display:flex;flex-direction:column;justify-content:center;gap:var(--space-0-25);
+  margin-left:var(--site-margin);padding:.5rem;border-radius:var(--radius-round)}
+.gallery_slider_thumb{position:relative;z-index:2;width:4rem;height:4rem;overflow:hidden;
+  border:2px solid transparent;border-radius:var(--radius-round);cursor:pointer;
+  transition:border-color var(--anim-ease)}
+.gallery_slider_thumb.is-current{border-color:var(--swatch-light)}
+.gallery_slider_thumb img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+
+/* --------------------------------------------------------------------------
+   Insights
+   -------------------------------------------------------------------------- */
+.ft-posts_layout{display:block}
+.post_list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--site-gutter);
+  row-gap:var(--section-main)}
+.post_card{position:relative}
+.post_card_content{margin-top:var(--space-2)}
+.post_card_title{margin-bottom:0}
+.post_card_text{--ch:33;max-width:min(100%, calc(var(--ch) * var(--ch-sans)))}
+.post_card p.post_card_text{margin-top:var(--space-2)}
+.post_card .u-image{transition:transform var(--dur-double) var(--ease)}
+.post_card:hover .u-image{transform:scale(1.03)}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.footer_contain.is-stack{gap:0}
+.footer_header_layout{position:relative;z-index:0;row-gap:var(--space-4)}
+.footer_visual_wrap{grid-column:1 / 4}
+.footer_visual{position:relative;width:80%;max-width:15.5rem;aspect-ratio:4/5;overflow:hidden}
+.footer_header{grid-column:4 / -1}
+.footer_header .heading_wrap h2{--ch:24;max-width:min(100%, calc(var(--ch) * var(--ch-serif)))}
+
+.footer_layout{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  column-gap:var(--site-gutter);row-gap:var(--space-4)}
+.footer_layout .u-spacer{grid-column:1 / -1}
+.footer_link_list_wrap{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2)}
+.footer_link_list_wrap.is-first{grid-column-start:2}
+.footer_link_item a{display:inline-block;padding:.125rem 0}
+.footer_divider{grid-column:1 / -1;height:1px;background:var(--theme-border)}
+.footer_address{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2)}
+.footer_social_list{display:flex;margin-left:-.75rem}
+.footer_social_link{display:flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem}
+.footer_social_link svg{width:1.25rem;height:1.25rem}
+.footer_wrap[data-footer-hover] [data-footer-hover-fade]{transition:opacity var(--anim-quarter)}
+/* Everything except the address under the cursor clears out of the way, so the
+   city reads as the layer on top: no portrait photo, heading or sibling column
+   showing through it. JS holds the hovered address at 1. */
+.footer_wrap[data-footer-hover="on"] [data-footer-hover-fade]{opacity:0}
+/* The other studios stay readable, so the cursor has somewhere obvious to go
+   next. JS holds the one being hovered at 1. */
+.footer_wrap[data-footer-hover="on"] .footer_address[data-footer-hover-fade]{opacity:.3}
+
+/* Backdrop sits behind everything in the section. The container is z-index 1,
+   so the copy stays legible on top of whichever city is showing. */
+.footer_bg_wrap{position:absolute;inset:0;z-index:0;overflow:clip;pointer-events:none}
+.footer_bg_item{position:absolute;inset:0;opacity:0;transition:opacity var(--anim)}
+.footer_bg_item.is-active{opacity:1}
+.footer_bg_item .u-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Scrim, so the light type has something to sit on over a bright photograph.
+   .48 is the previous .35 with a further 20% laid over it: 1 - (.65 * .8). */
+.footer_bg_item::after{content:"";position:absolute;inset:0;background:var(--swatch-dark);opacity:.48}
+
+/* While a city is up, the whole section borrows the dark theme's text values so
+   the copy reads white over the photograph, then returns on mouse-out. Only the
+   text tokens flip; the buttons keep their own colours. */
+.footer_wrap[data-footer-hover="on"]{
+  --theme-text:var(--swatch-light);
+  --theme-text-faded:rgb(242 240 230 / .7);
+  --theme-border:rgb(242 240 230 / .1);
+  color:var(--theme-text);
+}
+.footer_wrap .heading_wrap h2,
+.footer_wrap .footer_link_text,
+.footer_wrap .footer_link_list_wrap h3,
+.footer_wrap .footer_address,
+.footer_wrap .footer_address p,
+.footer_wrap .footer_address h3,
+.footer_wrap .footer_address a,
+.footer_wrap .footer_copyright_text,
+.footer_wrap .footer_social_link,
+.footer_wrap .footer_divider{transition:color var(--anim-quarter),background-color var(--anim-quarter)}
+
+/* --------------------------------------------------------------------------
+   Scroll reveal defaults
+   -------------------------------------------------------------------------- */
+[data-fade-in]{opacity:0}
+[data-reveal]{opacity:0}
+.js-ready [data-fade-in],.js-ready [data-reveal]{opacity:0}
+
+/* --------------------------------------------------------------------------
+   Breakpoints — the source's own: 991 / 767 / 479
+   The 12-column grid survives the tablet step; only spacing tightens.
+   The real collapse happens at 767.
+   -------------------------------------------------------------------------- */
+@media screen and (max-width:991px){
+  .logo-wall_list{--logo-size:calc((100vw - var(--site-margin) * 2) * .1505);--stagger-a:.664;--stagger-b:.265}
+  .process_slider_item{width:calc(24rem + 4rem + 1px)}
+  .footer_link_list_wrap,.footer_address{gap:var(--space-1-25)}
+}
+
+@media screen and (max-width:767px){
+  .logo-wall_list{--logo-size:calc((100vw - var(--site-margin) * 2) * .2);--stagger-a:.505;--stagger-b:.202}
+  .process_slider_item{width:calc(22.5rem + 4rem + 1px)}
+
+  .intro_layout{display:flex;flex-direction:column;gap:var(--space-3)}
+  .intro_visual{aspect-ratio:4/5}
+  .intro_visual_small{display:none}
+  .intro_content_wrap{gap:var(--space-4)}
+
+  .featured_item_title{font-size:var(--fs-h3)}
+
+  .testimonial-slider_layout{display:flex;flex-direction:column;gap:.5rem;
+    padding-top:var(--space-3)}
+  .testimonial-slider_quote-marks{position:relative;left:0;margin-bottom:1rem}
+
+  .post_list{grid-template-columns:1fr}
+  .post_card_text{max-width:none}
+
+  .gallery_slider_nav{flex-direction:row;left:50%;top:auto;bottom:var(--site-margin);
+    transform:translateX(-50%);margin-left:0}
+
+  .footer_header_layout{display:flex;flex-direction:column;gap:var(--space-4)}
+  .footer_visual{width:30%}
+  .footer_layout{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:var(--space-3)}
+  .footer_link_list_wrap.is-first{grid-column-start:1}
+
+  .header_indent{margin-left:0}
+  .nav_bar_inner{width:100%}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  [data-fade-in],[data-reveal]{opacity:1 !important}
+}
