@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auralis — Clean Paper Workflow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300..600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ====================================================================
+         PLACEHOLDER LANDING PAGE
+         Swap this whole file for your own page — the showcase loads it by
+         path only (see previewSrc in src/data/template.js). Nothing here is
+         imported by the showcase, so the two stylesheets can never collide.
+         ==================================================================== */
+
+      :root {
+        --paper: #faf8f5;
+        --paper-deep: #f1ece4;
+        --card: #fff;
+        --ink: #1a1713;
+        --ink-2: #554d42;
+        --ink-3: #928878;
+        --rule: rgba(26, 23, 19, 0.12);
+        --accent: #c2500f;
+        --accent-soft: #f7ebe1;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: var(--paper);
+        color: var(--ink-2);
+        font-family: 'Inter', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      .micro {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      .serif {
+        font-family: 'Instrument Serif', serif;
+        font-weight: 400;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+
+      .wrap { width: min(100% - 3rem, 1080px); margin-inline: auto; }
+
+      /* --- Nav ---------------------------------------------------------- */
+      header {
+        position: sticky; top: 0; z-index: 20;
+        background: rgba(250, 248, 245, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid transparent;
+        transition: border-color 240ms var(--ease);
+      }
+      header.stuck { border-bottom-color: var(--rule); }
+      header .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+      nav ul { display: flex; gap: 28px; list-style: none; }
+      nav a { text-decoration: none; position: relative; padding-block: 4px; }
+      /* Underline grows from the left on hover — the page's signature move. */
+      nav a::after {
+        content: ''; position: absolute; left: 0; bottom: 0;
+        width: 100%; height: 1px; background: var(--accent);
+        transform: scaleX(0); transform-origin: left;
+        transition: transform 240ms var(--ease);
+      }
+      nav a:hover { color: var(--ink); }
+      nav a:hover::after { transform: scaleX(1); }
+      @media (max-width: 720px) { nav { display: none; } }
+
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        border-radius: 6px; padding: 10px 16px; cursor: pointer;
+        font-family: 'JetBrains Mono', monospace; font-size: 0.625rem;
+        font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+        text-decoration: none; border: 1px solid transparent;
+        transition: transform 160ms var(--ease), box-shadow 160ms var(--ease),
+                    background-color 160ms var(--ease), border-color 160ms var(--ease);
+      }
+      .btn-primary { background: var(--ink); color: var(--paper); }
+      .btn-primary:hover {
+        background: var(--accent); transform: translateY(-1px);
+        box-shadow: 0 8px 24px -12px rgba(26, 23, 19, 0.5);
+      }
+      .btn-ghost { border-color: var(--rule); color: var(--ink); background: var(--card); }
+      .btn-ghost:hover { border-color: rgba(26,23,19,0.24); transform: translateY(-1px); }
+
+      /* --- Hero --------------------------------------------------------- */
+      .hero { padding: 96px 0 72px; text-align: center; position: relative; }
+      .hero h1 { font-size: clamp(2.75rem, 7vw, 5rem); margin: 24px 0; }
+      .hero h1 em { color: var(--ink-3); }
+      .hero p { max-width: 46ch; margin: 0 auto 32px; font-size: 1.0625rem; line-height: 1.65; }
+      .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+      /* Staggered word reveal on the headline. */
+      .word { display: inline-block; opacity: 0; transform: translateY(20px);
+              animation: rise 640ms var(--ease) forwards; }
+      @keyframes rise { to { opacity: 1; transform: none; } }
+
+      /* Concentric rings behind the hero — pure CSS, slowly breathing. */
+      .rings { position: absolute; inset: 0; z-index: -1; display: grid; place-items: center;
+               overflow: hidden; pointer-events: none; }
+      .rings span {
+        position: absolute; border: 1px solid var(--rule); border-radius: 50%;
+        animation: breathe 8s ease-in-out infinite;
+      }
+      .rings span:nth-child(1) { width: 340px; height: 340px; animation-delay: 0s; }
+      .rings span:nth-child(2) { width: 560px; height: 560px; animation-delay: 0.6s; }
+      .rings span:nth-child(3) { width: 820px; height: 820px; animation-delay: 1.2s; }
+      @keyframes breathe { 0%,100% { transform: scale(1); opacity: .8 } 50% { transform: scale(1.04); opacity: .35 } }
+
+      /* --- Logo cloud ---------------------------------------------------- */
+      .logos { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+               padding: 32px 0 72px; }
+      .logos span {
+        font-family: 'Instrument Serif', serif; font-size: 1.25rem; color: var(--ink-3);
+        opacity: .6; transition: opacity 240ms var(--ease), color 240ms var(--ease);
+      }
+      .logos span:hover { opacity: 1; color: var(--ink); }
+
+      /* --- Features ------------------------------------------------------ */
+      section { padding: 72px 0; }
+      .sec-head { display: grid; gap: 12px; margin-bottom: 40px; max-width: 52ch; }
+      .sec-head h2 { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+
+      .grid-3 { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .feature {
+        background: var(--card); border: 1px solid var(--rule); border-radius: 12px;
+        padding: 24px; display: grid; gap: 12px; align-content: start;
+        transition: transform 240ms var(--ease), box-shadow 240ms var(--ease),
+                    border-color 240ms var(--ease);
+      }
+      .feature:hover {
+        transform: translateY(-3px); border-color: rgba(26,23,19,0.2);
+        box-shadow: 0 1px 2px rgba(26,23,19,.04), 0 12px 32px -16px rgba(26,23,19,.28);
+      }
+      .feature .num {
+        font-family: 'Instrument Serif', serif; font-size: 1.75rem; color: var(--accent);
+        line-height: 1;
+      }
+      .feature h3 { font-family: 'Instrument Serif', serif; font-weight: 400;
+                    font-size: 1.25rem; color: var(--ink); }
+      .feature p { font-size: 0.9375rem; line-height: 1.6; }
+
+      /* --- Pricing ------------------------------------------------------- */
+      .plans { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .plan {
+        background: var(--card); border: 1px solid var(--rule); border-radius: 12px;
+        padding: 28px 24px; display: grid; gap: 16px; align-content: start;
+        transition: transform 240ms var(--ease), box-shadow 240ms var(--ease);
+      }
+      .plan:hover { transform: translateY(-3px); box-shadow: 0 12px 32px -16px rgba(26,23,19,.28); }
+      .plan.featured { background: var(--accent-soft); border-color: rgba(194,80,15,.28); }
+      .plan .price { font-family: 'Instrument Serif', serif; font-size: 2.75rem; color: var(--ink); line-height: 1; }
+      .plan ul { list-style: none; display: grid; gap: 10px; font-size: 0.875rem; }
+      .plan li { display: flex; gap: 10px; align-items: center; }
+      .plan li::before { content: ''; width: 5px; height: 5px; border-radius: 50%;
+                         background: var(--accent); flex: none; }
+
+      /* --- Footer -------------------------------------------------------- */
+      footer { border-top: 1px solid var(--rule); padding: 40px 0; margin-top: 32px; }
+      footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+      /* --- Scroll reveal -------------------------------------------------- */
+      .reveal { opacity: 0; transform: translateY(16px);
+                transition: opacity 640ms var(--ease), transform 640ms var(--ease); }
+      .reveal.in { opacity: 1; transform: none; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+        .reveal, .word { opacity: 1 !important; transform: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header id="hdr">
+      <div class="wrap">
+        <span class="serif" style="font-size: 1.25rem">Auralis</span>
+        <nav>
+          <ul>
+            <li><a class="micro" href="#features">Features</a></li>
+            <li><a class="micro" href="#pricing">Pricing</a></li>
+            <li><a class="micro" href="#pricing">Docs</a></li>
+          </ul>
+        </nav>
+        <a class="btn btn-primary" href="#pricing">Start free</a>
+      </div>
+    </header>
+
+    <div class="hero">
+      <div class="rings"><span></span><span></span><span></span></div>
+      <div class="wrap">
+        <span class="micro">Workflow, quietly</span>
+        <h1 class="serif" id="headline">
+          Build seamless systems with <em>intelligent precision</em>
+        </h1>
+        <p>
+          Auralis turns scattered documents into a single calm workspace — structured,
+          searchable, and shaped like the way you already think.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#pricing">Start free</a>
+          <a class="btn btn-ghost" href="#features">See how it works</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="logos wrap reveal">
+      <span>Northwind</span><span>Fathom</span><span>Ledger</span>
+      <span>*Kepler</span><span>Ostrom</span>
+    </div>
+
+    <section id="features" class="wrap">
+      <div class="sec-head reveal">
+        <span class="micro">What you get</span>
+        <h2 class="serif">Three ideas, repeated well</h2>
+        <p>Every surface uses the same rhythm, the same rules, and one accent colour.</p>
+      </div>
+      <div class="grid-3">
+        <article class="feature reveal">
+          <span class="num">01</span>
+          <h3>Structured capture</h3>
+          <p>Drop anything in. Auralis reads the shape of a document and files it where it belongs.</p>
+        </article>
+        <article class="feature reveal">
+          <span class="num">02</span>
+          <h3>Connected recall</h3>
+          <p>Search across every note, thread, and file with a single query that understands intent.</p>
+        </article>
+        <article class="feature reveal">
+          <span class="num">03</span>
+          <h3>Quiet automation</h3>
+          <p>Rules run in the background and stay out of the way until something needs your attention.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="pricing" class="wrap">
+      <div class="sec-head reveal">
+        <span class="micro">Pricing</span>
+        <h2 class="serif">Plans that stay out of the way</h2>
+      </div>
+      <div class="plans">
+        <article class="plan reveal">
+          <span class="micro">Solo</span>
+          <span class="price">$0</span>
+          <ul><li>One workspace</li><li>500 documents</li><li>Community support</li></ul>
+          <a class="btn btn-ghost" href="#pricing">Choose Solo</a>
+        </article>
+        <article class="plan featured reveal">
+          <span class="micro" style="color: var(--accent)">Studio — popular</span>
+          <span class="price">$18</span>
+          <ul><li>Unlimited documents</li><li>Shared workspaces</li><li>Priority support</li></ul>
+          <a class="btn btn-primary" href="#pricing">Choose Studio</a>
+        </article>
+        <article class="plan reveal">
+          <span class="micro">Team</span>
+          <span class="price">$44</span>
+          <ul><li>Everything in Studio</li><li>Roles &amp; permissions</li><li>Audit history</li></ul>
+          <a class="btn btn-ghost" href="#pricing">Choose Team</a>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <span class="micro">© 2026 Auralis</span>
+        <span class="micro">Placeholder preview — swap this file</span>
+      </div>
+    </footer>
+
+    <script>
+      // Split the headline into words so each can rise on its own delay.
+      const h = document.getElementById('headline')
+      h.innerHTML = h.innerHTML.replace(
+        /(\S+)/g,
+        '<span class="word">$1</span>',
+      )
+      document.querySelectorAll('#headline .word').forEach((w, i) => {
+        w.style.animationDelay = `${80 + i * 45}ms`
+      })
+
+      // Reveal on scroll. `rootMargin` fires slightly early so elements are
+      // already settled by the time they're properly in view.
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in')
+              io.unobserve(e.target)
+            }
+          })
+        },
+        { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
+      )
+      document.querySelectorAll('.reveal').forEach((el, i) => {
+        el.style.transitionDelay = `${(i % 3) * 70}ms`
+        io.observe(el)
+      })
+
+      // Hairline under the nav appears only once the page has moved.
+      const hdr = document.getElementById('hdr')
+      addEventListener(
+        'scroll',
+        () => hdr.classList.toggle('stuck', scrollY > 8),
+        { passive: true },
+      )
+    </script>
+  </body>
+</html>

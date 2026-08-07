@@ -1,0 +1,126 @@
+/* ==========================================================================
+   SPECIMEN SANDBOX
+
+   These are the *showcased template's* tokens, not the chrome's. They live in
+   their own file and are scoped under `.spec` so the two systems can sit on
+   the same page without either one leaking into the other.
+
+   Values are copied from public/preview/index.html. When you swap in your own
+   page, these are what you update — along with src/data/designSystem.js, which
+   supplies the labels and hex codes shown next to the specimens.
+   ========================================================================== */
+
+.spec {
+  --paper: #faf8f5;
+  --paper-deep: #f1ece4;
+  --card: #fff;
+  --ink: #1a1713;
+  --ink-2: #554d42;
+  --ink-3: #928878;
+  --rule: rgba(26, 23, 19, 0.12);
+  --accent: #c2500f;
+  --accent-soft: #f7ebe1;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  background: var(--paper);
+  color: var(--ink-2);
+  letter-spacing: normal; /* the chrome tightens tracking globally; undo it */
+}
+
+.spec-serif {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.spec-sans {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.spec-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* --- Live button specimens -------------------------------------------------
+   Real elements with real hover states, not pictures of buttons. This is the
+   whole reason the specimens are rendered rather than screenshotted. */
+
+.spec-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    transform 160ms var(--ease),
+    box-shadow 160ms var(--ease),
+    background-color 160ms var(--ease),
+    border-color 160ms var(--ease),
+    color 160ms var(--ease);
+}
+
+.spec-btn--primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+.spec-btn--primary:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -12px rgba(26, 23, 19, 0.5);
+}
+
+.spec-btn--ghost {
+  background: var(--card);
+  border-color: var(--rule);
+  color: var(--ink);
+}
+.spec-btn--ghost:hover {
+  border-color: rgba(26, 23, 19, 0.24);
+  transform: translateY(-1px);
+}
+
+/* Text action — the underline grows from the left, the page's signature move. */
+.spec-btn--text {
+  position: relative;
+  padding: 10px 0;
+  color: var(--ink);
+  background: none;
+}
+.spec-btn--text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 240ms var(--ease);
+}
+.spec-btn--text:hover::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spec-btn,
+  .spec-btn--text::after {
+    transition: none;
+  }
+  .spec-btn:hover {
+    transform: none;
+  }
+}

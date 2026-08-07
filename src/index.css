@@ -1,0 +1,164 @@
+@import 'tailwindcss';
+@import './specimen.css';
+
+/* ==========================================================================
+   DESIGN TOKENS — showcase chrome
+   Neutrals and type follow the DEPT® brand system; the accent is ours.
+
+   Scope note: these theme the *wrapper* only. The page inside the preview
+   iframe carries its own system and is intentionally untouched — the contrast
+   between the two is what makes the showcased work read as a separate object.
+   ========================================================================== */
+
+@theme {
+  /* --- Neutrals --------------------------------------------------------- */
+  --color-white: #ffffff;
+  --color-platinum: #f2f2f2; /* canvas, wells, recessed fills */
+  --color-iron: #dedfe1; /* the hairline */
+  --color-dim-gray: #646464; /* metadata, labels */
+  --color-anthrazit: #333333; /* body copy */
+  --color-rich-black: #121212; /* headings, primary fills */
+
+  /* --- Accent ------------------------------------------------------------
+     #FF4901 measures 3.38:1 on white and 5.54:1 against rich black. So:
+       fill + rich black text  → 5.54:1, passes AA at any size
+       accent as text on white → large display or UI only, never body copy
+       focus rings             → 3.38:1 clears the 3:1 bar for non-text UI
+     Every use below obeys that. */
+  --color-accent: #ff4901;
+
+  /* --- Typeface: one family, carried by weight -------------------------- */
+  --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+
+  /* --- Radii: square, except controls, which are full pills ------------- */
+  --radius-edge: 4px;
+  --radius-pill: 999px;
+
+  /* --- Motion ------------------------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+
+  /* Tracking. Both are negative — DEPT tightens body copy harder than
+     display, which is backwards from most systems and is a large part of why
+     their text reads the way it does. */
+  --track-display: -0.03em;
+  --track-body: -0.05em;
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-platinum);
+  color: var(--color-anthrazit);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: var(--track-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-rich-black);
+}
+
+/* ==========================================================================
+   PRIMITIVES
+   In @layer components so utility classes still override them.
+   ========================================================================== */
+
+@layer components {
+  /* Display type. Ultra-bold, uppercase, tight tracking and a line-height
+     below 1 so multi-line headings lock into a solid block. */
+  .display {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--color-rich-black);
+    letter-spacing: var(--track-display);
+    line-height: 0.86;
+  }
+
+  /* The small label. Same family, uppercase, negative tracking — no mono and
+     no letter-spacing blowout, which is what separates this system from the
+     usual technical-spec look. */
+  .micro {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    color: var(--color-dim-gray);
+  }
+
+  /* Surface. Depth comes from the hairline and the fill — there is not a
+     single box-shadow in the chrome, because the brand doesn't use them. */
+  .card {
+    background: var(--color-white);
+    border: 1px solid var(--color-iron);
+    border-radius: var(--radius-edge);
+  }
+
+  /* The metadata rail scrolls inside its card. A default scrollbar is far too
+     heavy against a hairline system, so it is thinned and tinted to the same
+     iron the borders use. */
+  .rail-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-iron) transparent;
+  }
+}
+
+/* ==========================================================================
+   MOTION — reveal on scroll
+   ========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scoped to `.js`, which main.jsx sets before the first render. This pattern
+   hides content by default, so without the guard a failed script would leave
+   a blank page — instead the hiding rule simply never applies. */
+.js .reveal {
+  opacity: 0;
+}
+
+.js .reveal.is-visible {
+  animation: rise var(--dur-slow) var(--ease-out-soft) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .js .reveal,
+  .js .reveal.is-visible {
+    opacity: 1;
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
