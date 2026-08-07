@@ -46,7 +46,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border-radius: 6px;
+  /* Per project: square on the pages that use no radius at all, a full pill on
+     the ones whose controls are capsules. */
+  border-radius: var(--spec-btn-radius, 6px);
   padding: 10px 16px;
   cursor: pointer;
   border: 1px solid transparent;

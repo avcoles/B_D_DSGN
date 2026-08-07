@@ -17,7 +17,7 @@ export const boutique = {
   subtitle: 'Hospitality Interiors',
 
   description:
-    'TODO. Two or three sentences on what this page is and who it is for. Match the length of the Auralis and Ensemble entries so the rail keeps its rhythm.',
+    "A premium portfolio template for architecture, interior design, and hospitality studios that need to show their work to high-value commercial clients. The editorial layout is built to carry project imagery and make the case for the studio's expertise.",
 
   attributes: [
     { label: 'Character', items: ['Editorial', 'Luxury', 'Restrained'] },
@@ -28,25 +28,51 @@ export const boutique = {
     heading: 'Overview',
     lead: 'The strategic read of this page.',
     body: [
-      'TODO. Replace with the strategic read: what the page is trying to achieve, and the one decision that shapes everything else about it.',
+      "Quiet editorial luxury, drawn from the way premium architecture publications look. Large-format photography, restraint, and elegant type are doing one job together: letting the reader feel something before they've read anything. That ordering, emotion ahead of information, is the whole premise of the page.",
     ],
   },
 
-  // TODO: five to eight principles. Each has to travel (it could judge a
-  // different page) and be earned (something on this page proves it).
+  /**
+   * Seven principles, named by the area of the system each one governs. The
+   * title is the subject, the rationale is the argument.
+   */
   principles: [
     {
-      principle: 'TODO: an imperative rule, short enough to repeat back',
+      principle: 'Narrative',
+      // PROVISIONAL: the source note broke off at "wrapped in". The second
+      // sentence below is a stand-in until that phrase is settled.
       rationale:
-        'TODO: one or two sentences making the reasoning legible to someone who has never opened a design tool. No jargon, no em dashes.',
+        'The goal is a slower, more intentional scroll. Tightly gridded sections get surrounded by open space so the reader moves at a measured pace rather than racing down the page.',
     },
     {
-      principle: 'TODO: a second rule',
-      rationale: 'TODO: what it buys the page, in plain words.',
+      principle: 'Color',
+      rationale:
+        'A restrained palette of warm neutrals with charcoal type. Pulling saturated color out means texture, light, and materials in the photography become the source of visual richness instead. The page reads as rich, but the richness comes from the images, not from the interface competing with them.',
     },
     {
-      principle: 'TODO: a third rule',
-      rationale: 'TODO: what it buys the page, in plain words.',
+      principle: 'Typography',
+      rationale:
+        'A high-contrast serif display for headlines against a plain sans-serif for body copy. Hierarchy comes from scale and spacing rather than color or weight: dramatic size jumps, generous leading, and consistent type rhythm. The contrast between an ornate headline face and a neutral body face is what signals which is which.',
+    },
+    {
+      principle: 'Grid',
+      rationale:
+        'A rigorous editorial grid lets oversized statements sit next to tightly composed multi-column content without the page feeling inconsistent. The modular layout creates rhythm, and because everything still aligns to the same underlying structure, the variety reads as composed rather than busy.',
+    },
+    {
+      principle: 'White space',
+      rationale:
+        "Expansive negative space slows browsing down and gives the photography and type room to breathe. It's what makes each section feel paced, the way turning pages in a magazine sets a rhythm; the emptiness is deliberate timing, not wasted space.",
+    },
+    {
+      principle: 'Behaviors / Interactions / Cursor',
+      rationale:
+        'Motion stays understated and architectural. Smooth scrolling, restrained fades, subtle hover states, and minimal transitions all confirm interactivity without asking for attention. Quiet motion reinforces the sense of sophistication; loud motion would undercut it.',
+    },
+    {
+      principle: 'UX',
+      rationale:
+        "The information architecture is narrative-first, moving visitors from philosophy to proof, then portfolio, insights, studio, and contact. Leading with story before the ask builds credibility first, so by the time a visitor reaches the contact point they've already been given reasons to trust the studio.",
     },
   ],
 
@@ -67,6 +93,7 @@ export const boutique = {
     display: "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
     label: "'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     labelTracking: '0.06em',
+    btnRadius: '0px',
   },
 
   system: {
@@ -81,21 +108,18 @@ export const boutique = {
           family: 'Cormorant Garamond',
           weights: '300 – 700',
           stack: "'Cormorant Garamond', Georgia, serif",
-          sample: 'Hospitality interiors',
         },
         {
           role: 'Body',
           family: 'Archivo',
           weights: '300 – 700',
           stack: "'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-          sample: 'Used for reading copy and captions',
         },
         {
           role: 'Label',
           family: 'Archivo',
           weights: '400 – 500',
           stack: "'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-          sample: 'Project index',
         },
       ],
     },
@@ -105,15 +129,15 @@ export const boutique = {
         {
           name: 'Surface',
           swatches: [
-            { value: '#EFEEEC', note: 'Page canvas' },
-            { value: '#FFFFFF', note: 'Raised surface' },
+            { value: '#EFEEEC', note: 'Primary' },
+            { value: '#FFFFFF', note: 'Secondary' },
           ],
         },
         {
           name: 'Ink',
           swatches: [
-            { value: '#000000', note: 'Headings' },
-            { value: '#5D5346', note: 'Body copy' },
+            { value: '#000000', note: 'Primary' },
+            { value: '#5D5346', note: 'Secondary' },
           ],
         },
       ],
@@ -151,12 +175,7 @@ export const boutique = {
 
     buttons: {
       variants: [
-        {
-          label: 'View project',
-          className: 'spec-btn--text',
-          role: 'Arrow link',
-          note: 'The arrow slides on hover',
-        },
+        { label: 'View project', className: 'spec-btn--text' },
       ],
     },
   },

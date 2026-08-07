@@ -30,7 +30,10 @@ export default function Hero({ t }) {
               appears at full strength, which is why it can carry the
               classification tag without a border or icon helping it. */}
         <div className="grid justify-items-start gap-4">
-          <span className="micro rounded-pill bg-accent px-3 py-1.5 text-rich-black">
+          {/* White on white, so it needs the hairline to exist at all. Reads as
+              a quiet classification tag rather than the loudest thing in the
+              rail, which is what the accent fill was doing. */}
+          <span className="micro rounded-pill border border-iron bg-white px-3 py-1.5 text-rich-black">
             {t.kicker}
           </span>
 

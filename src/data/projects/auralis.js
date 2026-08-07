@@ -123,6 +123,7 @@ export const auralis = {
     display: "'Instrument Serif', serif",
     label: "'JetBrains Mono', monospace",
     labelTracking: '0.16em',
+    btnRadius: '6px',
   },
 
   /**
@@ -140,21 +141,18 @@ export const auralis = {
           family: 'Instrument Serif',
           weights: 'Regular · Italic',
           stack: "'Instrument Serif', serif",
-          sample: 'Build seamless systems',
         },
         {
           role: 'Body',
           family: 'Inter',
           weights: '300 – 600',
           stack: "'Inter', system-ui, sans-serif",
-          sample: 'Used for summaries and supporting copy',
         },
         {
           role: 'Label',
           family: 'JetBrains Mono',
           weights: '400 · 500',
           stack: "'JetBrains Mono', monospace",
-          sample: 'Skills used',
         },
       ],
     },
@@ -164,25 +162,27 @@ export const auralis = {
         {
           name: 'Surface',
           swatches: [
-            { value: '#FAF8F5', note: 'Page canvas' },
-            { value: '#F1ECE4', note: 'Wells, insets' },
-            { value: '#FFFFFF', note: 'Raised surface' },
+            { value: '#FAF8F5', note: 'Primary' },
+            { value: '#F1ECE4', note: 'Secondary' },
+            { value: '#FFFFFF', note: 'Tertiary' },
           ],
         },
         {
           name: 'Ink',
           swatches: [
-            { value: '#1A1713', note: 'Headings' },
-            { value: '#554D42', note: 'Body copy' },
-            { value: '#928878', note: 'Metadata' },
+            { value: '#1A1713', note: 'Primary' },
+            { value: '#554D42', note: 'Secondary' },
+            { value: '#928878', note: 'Tertiary' },
           ],
         },
         {
+          // The hairline is left unlabelled: it is a border value, not a step
+          // in the accent hierarchy beside it.
           name: 'Line & Accent',
           swatches: [
-            { value: 'rgba(26, 23, 19, 0.12)', note: 'Hairline' },
-            { value: '#C2500F', note: 'Actions' },
-            { value: '#F7EBE1', note: 'Accent fill' },
+            { value: 'rgba(26, 23, 19, 0.12)' },
+            { value: '#C2500F', note: 'Accent' },
+            { value: '#F7EBE1', note: 'Accent tint' },
           ],
         },
       ],
@@ -216,19 +216,9 @@ export const auralis = {
 
     buttons: {
       variants: [
-        {
-          label: 'Start free',
-          className: 'spec-btn--primary',
-          role: 'Primary',
-          note: 'One per view',
-        },
-        {
-          label: 'See how it works',
-          className: 'spec-btn--ghost',
-          role: 'Secondary',
-          note: 'Repeatable',
-        },
-        { label: 'Read the docs', className: 'spec-btn--text', role: 'Text action', note: 'Inline' },
+        { label: 'Start free', className: 'spec-btn--primary' },
+        { label: 'See how it works', className: 'spec-btn--ghost' },
+        { label: 'Read the docs', className: 'spec-btn--text' },
       ],
     },
   },

@@ -20,7 +20,7 @@ export const ensemble = {
   subtitle: 'Everyday Pieces, Small Runs',
 
   description:
-    'A merch store for a design studio wearing its own label. Thirteen products, two colours, and a grid that changes rhythm row to row so the page reads as a curated release rather than a catalogue.',
+    'A DTC ecommerce template for fashion and streetwear brands that merchandise products with a graphic, editorial look rather than a standard retail grid.',
 
   attributes: [
     { label: 'Character', items: ['Retail', 'Editorial', 'Rectilinear'] },
@@ -31,63 +31,49 @@ export const ensemble = {
     heading: 'Overview',
     lead: 'The strategic read of this page.',
     body: [
-      'A merch store landing page for a design studio’s own apparel label. Its job is to make thirteen products feel like a curated release rather than a catalogue, and almost every decision on the page serves that one idea.',
-      'It works by removing rather than adding. No hero photograph, no headline, no shop button anywhere. A wordmark fills the screen, two colours carry the entire layout, and the only saturated colour left belongs to the products themselves.',
+      'Swiss-inspired brutalist minimalism with premium DTC polish. Restraint puts the product first: oversized graphics, editorial layout, and asymmetric composition.',
     ],
   },
 
   /**
-   * The design constitution, eight principles. Each one has to travel and each
-   * one is earned by a component on the page.
+   * Seven principles, named by the area of the system each one governs. The
+   * title is the subject, the rationale is the argument.
    */
   principles: [
     {
-      principle: 'Set the name big enough that it stops being text',
+      principle: 'Narrative',
       rationale:
-        'A wordmark filling the screen tells you what the site is in the glance you would have spent on a hero photo. No tagline needed.',
-      // Earned by: OUTFIT as vector letterforms, edge to edge, a fifth of the screen tall
+        'The page reads as immediate, graphic, and deliberately designed. The interface is treated as an extension of the brand rather than a neutral container for products, which is why industrial textures, assertive type, disciplined grids, and unexpected composition all pull in one direction. The effect is a space that feels like a design studio that happens to make clothing, rather than a retailer selling it.',
     },
     {
-      principle: 'Two colours, and let the photographs be the third',
+      principle: 'Color',
       rationale:
-        'If the layout is only a background and an ink, every scrap of colour on screen belongs to a product. The eye lands on merchandise by default.',
-      // Earned by: three themes, each exactly two values
+        'A neutral foundation lets a single saturated accent do the signaling. Because that accent is the only strong color on the page, the eye learns to read it as meaning "act here": navigation, pricing, branding, and calls to action. Consistency is what makes it work; the moment the accent appears somewhere decorative, the cue breaks.',
     },
     {
-      principle: 'Take out corners and shadows so nothing looks like a button',
+      principle: 'Typography',
       rationale:
-        'Rounded floating boxes read as software. Flat square edges read as printed matter, and people slow down for printed matter.',
-      // Earned by: radius 0px on every content element, box-shadow none everywhere
+        "Hierarchy comes from scale, not weight. Using a large neo-grotesk at very different sizes, with few styles and tight spacing, means the size jump alone tells you what's a headline and what's body. That's why the oversized headlines read as editorial rather than loud: there's nothing competing with them.",
     },
     {
-      principle: 'Change the grid rhythm row to row',
+      principle: 'Grid',
       rationale:
-        'Identical rows read as inventory and get scanned. A different count at a different size keeps people scrolling to see what is next.',
-      // Earned by: a straight row of four, then staggered and stepped rows
+        "A rigid modular grid sets the baseline consistency, and selective column spans create rhythm against it. The reason the asymmetry looks intentional rather than sloppy is that every element still aligns to the underlying grid; you're breaking a rule that's clearly present, not working without one.",
     },
     {
-      principle: 'Leave more empty space than feels comfortable',
+      principle: 'White space',
       rationale:
-        'Gaps give each product its own moment. A page that fills every column is telling you it has stock to move.',
-      // Earned by: 136px section rhythm against 4 to 12px card internals
+        'Generous negative space isolates each product so the eye has one thing to focus on at a time, which is what reads as premium. Here the empty space is doing a job (separation and emphasis) rather than sitting there as leftover room.',
     },
     {
-      principle: 'Personality in the words, strictness in the layout',
+      principle: 'Behaviors / Interactions / Cursor',
       rationale:
-        'If the copy jokes, the grid can stay severe without going cold. The humour also survives a redesign, because it lives in the writing.',
-      // Earned by: the footer statement against an entirely rectilinear grid
+        "Interactions stay understated on purpose. Hover states, subtle transitions, and cursor feedback confirm that something is interactive and reward exploration, but they're quiet enough that they never compete with the products for attention.",
     },
     {
-      principle: 'Let the pointer carry the instruction',
+      principle: 'UX',
       rationale:
-        'When the cursor becomes a view more label over a product, no card needs a button. The grid stays a clean wall of pictures.',
-      // Earned by: the custom cursor, swelling to a red disc over any product
-    },
-    {
-      principle: 'Use the first seconds to set tone, not to apologise for loading',
-      rationale:
-        'A counter and flickering product shots turn a wait into a title sequence. The counter has a visible end, so the wait feels bounded.',
-      // Earned by: the preloader, 000 to 100 behind flickering product photography
+        'The commerce flow borrows the logic of an editorial gallery. Clear hierarchy tells you where to look, predictable scanning patterns and persistent navigation keep you oriented, and products reveal themselves progressively as you move down the page, so browsing stays low-effort.',
     },
   ],
 
@@ -108,6 +94,8 @@ export const ensemble = {
     display: "'Neue Haas Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     label: "'Neue Haas Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     labelTracking: '0.02em',
+    // Radius is 0px on every element of this page.
+    btnRadius: '0px',
   },
 
   system: {
@@ -121,21 +109,18 @@ export const ensemble = {
           family: 'Neue Haas Grotesk',
           weights: '800',
           stack: "'NHG', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-          sample: 'Made to be worn',
         },
         {
           role: 'Body',
           family: 'Neue Haas Grotesk',
           weights: '400',
           stack: "'NHG', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-          sample: 'Product titles, prices, and lead copy',
         },
         {
           role: 'Label',
           family: 'Neue Haas Grotesk',
           weights: '700',
           stack: "'NHG', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-          sample: 'Apparel',
         },
       ],
     },
@@ -149,14 +134,16 @@ export const ensemble = {
         {
           name: 'Theme values',
           swatches: [
-            { value: '#000000', note: 'Ground or ink' },
-            { value: '#EDE4DD', note: 'Ground or ink' },
-            { value: '#FF0001', note: 'Signal, cursor' },
+            { value: '#000000', note: 'Primary' },
+            { value: '#EDE4DD', note: 'Secondary' },
+            { value: '#FF0001', note: 'Accent' },
           ],
         },
         {
+          // Left unlabelled: this is an image placeholder tone and has no
+          // place in the hierarchy above.
           name: 'Support',
-          swatches: [{ value: '#D2CAC3', note: 'Image placeholder' }],
+          swatches: [{ value: '#D2CAC3' }],
         },
       ],
     },
@@ -197,18 +184,8 @@ export const ensemble = {
      */
     buttons: {
       variants: [
-        {
-          label: 'Shop',
-          className: 'spec-btn--text',
-          role: 'Nav link',
-          note: 'Underline wipes in from the left',
-        },
-        {
-          label: 'View more',
-          className: 'spec-btn--primary',
-          role: 'Pointer',
-          note: 'The only call to action, and it rides the cursor',
-        },
+        { label: 'Shop', className: 'spec-btn--text' },
+        { label: 'View more', className: 'spec-btn--primary' },
       ],
     },
   },

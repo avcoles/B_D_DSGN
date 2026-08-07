@@ -23,14 +23,20 @@ export default function Colors({ data, className }) {
                     style={{ background: s.value, borderColor: 'var(--rule)' }}
                   />
                   {/* Value first, role beneath. With the name gone the hex is
-                      the identifier, so it takes the ink weight. */}
+                      the identifier, so it takes the ink weight. The role is
+                      only rendered when there is one: a swatch whose place in
+                      the hierarchy isn't clear is left unlabelled rather than
+                      given a guess, and an empty line would leave the grid
+                      rows out of step. */}
                   <div className="grid gap-0.5">
                     <span className="text-[0.8125rem] leading-tight text-[var(--ink)]">
                       {s.value}
                     </span>
-                    <span className="text-[0.6875rem] leading-tight text-[var(--ink-3)]">
-                      {s.note}
-                    </span>
+                    {s.note && (
+                      <span className="text-[0.6875rem] leading-tight text-[var(--ink-3)]">
+                        {s.note}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}

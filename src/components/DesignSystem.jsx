@@ -22,6 +22,7 @@ const specStyle = (t) => ({
   '--spec-display': t.display,
   '--spec-label': t.label,
   '--spec-label-tracking': t.labelTracking,
+  '--spec-btn-radius': t.btnRadius,
 })
 
 /**
