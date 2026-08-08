@@ -1,6 +1,52 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
 import PreviewPanel from './PreviewPanel.jsx'
 import Overview from './Overview.jsx'
 import FitText from './FitText.jsx'
+
+/**
+ * Watches a scroll container and reports whether it currently has anything
+ * left to scroll to.
+ *
+ * The rail is sized to the preview panel, and the preview is a 4:3 box in a
+ * fluid column, so the rail's height tracks the window width. Between about
+ * 1024 and 1400px the content is taller than that box and the last paragraph
+ * ends up below the fold. The fade that signals this used to be painted
+ * unconditionally, which meant it also washed out copy that was not
+ * scrollable, and readers saw text dissolving for no reason.
+ */
+function useHasMoreBelow(ref) {
+  const [hasMore, setHasMore] = useState(false)
+
+  const measure = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    // A pixel of slack: fractional layout heights can leave scrollHeight a
+    // hair above clientHeight on a container that is not really scrollable.
+    const remaining = el.scrollHeight - el.clientHeight - el.scrollTop
+    setHasMore(remaining > 1)
+  }, [ref])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    measure()
+
+    // Height changes come from the window resizing, and content changes come
+    // from paging to another project. One observer on the container catches
+    // both without a window listener.
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+
+    el.addEventListener('scroll', measure, { passive: true })
+    return () => {
+      observer.disconnect()
+      el.removeEventListener('scroll', measure)
+    }
+  }, [ref, measure])
+
+  return hasMore
+}
 
 /**
  * Hero — live preview on the left, metadata rail on the right.
@@ -10,6 +56,9 @@ import FitText from './FitText.jsx'
  * description paragraph stays readable at any screen size.
  */
 export default function Hero({ t }) {
+  const railRef = useRef(null)
+  const hasMoreBelow = useHasMoreBelow(railRef)
+
   return (
     // No min-height on the row. The preview panel's 4:3 ratio is the only thing
     // setting the hero's height now, and the rail matches it.
@@ -24,7 +73,11 @@ export default function Hero({ t }) {
           to its own height, which is the whitespace this is fixing. Below lg the
           columns stack and the rail is an ordinary card again. */}
       <aside className="card relative overflow-hidden">
-        <div className="rail-scroll grid content-start gap-6 p-5 lg:absolute lg:inset-0 lg:overflow-y-auto">
+        <div
+          ref={railRef}
+          data-scrollable={hasMoreBelow ? '' : undefined}
+          className="rail-scroll grid content-start gap-6 p-5 lg:absolute lg:inset-0 lg:overflow-y-auto"
+        >
           {/* --- Title block --------------------------------------------
               Accent fill, rich black text. The one place the brand colour
               appears at full strength, which is why it can carry the
@@ -79,8 +132,12 @@ export default function Hero({ t }) {
 
         {/* Signals that the rail continues past the fold. Needed because the
             scrollbar is hidden by default on macOS, so without it the content
-            just looks cropped. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-12 bg-linear-to-t from-white to-transparent lg:block" />
+            just looks cropped. Rendered only while there is something left to
+            reach: over copy that has nowhere to scroll, a fade is not an
+            affordance, it is a rendering fault. */}
+        {hasMoreBelow && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-12 bg-linear-to-t from-white to-transparent lg:block" />
+        )}
       </aside>
     </section>
   )

@@ -147,6 +147,19 @@ body {
     scrollbar-width: thin;
     scrollbar-color: var(--color-iron) transparent;
   }
+
+  /* WebKit hides overlay scrollbars until you scroll, which is fine on a page
+     but not inside a panel nobody knows is scrollable. When the rail actually
+     has something below the fold it keeps a permanent track, so the fade has a
+     visible partner rather than being the only clue. */
+  .rail-scroll[data-scrollable]::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .rail-scroll[data-scrollable]::-webkit-scrollbar-thumb {
+    background: var(--color-iron);
+    border-radius: 2px;
+  }
 }
 
 /* ==========================================================================
