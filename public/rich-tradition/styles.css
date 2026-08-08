@@ -58,8 +58,20 @@
   --ease-quart: cubic-bezier(.165, .84, .44, 1);
   --ease-snap: cubic-bezier(1, 0, 0, 1);
 
-  /* ---- Type. Archivo stands in for the source's commercial face. ---- */
-  --ff: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* ---- Type. Anton stands in for the source's commercial face. ----
+     One weight, no axes. Nothing below asks the family to get bolder or
+     narrower, because it cannot. Tracking is the only lever, and it runs
+     the other way from a variable face: open the small sizes up, leave
+     the display sizes alone. */
+  --ff: 'Anton', 'Haettenschweiler', 'Arial Narrow', Helvetica, sans-serif;
+
+  /* Anton sets about a third narrower than the face it replaces, so at
+     the source's own sizes the headlines stop short of the page edge and
+     the page loses the thing it is built on. This multiplies the display
+     steps back up. The measured numbers stay visible in the rules below;
+     the substitution lives here, in one place, and goes to 1 if the real
+     face is ever licensed. */
+  --display-fill: 1.2;
 }
 
 @media screen and (min-width: 960px) {
@@ -116,7 +128,9 @@ body {
   color: var(--c-accent);
   font-family: var(--ff);
   font-size: max(2rem, min(2vw, 3rem));
-  font-variation-settings: 'wdth' 94, 'wght' 800;
+  /* Anton is drawn for posters. Below about 24px its sidebearings close
+     up, so everything set small gets tracking back. */
+  letter-spacing: .02em;
   line-height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -143,25 +157,27 @@ body.--locked { overflow: hidden; }
 /* Type scale. Every step is the same clamp shape: a rem floor so it
    never collapses on a phone, a vw middle so it tracks the viewport,
    a rem ceiling so it stops growing on a 5K display. */
-.fs-340 { font-size: max(7rem, min(17vw, 34rem)); line-height: 85%; }
-.fs-300 { font-size: max(8rem, min(15vw, 30rem)); line-height: 85%; }
-.fs-260 { font-size: max(7rem, min(13vw, 26rem)); line-height: 85%; }
-.fs-240 { font-size: max(10rem, min(10vw, 24rem)); line-height: 85%; }
-.fs-110 { font-size: max(6rem, min(6vw, 11rem)); line-height: 90%; }
-.fs-90  { font-size: max(5rem, min(5vw, 9rem)); line-height: 90%; }
+/* The source sets its display leading at 85%. Anton's capitals stand at
+   about 71% of the em against roughly 55% for the face it replaces, so
+   85% of the enlarged size puts one line of capitals through the next.
+   80% is the floor that still clears them. */
+.fs-340 { font-size: calc(max(7rem, min(17vw, 34rem)) * var(--display-fill)); line-height: 80%; }
+.fs-300 { font-size: calc(max(8rem, min(15vw, 30rem)) * var(--display-fill)); line-height: 80%; }
+.fs-260 { font-size: calc(max(7rem, min(13vw, 26rem)) * var(--display-fill)); line-height: 80%; }
+.fs-240 { font-size: calc(max(10rem, min(10vw, 24rem)) * var(--display-fill)); line-height: 80%; }
+.fs-110 { font-size: calc(max(6rem, min(6vw, 11rem)) * var(--display-fill)); line-height: 88%; }
+.fs-90  { font-size: calc(max(5rem, min(5vw, 9rem)) * var(--display-fill)); line-height: 88%; }
 .fs-35  { font-size: max(2rem, min(2vw, 3.5rem)); line-height: 100%; }
 .fs-24  { font-size: max(1.6rem, min(1.6vw, 2.4rem)); line-height: 100%; }
 .fs-20  { font-size: max(1.6rem, min(1.8vw, 2rem)); line-height: 100%; }
 
-/* The display sizes are set tighter than the text sizes; at 30rem a
-   default sidebearing reads as a gap. */
+/* The display steps run at the face's own tracking. Anton is already
+   tight enough that pulling it in further closes the counters, but its
+   word space is narrow in proportion to the letters, so at 190px two
+   words weld together without help. */
 .fs-340, .fs-300, .fs-260, .fs-240, .fs-110, .fs-90 {
-  font-variation-settings: 'wdth' 92, 'wght' 880;
-  letter-spacing: -0.022em;
-  /* Negative tracking eats the word space along with everything else,
-     and at 190px a lost space welds two words together. This puts it
-     back without loosening the letters. */
-  word-spacing: 0.06em;
+  letter-spacing: 0;
+  word-spacing: 0.08em;
 }
 
 /* Vertical rhythm. The same clamp shape again — margin-bottom only,
@@ -177,9 +193,9 @@ body.--locked { overflow: hidden; }
 .sp-20  { margin-bottom: max(1.5rem, min(1.5vw, 3rem)); }
 .sp-14  { margin-bottom: max(1rem, min(1vw, 1.4rem)); }
 
-.col-1 { width: var(--col-1); }
-.col-2 { width: var(--col-2); }
-.col-3 { width: var(--col-3); }
+/* Only the spans the page actually asks for as a class. The full
+   --col-1 … --col-8 ladder stays in :root because components size
+   themselves from it directly. */
 .col-4 { width: var(--col-4); }
 
 @media screen and (max-width: 959.8px) { .col-4-m { width: var(--col-4); } }
@@ -266,8 +282,13 @@ body.--locked { overflow: hidden; }
    choreographed against each other by setting one number each.
    ============================================================ */
 
-.st { visibility: hidden; }
-.st.is-inview { visibility: visible; }
+/* Hidden before it lands, so nothing flashes in unsplit while the face
+   is still loading. `opacity`, not `visibility`: the copy has to stay in
+   the accessibility tree whether or not it has been scrolled past. The
+   fade needs no duration — the characters are still clipped below their
+   masks at the moment it becomes visible. */
+.st { opacity: 0; }
+.st.is-inview { opacity: 1; }
 
 .st .char-mask,
 .st .line-mask {
@@ -418,7 +439,7 @@ body.--locked { overflow: hidden; }
 .intro__logo {
   position: relative;
   z-index: 10;
-  width: max(30rem, min(30vw, 60rem));
+  max-width: 90vw;
   text-align: center;
   opacity: 0;
   transform: translate3d(0, 30%, 0);
@@ -431,16 +452,14 @@ body.--locked { overflow: hidden; }
   letter-spacing: .18em;
   line-height: 200%;
   text-transform: uppercase;
-  font-variation-settings: 'wdth' 100, 'wght' 700;
 }
 
 .intro__word {
   display: block;
-  font-size: max(4rem, min(7vw, 12rem));
-  line-height: 82%;
-  letter-spacing: -.025em;
+  font-size: max(4rem, min(6.5vw, 11rem));
+  line-height: 88%;
+  letter-spacing: .01em;
   text-transform: uppercase;
-  font-variation-settings: 'wdth' 88, 'wght' 900;
 }
 
 .intro.is-ready .intro__logo { opacity: 1; transform: translateZ(0); }
@@ -507,7 +526,12 @@ body.--locked { overflow: hidden; }
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+  transition: gap .5s var(--ease-expo);
 }
+
+/* Collapsing the gap is what lets the plate close around the mark
+   rather than leaving a tall empty red bar behind it. */
+#menu-label.is-collapsed .menu-label__inner { gap: 1.2rem; }
 
 .menu-label__bg {
   position: absolute;
@@ -599,19 +623,14 @@ body.--locked { overflow: hidden; }
   letter-spacing: .14em;
   line-height: 140%;
   text-align: center;
-  font-variation-settings: 'wdth' 88, 'wght' 700;
 }
 
 .wordmark__word {
   font-size: max(3rem, min(3vw, 6rem));
-  line-height: .82em;
-  letter-spacing: -.02em;
-  font-variation-settings: 'wdth' 88, 'wght' 900;
+  line-height: .88em;
+  letter-spacing: .01em;
 }
 
-/* The second line is set to the full width of the plate, which is what
-   makes the lockup read as a block rather than as two words. */
-.wordmark__word--wide { font-variation-settings: 'wdth' 76, 'wght' 900; }
 
 .wordmark__mark {
   fill: var(--c-secondary);
@@ -819,8 +838,7 @@ body.--locked { overflow: hidden; }
    at this size a smaller point size would stop reading as a claim. */
 .title-large__sup {
   display: block;
-  font-variation-settings: 'wdth' 84, 'wght' 800;
-  letter-spacing: .01em;
+  letter-spacing: .05em;
   line-height: 120%;
 }
 
@@ -1036,7 +1054,7 @@ body.--locked { overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: max(7rem, min(17vw, 34rem));
+  font-size: calc(max(7rem, min(17vw, 34rem)) * var(--display-fill));
   line-height: 85%;
   text-align: center;
   text-transform: uppercase;
@@ -1054,8 +1072,8 @@ body.--locked { overflow: hidden; }
 .product-showcase__title {
   pointer-events: none;
   user-select: none;
-  font-variation-settings: 'wdth' 92, 'wght' 880;
-  letter-spacing: -.022em;
+  letter-spacing: 0;
+  word-spacing: .08em;
 }
 
 /* The jar sits over the headline, not beside it — the type is the
@@ -1177,31 +1195,6 @@ body.--locked { overflow: hidden; }
   flex-wrap: wrap;
 }
 
-.footer__fondo,
-.footer__fondo__badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.footer__fondo__badge { gap: 1rem; }
-.footer__fondo__flag { width: var(--col-1); }
-.footer__fondo__flag__label { display: flex; text-align: center; }
-
-.footer__fondo__badges {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: var(--col-4);
-}
-
-.footer__fondo__title {
-  padding: max(1.5rem, min(1.5vw, 3rem)) 0;
-  border-top: 1px solid var(--c-accent);
-  border-bottom: 1px solid var(--c-accent);
-}
-
 .footer__legal { text-align: center; text-transform: uppercase; color: var(--c-accent); line-height: 140%; }
 
 @media screen and (min-width: 960px) { .footer__legal br { display: none; } }
@@ -1215,7 +1208,7 @@ body.--locked { overflow: hidden; }
 
 /* The SVG's own user units, not CSS pixels — 200 wide, so 17 here is
    a little over 8% of the seal's diameter at any rendered size. */
-.logo-seal text { font-size: 17px; letter-spacing: .1em; font-variation-settings: 'wdth' 92, 'wght' 800; fill: var(--c-text-alt); }
+.logo-seal text { font-size: 17px; letter-spacing: .12em; fill: var(--c-text-alt); }
 .logo-seal .logo-seal__mark { fill: var(--c-text-alt); }
 
 @keyframes seal-rotate { from { transform: rotate(0); } to { transform: rotate(1turn); } }

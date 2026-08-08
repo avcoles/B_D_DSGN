@@ -7,10 +7,11 @@
 <meta name="description" content="Rich Tradition has been stuffing piquillo peppers in Navarre since 1987. Four formats, four fillings, ready to eat straight from the jar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- One family on both axes. The source runs a single commercial cut for
-     the whole page; Archivo's width axis is what lets one family cover
-     both the 34rem headline and the 1.6rem caption without a second face. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<!-- One face, one weight, one file. That matches the source, which
+     declares two cuts and only ever loads one, and runs weight 400 across
+     headlines, body, nav and buttons alike. Size, case and position carry
+     the whole hierarchy. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -108,7 +109,7 @@
           <span class="wordmark__word">Rich</span>
           <span class="wordmark__sup">New<br>tradition</span>
         </span>
-        <span class="wordmark__word wordmark__word--wide">Tradition</span>
+        <span class="wordmark__word">Tradition</span>
         <svg class="wordmark__mark" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
       </span>
       <svg class="wordmark__mono" viewBox="0 0 34 44" aria-hidden="true"><use href="#mono"/></svg>
@@ -128,14 +129,14 @@
       <h1 class="ta-c hero__title fs-300 tt-u">
         <span class="title-large__line title-large__line--first">
           <span class="title-large__sup title-large__sup--left st fs-35" data-split="chars" data-observe="once">Since<br>1987</span>
-          <span class="title-large__word st" data-split="chars" data-observe="once" style="line-height:70%">From</span>
+          <span class="title-large__word st" data-split="chars" data-observe="once" style="line-height:80%">From</span>
           <span class="title-large__sup title-large__sup--right st fs-35" data-split="chars" data-observe="once">New<br>tradition</span>
         </span>
         <span class="title-large__line">
-          <span class="st" data-split="chars" data-observe="once" data-delay="0.1" style="line-height:70%">Navarre to</span>
+          <span class="st" data-split="chars" data-observe="once" data-delay="0.1" style="line-height:80%">Navarre to</span>
         </span>
         <span class="title-large__line">
-          <span class="st" data-split="chars" data-observe="once" data-delay="0.2" style="line-height:70%">All of Spain</span>
+          <span class="st" data-split="chars" data-observe="once" data-delay="0.2" style="line-height:80%">All of Spain</span>
         </span>
       </h1>
     </div>
@@ -184,17 +185,17 @@
   <h2 class="ta-c sp-40 fs-260 tt-u">
     <span class="title-large__line title-large__line--first">
       <span class="title-large__sup title-large__sup--left st" style="font-size:max(2rem,min(2vw,3rem))" data-split="chars" data-observe="once">Since<br>1987</span>
-      <span class="title-large__word st" data-split="chars" data-observe="once" style="line-height:70%">Taste</span>
+      <span class="title-large__word st" data-split="chars" data-observe="once" style="line-height:80%">Taste</span>
       <span class="title-large__sup title-large__sup--right st" style="font-size:max(2rem,min(2vw,3rem))" data-split="chars" data-observe="once">New<br>tradition</span>
     </span>
     <span class="title-large__line">
-      <span class="st" data-split="chars" data-observe="once" style="line-height:70%">The flavour</span>
+      <span class="st" data-split="chars" data-observe="once" style="line-height:80%">The flavour</span>
     </span>
     <span class="title-large__line">
-      <span class="st" data-split="chars" data-observe="once" style="line-height:70%">Of the new</span>
+      <span class="st" data-split="chars" data-observe="once" style="line-height:80%">Of the new</span>
     </span>
     <span class="title-large__line">
-      <span class="st" data-split="chars" data-observe="once" style="line-height:70%">Tradition</span>
+      <span class="st" data-split="chars" data-observe="once" style="line-height:80%">Tradition</span>
     </span>
   </h2>
 
@@ -325,30 +326,7 @@
         <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Data Rights">Data Rights</span></span></a>
       </div>
 
-      <!-- The rural-development funding notice. Kept because it is a real
-           structural obligation for a producer of this kind, and because
-           it is the one place on the page where the type is allowed to
-           be small and plain. -->
-      <div class="footer__fondo sp-80">
-        <span class="footer__fondo__title tt-u c-accent col-4-m col-8-d col-6-t ta-c fs-24 sp-40">This company has received support co-financed at 31% by the European Agricultural Fund for Rural Development through the Navarre Rural Development Programme 2014&ndash;2020</span>
-        <span class="tt-u c-accent col-4-m ta-c fs-20 sp-60">Project co-financed by:</span>
-        <div class="footer__fondo__badges">
-          <div class="footer__fondo__badge">
-            <div class="media footer__fondo__flag">
-              <img class="media__picture picture__image is-loading" src="./assets/flag-europe.png" alt="Flag of the European Union" draggable="false">
-            </div>
-            <span class="footer__fondo__flag__label fs-20 col-2 c-accent tt-u">European Agricultural Fund for Rural Development: Europe investing in rural areas</span>
-          </div>
-          <div class="footer__fondo__badge">
-            <div class="media footer__fondo__flag">
-              <img class="media__picture picture__image is-loading" src="./assets/flag-region.png" alt="Emblem of the Government of Navarre" draggable="false">
-            </div>
-            <span class="footer__fondo__flag__label fs-20 col-2 c-accent tt-u">Department of Economic Development</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer__legal sp-60 ta-c fs-20 tt-u c-accent">
+      <div class="footer__legal sp-80 ta-c fs-20 tt-u c-accent">
         &copy; Copyright 2026 Rich Tradition Foods S.A.<br> All rights reserved.
       </div>
     </div>

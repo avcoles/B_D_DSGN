@@ -4,6 +4,7 @@ import { boutique } from './boutique.js'
 import { commercialStudio } from './commercialStudio.js'
 import { actionFigure } from './actionFigure.js'
 import { runClub } from './runClub.js'
+import { richTradition } from './richTradition.js'
 
 /**
  * Every showcased page, in the order they appear.
@@ -21,4 +22,5 @@ export const projects = [
   commercialStudio,
   runClub,
   actionFigure,
+  richTradition,
 ].filter((project) => !project.hidden)

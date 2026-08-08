@@ -42,7 +42,12 @@
   // from the DOM it produced last time.
   splits.forEach((el) => {
     el.dataset.source = el.innerHTML.trim();
-    el.setAttribute('aria-label', el.textContent.replace(/\s+/g, ' ').trim());
+    // A forced break carries no whitespace of its own, so reading the
+    // label off textContent would give "Since1987".
+    el.setAttribute(
+      'aria-label',
+      el.dataset.source.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
+    );
   });
 
   const segmentsOf = (html) => html.split(/<br\s*\/?>/i);
@@ -248,6 +253,7 @@
      whose transitions are staggered against each other in CSS.
      ============================================================ */
 
+  const label = document.getElementById('menu-label');
   const plate = document.getElementById('plate');
   const logos = document.getElementById('logos');
   const heroMedia = document.querySelector('.hero .pr');
@@ -260,6 +266,7 @@
     const y = window.scrollY;
 
     const collapsed = y > 80;
+    label.classList.toggle('is-collapsed', collapsed);
     plate.classList.toggle('is-collapsed', collapsed);
     logos.classList.toggle('is-collapsed', collapsed);
 
