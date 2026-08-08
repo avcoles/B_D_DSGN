@@ -182,13 +182,23 @@ Anton is narrower than the face it replaces and its capitals stand
 taller in the em, so two compensations are needed. Both are named and
 both live in one place each:
 
-- `--display-fill: 1.2` multiplies the display steps. At the source's
-  own sizes Anton stops well short of the page edge, and the page is
-  built on headlines that reach it. The measured clamps stay visible in
-  the rules; set this to 1 if the real face is ever licensed.
-- Display leading goes from 85% to 80%. Anton's capitals are about 71%
-  of the em against roughly 55% for the source cut, so 85% of the
-  enlarged size runs one line of capitals through the next.
+- `--display-fill: 1.05` multiplies the display steps. At the source's
+  own sizes Anton stops short of the page edge, and the page is built on
+  headlines that reach it. It stays modest because the tall capitals
+  already read as large and every point of size costs height twice over.
+  Below 960px it drops to 1: the display steps sit on their rem floors
+  there, and multiplying a floor overflows the screen.
+- `--display-leading: 1.02` replaces the source's 85%. Anton's capitals
+  measure **0.87 of the em**, against roughly 0.55 for the source cut,
+  so anything under 87% seats one line of capitals inside the one above
+  it. 1.02 leaves a gap of about a sixth of the cap height, which is as
+  tight as this face goes. The same floor applies to the line-split
+  headings, whose leading is set per element: the showcase title and the
+  award heading were on 85% and 90% and both had to come up.
+
+The line masks also gained an 8% bottom inset. Anton's `Q` has a tail
+that a flush mask cuts off, and 8% is well short of the 115% a waiting
+line sits at, so the mask still hides one.
 
 Tracking runs the opposite way from a variable face. Rather than pulling
 the display sizes tight, the small sizes are opened up: `.02em` on body,
@@ -241,12 +251,16 @@ license the original.
   a 2.6s ceiling.
 - **The nav, footer and menu links are in-page anchors.** This is one
   page; the source is four.
-- **Copy is translated, not localised — and that costs one device.**
-  The source is bilingual on purpose: Spanish carries the heritage copy
-  while a short English label sits beside it, which is how a Navarre
-  producer signals it ships beyond Navarre. Rendering everything into
-  English keeps the meaning and loses that signal. The translation is
-  otherwise close to literal, grandmother joke included.
+- **The copy is written for the template, not translated.** An earlier
+  pass rendered the Spanish original into English close to literally.
+  That read as one producer's story rather than as a page anyone could
+  take, so it was replaced: the headlines, the standfirst, the CTAs and
+  the awards section are now original and carry no place name, no family
+  anecdote and no borrowed prize list. One device is lost in the move.
+  The source is bilingual on purpose, with Spanish carrying the heritage
+  copy and a short English label beside it, which is how a regional
+  producer signals it ships beyond its region. A single-language page
+  cannot do that.
 - **The rural-development funding block is cut.** The source closes its
   footer with an EU co-financing notice, two government emblems and
   their captions — a real disclosure obligation for that producer, and

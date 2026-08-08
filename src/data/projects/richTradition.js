@@ -22,7 +22,7 @@ export const richTradition = {
   subtitle: 'Heritage Food',
 
   description:
-    'A brand template whose job is to make a thirty-year-old preserved-food recipe look like something you would order in a restaurant. It behaves like packaging rather than like a website. A seal sits stamped dead centre of every screen, the buttons are cut into ribbons, and the type runs large enough that you see pattern before you read words.',
+    'A heritage landing page for a producer with a long history and a short product list, where oversized type and full-bleed photography do the selling instead of a catalogue.',
 
   attributes: [
     { label: 'Character', items: ['Loud', 'Warm', 'Graphic'] },
@@ -33,8 +33,8 @@ export const richTradition = {
     heading: 'Overview',
     lead: 'The strategic read of this page.',
     body: [
-      'You cannot argue anyone into wanting a jar of stuffed peppers, so the page does not try. It opens on a photograph of a laid table and sits there for a beat before a single word shows up. Appetite first, pitch second. After that it stops borrowing from the web and starts borrowing from the jar: a circular seal that turns as you pass it, buttons cut like ribbon, and one red used often enough that you know whose page this is without a logo ever being on screen.',
-      'Below the hero it stops scrolling like a document. The page becomes a stack of full-screen panels sliding over one another, each holding for exactly one screen, which gives a four-variant range the pacing of a campaign. The source used a smooth-scroll library for that. This gets there with sticky positioning and a z-index apiece.',
+      'Photography leads, type follows, and the product only turns up once the case is made.',
+      'Below the hero the page stops scrolling and starts stacking, each panel holding for a screen.',
     ],
   },
 
