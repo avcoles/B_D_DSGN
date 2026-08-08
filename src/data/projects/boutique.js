@@ -82,14 +82,12 @@ export const boutique = {
    */
   specTokens: {
     paper: '#efeeec',
-    paperDeep: '#e6e4e1',
     card: '#ffffff',
     ink: '#000000',
     ink2: '#5d5346',
     ink3: 'rgba(93, 83, 70, 0.68)',
     rule: 'rgba(93, 83, 70, 0.22)',
     accent: '#5d5346',
-    accentSoft: '#efeeec',
     display: "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
     label: "'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     labelTracking: '0.06em',

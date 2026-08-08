@@ -11,14 +11,12 @@ import Buttons from './system/Buttons.jsx'
  */
 const specStyle = (t) => ({
   '--paper': t.paper,
-  '--paper-deep': t.paperDeep,
   '--card': t.card,
   '--ink': t.ink,
   '--ink-2': t.ink2,
   '--ink-3': t.ink3,
   '--rule': t.rule,
   '--accent': t.accent,
-  '--accent-soft': t.accentSoft,
   '--spec-display': t.display,
   '--spec-label': t.label,
   '--spec-label-tracking': t.labelTracking,

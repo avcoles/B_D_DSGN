@@ -83,14 +83,12 @@ export const commercialStudio = {
    */
   specTokens: {
     paper: '#f2f0e6',
-    paperDeep: '#eae7db',
     card: '#eae7db',
     ink: '#1d1d1d',
     ink2: 'rgb(29 29 29 / 0.85)',
     ink3: 'rgb(29 29 29 / 0.7)',
     rule: 'rgb(29 29 29 / 0.16)',
     accent: '#ff4101',
-    accentSoft: 'rgb(29 29 29 / 0.05)',
     display: "'Serrif Compressed', 'Instrument Serif', Georgia, serif",
     label: "'Saans', 'Hanken Grotesk', Arial, sans-serif",
     labelTracking: '0.06em',

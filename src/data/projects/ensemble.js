@@ -83,14 +83,12 @@ export const ensemble = {
    */
   specTokens: {
     paper: '#ede4dd',
-    paperDeep: '#d2cac3',
     card: '#ede4dd',
     ink: '#000000',
     ink2: '#5a5a5a',
     ink3: '#7a7a7a',
     rule: 'rgba(0, 0, 0, 0.16)',
     accent: '#ff0001',
-    accentSoft: '#d2cac3',
     display: "'Neue Haas Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     label: "'Neue Haas Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     labelTracking: '0.02em',

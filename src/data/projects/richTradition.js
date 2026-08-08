@@ -86,14 +86,12 @@ export const richTradition = {
    */
   specTokens: {
     paper: '#fbf5e7',
-    paperDeep: '#f2e9d4',
     card: '#fbf5e7',
     ink: '#d70321',
     ink2: '#cba058',
     ink3: 'rgb(203 160 88 / 0.72)',
     rule: 'rgb(215 3 33 / 0.24)',
     accent: '#d70321',
-    accentSoft: '#ffb82e',
     display: "'Anton', 'Haettenschweiler', 'Arial Narrow', Helvetica, sans-serif",
     label: "'Anton', 'Haettenschweiler', 'Arial Narrow', Helvetica, sans-serif",
     labelTracking: '0.14em',

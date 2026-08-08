@@ -19,7 +19,7 @@ import { useLayoutEffect, useRef } from 'react'
  * during measurement never gets restored and the text collapses to whatever it
  * inherits. One owner for the property, and no render involved.
  */
-export default function FitText({ max = 56, min = 22, className = '', children }) {
+export default function FitText({ max = 56, min = 22, children }) {
   const ref = useRef(null)
 
   useLayoutEffect(() => {
@@ -52,17 +52,29 @@ export default function FitText({ max = 56, min = 22, className = '', children }
     // Runs before paint, so there is no flash at the unfitted size.
     fit()
 
+    // Measure again on the next frame. The rail this sits in is absolutely
+    // positioned, so on a page change the box can still be mid-layout when the
+    // effect fires. A width that is small but not zero slips past the guard
+    // above and the search collapses to `min`, which then sticks: the observer
+    // only reports *changes*, and by the time it would fire the box has already
+    // reached the width it was measured at. One extra frame closes that window.
+    const frame = requestAnimationFrame(fit)
+
     // Webfonts land after first paint and change every measurement, so redo it
     // once they are in. Without this the title is sized against the fallback.
     document.fonts?.ready.then(fit).catch(() => {})
 
     const ro = new ResizeObserver(fit)
     ro.observe(box)
-    return () => ro.disconnect()
+
+    return () => {
+      cancelAnimationFrame(frame)
+      ro.disconnect()
+    }
   }, [children, max, min])
 
   return (
-    <span ref={ref} className={`block ${className}`}>
+    <span ref={ref} className="block">
       {children}
     </span>
   )

@@ -87,14 +87,12 @@ export const runClub = {
    */
   specTokens: {
     paper: '#ffffff',
-    paperDeep: '#eaeaec',
     card: '#ffffff',
     ink: '#171614',
     ink2: '#828282',
     ink3: 'rgba(130, 130, 130, 0.85)',
     rule: 'rgba(23, 22, 20, 0.14)',
     accent: '#171614',
-    accentSoft: '#eaeaec',
     display: "'PP Neue Montreal', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     label: "'PP Neue Montreal', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     labelTracking: '0.04em',

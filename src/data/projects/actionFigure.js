@@ -90,14 +90,12 @@ export const actionFigure = {
    */
   specTokens: {
     paper: '#0E0E0E',
-    paperDeep: '#161616',
     card: '#1F1F1F',
     ink: '#F5F5F5',
     ink2: 'rgb(245 245 245 / 0.66)',
     ink3: 'rgb(245 245 245 / 0.40)',
     rule: 'rgb(245 245 245 / 0.14)',
     accent: '#5D2DE6',
-    accentSoft: 'rgb(93 45 230 / 0.16)',
     display: "'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     label: "'JetBrains Mono', ui-monospace, Menlo, monospace",
     labelTracking: '0.06em',

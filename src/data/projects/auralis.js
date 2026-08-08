@@ -112,14 +112,12 @@ export const auralis = {
    */
   specTokens: {
     paper: '#faf8f5',
-    paperDeep: '#f1ece4',
     card: '#ffffff',
     ink: '#1a1713',
     ink2: '#554d42',
     ink3: '#928878',
     rule: 'rgba(26, 23, 19, 0.12)',
     accent: '#c2500f',
-    accentSoft: '#f7ebe1',
     display: "'Instrument Serif', serif",
     label: "'JetBrains Mono', monospace",
     labelTracking: '0.16em',
