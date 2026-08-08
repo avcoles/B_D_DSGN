@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action Figure® | The Fully Poseable Design Studio</title>
+<meta name="description" content="Action Figure is a design studio for brands that need to move. Strategy, identity, motion and build — assembled in Bristol and Brooklyn since 2016.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Three faces, two families. Archivo is variable on both width and weight, so
+     the expanded display cuts and the condensed section labels come from one
+     download. Pixelify Sans covers the raster/bitmap moments (boot screen,
+     badges, terminal) that the reference handles with FK Raster Grotesk. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&family=Pixelify+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+
+<!-- ========================================================================
+     Boot overlay. Ten column blocks wipe up once the hero scene reports ready
+     (or after a hard timeout, so a machine without WebGL is never stuck here).
+     ===================================================================== -->
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="boot__cols">
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+  <div class="boot__center">
+    <div class="boot__word" data-boot-word>BOOTING</div>
+    <div class="boot__word" data-boot-word>PLS</div>
+    <div class="boot__word" data-boot-word>WAIT</div>
+  </div>
+  <div class="boot__meter"><span id="boot-fill"></span></div>
+  <div class="boot__readout mono" id="boot-readout">AF-2016 // INIT</div>
+</div>
+
+<div class="page" id="top">
+
+  <!-- ==================== Nav ==================== -->
+  <header class="nav">
+    <a class="nav__logo" href="#top" aria-label="Action Figure, home">
+      <!-- The mark is the figure reduced to its joints: a head, a torso bar and
+           four limbs radiating from one pivot. -->
+      <svg viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+        <circle cx="22" cy="8" r="6.5" fill="currentColor"/>
+        <rect x="18.5" y="16" width="7" height="14" rx="3.5" fill="currentColor"/>
+        <rect x="2" y="17" width="16" height="6.5" rx="3.25" fill="currentColor"/>
+        <rect x="26" y="17" width="16" height="6.5" rx="3.25" fill="currentColor"/>
+        <rect x="10" y="30" width="6.5" height="13" rx="3.25" fill="currentColor" transform="rotate(12 13.25 36.5)"/>
+        <rect x="27.5" y="30" width="6.5" height="13" rx="3.25" fill="currentColor" transform="rotate(-12 30.75 36.5)"/>
+      </svg>
+      <span class="nav__wordmark">Action<br>Figure<sup>®</sup></span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a class="link-swap" href="#work"><span>Work</span><span aria-hidden="true">Work</span></a>
+      <a class="link-swap" href="#parts"><span>Parts</span><span aria-hidden="true">Parts</span></a>
+      <a class="link-swap" href="#studio"><span>Studio</span><span aria-hidden="true">Studio</span></a>
+      <a class="link-swap" href="#latest"><span>Latest</span><span aria-hidden="true">Latest</span></a>
+    </nav>
+
+    <div class="nav__end">
+      <button class="terminal-hint mono" data-term-open type="button">
+        Press <kbd>/</kbd> for terminal
+      </button>
+      <a class="btn" href="#contact">
+        <span class="btn__bg"></span>
+        <span class="btn__mask"><span>Start a build</span><span>Start a build</span></span>
+      </a>
+      <button class="nav__menu" id="menu-toggle" type="button" aria-expanded="false" aria-controls="menu">
+        <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
+        <span class="mono">Menu</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile sheet -->
+  <div class="menu" id="menu" hidden>
+    <a href="#work">Work</a>
+    <a href="#parts">Parts</a>
+    <a href="#studio">Studio</a>
+    <a href="#latest">Latest</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <!-- ==================== Hero ==================== -->
+  <section class="hero" id="hero">
+    <!-- The turntable. Everything in here is drawn by figure.js; the CSS supplies
+         the scanlines and vignette on top so the render reads as a CRT feed. -->
+    <div class="stage" id="stage">
+      <canvas id="figure-canvas"></canvas>
+      <div class="stage__scan" aria-hidden="true"></div>
+      <div class="stage__vignette" aria-hidden="true"></div>
+      <p class="stage__fallback mono" id="stage-fallback" hidden>
+        WebGL unavailable — figure shown as still.
+      </p>
+    </div>
+
+    <div class="hero__type">
+      <h1 class="display">
+        <span class="lm"><span class="l">The Fully</span></span>
+        <span class="lm"><span class="l">Poseable<sup>®</sup></span></span>
+        <span class="lm"><span class="l">Design Studio</span></span>
+      </h1>
+    </div>
+
+    <!-- Corner HUD. Four fixed reads that make the hero feel instrumented
+         rather than decorated. -->
+    <div class="hud hud--tl mono">
+      <span>AF-2016</span><span data-hud-clock>--:--:--</span>
+    </div>
+    <div class="hud hud--tr mono">
+      <span>ARTICULATION</span><span>32 PTS</span>
+    </div>
+    <div class="hud hud--bl mono">
+      <a class="link-underline" href="mailto:hello@actionfigure.studio">hello@actionfigure.studio</a>
+    </div>
+    <div class="hud hud--br mono">
+      <button type="button" class="pose-btn" data-pose>Pose <i aria-hidden="true"></i></button>
+    </div>
+
+    <a class="hero__scroll mono" href="#statement">
+      <span>Scroll</span>
+      <svg viewBox="0 0 12 20" aria-hidden="true"><path d="M6 0v18M1 13l5 5 5-5" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+    </a>
+  </section>
+
+  <!-- ==================== Ticker ==================== -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <span class="ticker__set">
+        Strategy <b>✳</b> Identity <b>✳</b> Digital <b>✳</b> Motion <b>✳</b> Content <b>✳</b> Build <b>✳</b>
+      </span>
+      <span class="ticker__set">
+        Strategy <b>✳</b> Identity <b>✳</b> Digital <b>✳</b> Motion <b>✳</b> Content <b>✳</b> Build <b>✳</b>
+      </span>
+    </div>
+  </div>
+
+  <!-- ==================== Statement ==================== -->
+  <section class="statement" id="statement">
+    <p class="eyebrow mono" data-reveal>001 — What we do</p>
+    <h2 class="h2">
+      <span class="lm"><span class="l">We make brands that</span></span>
+      <span class="lm"><span class="l">hold a pose and still</span></span>
+      <span class="lm"><span class="l">know how to move.</span></span>
+    </h2>
+    <div class="statement__body">
+      <p data-reveal>
+        Action Figure has been building brands since 2016 — strategy, identity,
+        digital, motion and the code underneath. We work with a small number of
+        partners a year and we build every part of the thing, not a deck about it.
+      </p>
+      <p data-reveal>
+        The name is the method. A brand that only works in one position is a
+        statue. We design systems with joints in them: enough structure to stay
+        recognisable, enough give to be put into a shape nobody planned for.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== Work ==================== -->
+  <section class="work" id="work">
+    <div class="section-head">
+      <p class="eyebrow mono" data-reveal>002 — Selected work</p>
+      <h2 class="h3 condensed" data-reveal>Four out of the box</h2>
+    </div>
+
+    <div class="work__grid">
+
+      <article class="card card--wide" data-reveal>
+        <a href="#work" class="card__link" aria-label="Nomad Athletic — A running brand with a pulse">
+          <div class="card__media" data-swatch="violet">
+            <div class="card__art" data-art="pulse" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span class="card__no mono">No. 001</span>
+          </div>
+          <div class="card__foot">
+            <div>
+              <h3 class="card__title">Nomad Athletic</h3>
+              <p class="card__sub">A running brand with a pulse</p>
+            </div>
+            <ul class="tags mono"><li>Identity</li><li>Digital</li><li>Motion</li></ul>
+          </div>
+        </a>
+      </article>
+
+      <article class="card" data-reveal>
+        <a href="#work" class="card__link" aria-label="Fathom — Deep water, loud packaging">
+          <div class="card__media" data-swatch="mint">
+            <div class="card__art" data-art="waves" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <span class="card__no mono">No. 002</span>
+          </div>
+          <div class="card__foot">
+            <div>
+              <h3 class="card__title">Fathom</h3>
+              <p class="card__sub">Deep water, loud packaging</p>
+            </div>
+            <ul class="tags mono"><li>Brand</li><li>Packaging</li></ul>
+          </div>
+        </a>
+      </article>
+
+      <article class="card" data-reveal>
+        <a href="#work" class="card__link" aria-label="Circuit Club — Arcade culture, rebooted">
+          <div class="card__media" data-swatch="blush">
+            <div class="card__art" data-art="grid" aria-hidden="true"></div>
+            <span class="card__no mono">No. 003</span>
+          </div>
+          <div class="card__foot">
+            <div>
+              <h3 class="card__title">Circuit Club</h3>
+              <p class="card__sub">Arcade culture, rebooted</p>
+            </div>
+            <ul class="tags mono"><li>Digital</li><li>Motion</li></ul>
+          </div>
+        </a>
+      </article>
+
+      <article class="card card--wide" data-reveal>
+        <a href="#work" class="card__link" aria-label="Halcyon — A games label grows up">
+          <div class="card__media" data-swatch="lavender">
+            <div class="card__art" data-art="orbit" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="card__no mono">No. 004</span>
+          </div>
+          <div class="card__foot">
+            <div>
+              <h3 class="card__title">Halcyon</h3>
+              <p class="card__sub">A games label grows up</p>
+            </div>
+            <ul class="tags mono"><li>Strategy</li><li>Identity</li><li>Build</li></ul>
+          </div>
+        </a>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ==================== Parts / capabilities ==================== -->
+  <section class="parts" id="parts">
+    <div class="section-head">
+      <p class="eyebrow mono" data-reveal>003 — Parts included</p>
+      <h2 class="h3 condensed" data-reveal>Everything in the box</h2>
+    </div>
+
+    <ul class="accordion" id="accordion">
+      <li class="acc">
+        <button class="acc__head" type="button" aria-expanded="false">
+          <span class="acc__no mono">01</span>
+          <span class="acc__title condensed">Strategy</span>
+          <span class="acc__plus" aria-hidden="true"></span>
+        </button>
+        <div class="acc__panel"><div class="acc__inner">
+          <p>Positioning, naming, architecture, tone. The part where we work out
+          what the thing actually is before anyone opens a design file.</p>
+          <ul class="tags mono"><li>Positioning</li><li>Naming</li><li>Messaging</li><li>Architecture</li></ul>
+        </div></div>
+      </li>
+      <li class="acc">
+        <button class="acc__head" type="button" aria-expanded="false">
+          <span class="acc__no mono">02</span>
+          <span class="acc__title condensed">Identity</span>
+          <span class="acc__plus" aria-hidden="true"></span>
+        </button>
+        <div class="acc__panel"><div class="acc__inner">
+          <p>Marks, type, colour, imagery and the rules that hold them together —
+          delivered as a working system, not a PDF of nice examples.</p>
+          <ul class="tags mono"><li>Marks</li><li>Type systems</li><li>Art direction</li><li>Guidelines</li></ul>
+        </div></div>
+      </li>
+      <li class="acc">
+        <button class="acc__head" type="button" aria-expanded="false">
+          <span class="acc__no mono">03</span>
+          <span class="acc__title condensed">Digital</span>
+          <span class="acc__plus" aria-hidden="true"></span>
+        </button>
+        <div class="acc__panel"><div class="acc__inner">
+          <p>Sites, stores and product surfaces. Designed and built in the same
+          room, which is why the built thing looks like the designed thing.</p>
+          <ul class="tags mono"><li>Websites</li><li>Commerce</li><li>Product UI</li><li>Design systems</li></ul>
+        </div></div>
+      </li>
+      <li class="acc">
+        <button class="acc__head" type="button" aria-expanded="false">
+          <span class="acc__no mono">04</span>
+          <span class="acc__title condensed">Motion &amp; 3D</span>
+          <span class="acc__plus" aria-hidden="true"></span>
+        </button>
+        <div class="acc__panel"><div class="acc__inner">
+          <p>Real-time 3D, film, and the small interface movements nobody
+          credits and everybody notices. Modelled, lit and shipped to the web.</p>
+          <ul class="tags mono"><li>Real-time 3D</li><li>Film</li><li>Interaction</li><li>Sound</li></ul>
+        </div></div>
+      </li>
+      <li class="acc">
+        <button class="acc__head" type="button" aria-expanded="false">
+          <span class="acc__no mono">05</span>
+          <span class="acc__title condensed">Build</span>
+          <span class="acc__plus" aria-hidden="true"></span>
+        </button>
+        <div class="acc__panel"><div class="acc__inner">
+          <p>Front-end, CMS, performance and the handover. We stay on after
+          launch, because the first month is when a system learns to bend.</p>
+          <ul class="tags mono"><li>Front-end</li><li>CMS</li><li>Performance</li><li>Support</li></ul>
+        </div></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ==================== Studio / spec plate ==================== -->
+  <section class="studio" id="studio">
+    <div class="spec" data-reveal>
+      <div class="spec__head">
+        <span class="raster">Action Figure<sup>®</sup></span>
+        <span class="mono">Model AF-2016</span>
+      </div>
+      <dl class="spec__grid">
+        <div><dt class="mono">Scale</dt><dd>1:1</dd></div>
+        <div><dt class="mono">Articulation</dt><dd>32 points</dd></div>
+        <div><dt class="mono">Assembled in</dt><dd>Bristol &amp; Brooklyn</dd></div>
+        <div><dt class="mono">In production since</dt><dd>2016</dd></div>
+        <div><dt class="mono">Materials</dt><dd>Strategy, identity, digital, motion, build</dd></div>
+        <div><dt class="mono">Partners per year</dt><dd>Eight, maximum</dd></div>
+      </dl>
+      <p class="spec__warning mono">
+        <b>Warning:</b> contains small ideas. Not suitable for brands under three.
+      </p>
+    </div>
+
+    <div class="studio__copy">
+      <p class="eyebrow mono" data-reveal>004 — Studio</p>
+      <h2 class="h3" data-reveal>Fourteen people, one bench, no floors between us.</h2>
+      <p data-reveal>
+        We are strategists, designers, animators and engineers who sit close
+        enough to argue. Everything is prototyped early and badly, then made
+        properly once it has earned it.
+      </p>
+      <p data-reveal>
+        We take on eight partners a year. That number is not a positioning
+        exercise — it is the number of things fourteen people can do well.
+      </p>
+      <a class="btn btn--ghost" href="#contact" data-reveal>
+        <span class="btn__bg"></span>
+        <span class="btn__mask"><span>Meet the studio</span><span>Meet the studio</span></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== Latest ==================== -->
+  <section class="latest" id="latest">
+    <div class="section-head">
+      <p class="eyebrow mono" data-reveal>005 — Latest</p>
+      <h2 class="h3 condensed" data-reveal>Off the shelf</h2>
+    </div>
+
+    <ul class="news">
+      <li class="news__row" data-reveal>
+        <a href="#latest">
+          <span class="news__kind mono">Open position</span>
+          <span class="news__title">We are looking for a senior motion designer</span>
+          <span class="news__date mono">Aug 2026</span>
+          <span class="news__arrow" aria-hidden="true">↗</span>
+        </a>
+      </li>
+      <li class="news__row" data-reveal>
+        <a href="#latest">
+          <span class="news__kind mono">Awards</span>
+          <span class="news__title">Six more shelves have been ordered</span>
+          <span class="news__date mono">Jul 2026</span>
+          <span class="news__arrow" aria-hidden="true">↗</span>
+        </a>
+      </li>
+      <li class="news__row" data-reveal>
+        <a href="#latest">
+          <span class="news__kind mono">Journal</span>
+          <span class="news__title">Why we still prototype in cardboard first</span>
+          <span class="news__date mono">Jun 2026</span>
+          <span class="news__arrow" aria-hidden="true">↗</span>
+        </a>
+      </li>
+      <li class="news__row" data-reveal>
+        <a href="#latest">
+          <span class="news__kind mono">News</span>
+          <span class="news__title">Action Figure opens a second bench in Brooklyn</span>
+          <span class="news__date mono">May 2026</span>
+          <span class="news__arrow" aria-hidden="true">↗</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer" id="contact">
+    <!-- The slot machine. Each middle column cycles through synonyms while the
+         fixed words hold the sentence in place, so the tagline keeps rewriting
+         itself without ever stopping being the tagline. -->
+    <div class="slot" data-slot aria-label="The fully poseable design studio">
+      <div class="slot__line">
+        <span class="slot__fixed">The</span>
+        <span class="slot__reel" data-reel><i>Fully</i><i>Truly</i><i>Endlessly</i><i>Properly</i></span>
+      </div>
+      <div class="slot__line">
+        <span class="slot__reel" data-reel><i>Poseable<sup>®</sup></i><i>Buildable</i><i>Bendable</i><i>Repairable</i></span>
+      </div>
+      <div class="slot__line">
+        <span class="slot__reel" data-reel><i>Design</i><i>Brand</i><i>Creative</i></span>
+        <span class="slot__fixed">Studio</span>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div>
+        <p class="eyebrow mono">General enquiries</p>
+        <a class="footer__mail link-underline" href="mailto:hello@actionfigure.studio">hello@actionfigure.studio</a>
+      </div>
+      <div>
+        <p class="eyebrow mono">Connect</p>
+        <ul class="footer__list">
+          <li><a class="link-swap" href="#contact"><span>LinkedIn</span><span aria-hidden="true">LinkedIn</span></a></li>
+          <li><a class="link-swap" href="#contact"><span>Instagram</span><span aria-hidden="true">Instagram</span></a></li>
+          <li><a class="link-swap" href="#contact"><span>Read.cv</span><span aria-hidden="true">Read.cv</span></a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow mono">Benches</p>
+        <ul class="footer__list">
+          <li>Bristol, UK</li>
+          <li>Brooklyn, NY</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__base mono">
+      <span>© 2026 Action Figure® — All rights reserved</span>
+      <span><a class="link-underline" href="#contact">Privacy</a> / <a class="link-underline" href="#contact">Terms</a></span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ========================================================================
+     Command terminal. The reference hides its whole navigation behind a typed
+     prompt; this is the same idea — "/" anywhere opens it, commands route or
+     apply a screen effect, ESC closes.
+     ===================================================================== -->
+<div class="term" id="term" hidden>
+  <div class="term__scrim" data-term-close></div>
+  <div class="term__panel" role="dialog" aria-modal="true" aria-label="Command terminal">
+    <div class="term__bar mono">
+      <span>AF:/ command terminal</span>
+      <button type="button" data-term-close aria-label="Close terminal">ESC</button>
+    </div>
+    <div class="term__body">
+      <label class="term__prompt mono" for="term-input">&gt;</label>
+      <input class="term__input mono" id="term-input" type="text" autocomplete="off"
+             spellcheck="false" placeholder="Enter command">
+    </div>
+    <p class="term__help mono" id="term-help">
+      Start typing and see where it leads you, or use one of the prompts below.
+    </p>
+    <div class="term__cmds">
+      <button type="button" class="chip mono" data-cmd="work">work</button>
+      <button type="button" class="chip mono" data-cmd="parts">parts</button>
+      <button type="button" class="chip mono" data-cmd="studio">studio</button>
+      <button type="button" class="chip mono" data-cmd="latest">latest</button>
+      <button type="button" class="chip mono" data-cmd="contact">contact</button>
+      <button type="button" class="chip mono" data-cmd="pose">pose</button>
+      <button type="button" class="chip mono" data-cmd="bw">bw</button>
+      <button type="button" class="chip mono" data-cmd="negative">negative</button>
+      <button type="button" class="chip mono" data-cmd="crt">crt</button>
+      <button type="button" class="chip mono" data-cmd="reset">reset</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>

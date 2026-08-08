@@ -1,0 +1,1155 @@
+/* ============================================================
+   Run Club — landing page rebuild
+
+   Everything here derives from three decisions read off the source
+   snapshot's stylesheet:
+
+   1. One typeface at three weights, one near-black, one page-grey.
+   2. A column count that changes (4 / 8 / 12) while the gutter and the
+      page margin never do — both stay at 10px at every size.
+   3. Zero radii, zero shadows, zero fills. Structure is expressed by
+      where an image edge lands, never by a box drawn around content.
+   ============================================================ */
+
+/* ---- Typeface ---------------------------------------------
+   PP Neue Montreal, self-hosted, which is what the source theme used.
+
+   The cut we do not have is Regular (400), and 400 is the weight almost
+   every element on this page asks for. CSS font matching would answer a
+   400 request with Medium, because for a desired weight of 400 it checks
+   500 before it checks anything lighter, and the whole page would come
+   out a step heavy. So Book claims the 300–400 band explicitly and 400
+   resolves down to it, which is the closer of the two neighbours here:
+   Book is this family's text weight, Medium is its emphasis weight.
+
+   Only Book and Medium are ever requested by the stylesheet, so Thin and
+   Bold are declared for completeness and never downloaded. */
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('./fonts/PPNeueMontreal-Thin.otf') format('opentype');
+  font-weight: 100 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('./fonts/PPNeueMontreal-Book.otf') format('opentype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('./fonts/PPNeueMontreal-Medium.otf') format('opentype');
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('./fonts/PPNeueMontreal-Bold.otf') format('opentype');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-black: #171614;
+  --color-white: #ffffff;
+  --gray-200: #eaeaec;
+  --gray-400: #e8e9eb;
+  --gray-600: #828282;
+
+  --ff: 'PP Neue Montreal', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* Margin and gutter are the same 10px everywhere; only the column
+     count moves. That is what keeps the page feeling like one document
+     rather than three breakpoint-specific layouts. */
+  --margin: 10px;
+  --gap: 10px;
+  --cols: 4;
+
+  --header-h: 47px;
+
+  /* The gap between every top-level section, and the footer's top
+     padding. Changing this one value re-paces the entire page. */
+  --section-gap: 30px;
+
+  --ease-out: cubic-bezier(.215, .61, .355, 1);
+  --ease-expo: cubic-bezier(.19, 1, .22, 1);
+  --ease-inout: cubic-bezier(.645, .045, .355, 1);
+}
+
+@media (min-width: 768px) {
+  :root { --cols: 8; --header-h: 56px; --section-gap: 50px; }
+}
+
+@media (min-width: 1200px) {
+  :root { --cols: 12; --header-h: 60px; --section-gap: 70px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--ff);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.--locked { overflow: hidden; }
+
+h1, h2, h3, h4, p, figure, ul, fieldset { margin: 0; padding: 0; }
+ul { list-style: none; }
+img, video { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+button, input, select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 0;
+}
+button { cursor: pointer; touch-action: manipulation; }
+button:focus, input:focus, select:focus, a:focus { outline: none; }
+:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+
+.wysiwyg p { margin: 0; }
+.wysiwyg p + p { margin-top: 1em; }
+
+/* ---- Layout primitives ------------------------------------
+   `.wrap` is the page margin, `.g` is the column grid. Sections take
+   both; a section that only needs the margin takes `.wrap` alone. */
+.wrap { padding-left: var(--margin); padding-right: var(--margin); }
+
+.g {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+
+/* Media that fills its figure. Every photograph on the page is placed
+   this way, so the figure's aspect-ratio — not the file — decides the
+   crop, and swapping an image never changes the layout. */
+.as-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- Text link -------------------------------------------
+   The underline is a background gradient rather than a border, which
+   is what lets it redraw left-to-right on hover instead of appearing
+   all at once. Every call to action on the page is this one control. */
+.btn { position: relative; display: block; color: currentColor; }
+
+.btn.--link .btn__label {
+  --bottom: 1px;
+  --height: 1px;
+  background-image: linear-gradient(transparent calc(100% - var(--height)), currentColor var(--height));
+  background-repeat: no-repeat;
+  background-size: 100% calc(100% - var(--bottom));
+  background-position: top left;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn.--link:hover .btn__label,
+  .btn.--link:focus-visible .btn__label {
+    animation: linkRedraw .75s var(--ease-inout) both;
+  }
+}
+
+@keyframes linkRedraw {
+  0% { background-size: 0% calc(100% - var(--bottom)); }
+  100% { background-size: 100% calc(100% - var(--bottom)); }
+}
+
+/* ============================================================
+   Site header
+   ============================================================ */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9000;
+  width: 100%;
+  color: var(--color-black);
+  transition: color .1s linear;
+}
+
+/* Inverted while a dark section is behind the bar. The class is set
+   from script against the sections marked `data-invert`, so adding a
+   dark section never means editing a scroll threshold. */
+.site-header.--inverted { color: var(--color-white); }
+
+.site-header__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-h);
+  background: var(--color-white);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s linear;
+}
+.site-header.--solid .site-header__bg { opacity: 1; }
+
+.site-header__wrap {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gap);
+  align-items: center;
+  height: var(--header-h);
+}
+
+.site-header__leftNav,
+.site-header__rightNav {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.site-header__leftNav { justify-self: start; }
+.site-header__rightNav { justify-self: end; }
+
+.site-header__logo {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+}
+.site-header__logoLink {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.site-header__leftMenu,
+.site-header__rightMenu { display: none; }
+
+@media (min-width: 1200px) {
+  .site-header__leftNav,
+  .site-header__rightNav { gap: 35px; }
+  .site-header__leftMenu,
+  .site-header__rightMenu { display: flex; align-items: center; gap: 35px; }
+  .site-header__logoLink { font-size: 16px; }
+}
+
+/* Submenus open on hover. The rule above them scales out from the left
+   and the items translate in on a 50ms stagger — the same two-part move
+   the source uses to make a plain list feel deliberate. */
+.site-header__leftMenu > li:has(> ul),
+.site-header__rightMenu > li:has(> ul) { position: relative; }
+
+.site-header__leftMenu > li > ul,
+.site-header__rightMenu > li > ul {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 100%;
+  padding-top: 26px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+.site-header__leftMenu > li:hover > ul,
+.site-header__leftMenu > li:focus-within > ul,
+.site-header__rightMenu > li:hover > ul,
+.site-header__rightMenu > li:focus-within > ul { display: flex; }
+
+.site-header__leftMenu > li > ul::before,
+.site-header__rightMenu > li > ul::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 0;
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: top left;
+  animation: ruleGrow .95s var(--ease-expo) backwards;
+}
+
+.site-header__leftMenu > li > ul > li,
+.site-header__rightMenu > li > ul > li {
+  --delay: calc(var(--index, 0) * 50ms);
+  animation: itemIn .95s var(--ease-expo) var(--delay) backwards,
+             fadeIn .25s linear var(--delay) backwards;
+}
+
+@keyframes ruleGrow { 0% { scale: 0 1; } }
+@keyframes itemIn { 0% { translate: -20px 0; } }
+@keyframes fadeIn { 0% { opacity: 0; } }
+
+/* Everything in the bar except the item under the cursor dims. It is
+   the page's only hover state that reaches outside the hovered
+   element, and it is what makes the thin bar feel responsive. */
+@media (hover: hover) and (min-width: 1200px) {
+  .site-header__wrap:has(.site-header__leftMenu > li:hover,
+                         .site-header__rightMenu > li:hover,
+                         .site-header__cartBtn:hover,
+                         .site-header__searchBtn:hover,
+                         .site-header__accountLink:hover) :is(
+    .site-header__leftMenu > li,
+    .site-header__rightMenu > li,
+    .site-header__cartBtn,
+    .site-header__searchBtn,
+    .site-header__accountLink
+  ):not(:hover):not(:focus-within) {
+    opacity: .11;
+    transition: opacity .25s linear;
+  }
+
+  .site-header__leftMenu > li,
+  .site-header__rightMenu > li,
+  .site-header__cartBtn,
+  .site-header__searchBtn,
+  .site-header__accountLink { transition: opacity .15s .15s linear; }
+}
+
+.site-header__burger {
+  position: relative;
+  width: 20px;
+  height: 16px;
+  color: currentColor;
+}
+.site-header__burger::before,
+.site-header__burger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transition: transform .35s var(--ease-inout);
+}
+.site-header__burger::before { top: 4px; }
+.site-header__burger::after { bottom: 4px; }
+body.--nav-open .site-header__burger::before { transform: translateY(3.5px) rotate(45deg); }
+body.--nav-open .site-header__burger::after { transform: translateY(-3.5px) rotate(-45deg); }
+
+@media (min-width: 1200px) { .site-header__burger { display: none; } }
+
+.site-header__cartBtn,
+.site-header__searchBtn,
+.site-header__accountLink { font-weight: inherit; white-space: nowrap; }
+
+.site-header__searchBtn,
+.site-header__accountLink { display: none; }
+
+@media (min-width: 1200px) {
+  .site-header__searchBtn { display: block; order: 1; }
+  .site-header__accountLink { display: block; order: 2; }
+  .site-header__cartBtn { order: 3; }
+}
+
+/* ---- Search ---------------------------------------------- */
+.site-header__searchbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: calc(var(--header-h) + 22px);
+  padding-bottom: 22px;
+  background: var(--color-white);
+  color: var(--color-black);
+}
+.site-header__searchbar[aria-hidden="true"] { display: none; }
+
+.search-form {
+  grid-column: 1 / -1;
+}
+@media (min-width: 768px) { .search-form { grid-column: 3 / span 4; } }
+@media (min-width: 1200px) { .search-form { grid-column: 4 / span 6; } }
+
+.search-form__fieldset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-bottom: 1px solid var(--color-black);
+  padding-bottom: 6px;
+}
+.search-form__input { flex: 1 1 auto; min-width: 0; }
+.search-form__input::placeholder { color: var(--gray-600); }
+
+/* ============================================================
+   Mobile navigation
+   ============================================================ */
+
+.site-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: var(--color-white);
+  overflow: hidden;
+}
+.site-nav[aria-hidden="true"] { display: none; }
+
+.site-nav__scroller { width: 100%; height: 100%; overflow-y: auto; }
+
+.site-nav__wrap { padding-top: 90px; padding-bottom: 90px; }
+
+.site-nav__menu {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 40px;
+  align-items: start;
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  .site-nav__menu { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 60px; font-size: 16px; }
+}
+
+.site-nav__menu > .menu-item > a { font-weight: 500; }
+.site-nav__menu ul { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+
+/* ============================================================
+   Cart drawer
+   ============================================================ */
+
+.site-cart {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgb(0 0 0 / .25);
+}
+.site-cart[aria-hidden="true"] { display: none; }
+
+.site-cart__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 420px);
+  height: 100%;
+  padding: 0 var(--margin);
+  background: var(--color-white);
+  animation: cartIn .35s var(--ease-out) both;
+}
+@keyframes cartIn { 0% { transform: translateX(100%); } }
+
+.site-cart__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.site-cart__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 14px;
+}
+.site-cart__emptyTitle { font-size: 16px; }
+.site-cart__emptyRule { color: var(--gray-600); }
+.site-cart__empty .btn { margin-top: 18px; }
+
+/* ============================================================
+   Rows
+   ============================================================ */
+
+.row { position: relative; }
+
+/* One gap governs the whole stack. Every section is separated from the
+   one above it by the same measure, so the page has a single vertical
+   rhythm instead of a per-section margin that has to be remembered. */
+.row + .row { margin-top: var(--section-gap); }
+
+/* ---- Hero ------------------------------------------------
+   Full viewport height, with the whole grid pushed to its baseline.
+   Only the tablet range breaks that rule and goes square, because a
+   full-height hero on a portrait tablet leaves the copy stranded. */
+.row-hero {
+  height: 100lvh;
+  grid-template-rows: 1fr;
+  grid-auto-rows: auto;
+  row-gap: 20px;
+  padding-bottom: 30px;
+  color: var(--color-white);
+  background: #000;
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .row-hero { aspect-ratio: 1; height: auto; }
+}
+@media (min-width: 768px) { .row-hero { padding-bottom: 12px; } }
+@media (min-width: 1200px) { .row-hero { padding-bottom: 10px; } }
+
+.row-hero__media {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.row-hero__picture { position: absolute; inset: 0; display: block; }
+/* Only the foot of the frame darkens. A full-image scrim would flatten
+   the photograph; this puts contrast exactly where the type sits.
+
+   The ramp is steep at the very bottom because the hero photograph is
+   bright concrete under the headline. A flat 30% wash left white type at
+   about 2.2:1 against the lightest patches, so the gradient now keeps
+   fading down to the last pixel rather than settling three quarters of
+   the way. */
+.row-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 50%,
+    rgb(0 0 0 / .12) 70%,
+    rgb(0 0 0 / .52) 83%,
+    rgb(0 0 0 / .62) 100%
+  );
+}
+
+.row-hero__header {
+  position: relative;
+  grid-column: 1 / span 4;
+  grid-row: 1;
+  align-self: end;
+  display: flex;
+  align-items: flex-start;
+}
+@media (min-width: 1200px) { .row-hero__header { grid-column: 1 / span 9; } }
+
+.row-hero__title { font-size: 20px; font-weight: 400; text-transform: uppercase; }
+.row-hero__subtitle { position: relative; top: -.5em; font-size: 11px; }
+
+@media (min-width: 768px) {
+  .row-hero__title { font-size: 32px; }
+  .row-hero__subtitle { font-size: 18px; }
+}
+@media (min-width: 1200px) {
+  .row-hero__title { font-size: 40px; }
+  .row-hero__subtitle { font-size: 14px; }
+}
+
+/* The same link exists twice: beside the headline on desktop, under the
+   standfirst on mobile. One of the two is always hidden. */
+.row-hero__header .row-hero__buttons { display: none; }
+@media (min-width: 768px) {
+  .row-hero__header .row-hero__buttons {
+    display: block;
+    margin-top: auto;
+    margin-bottom: 3px;
+  }
+  .row-hero__content .row-hero__buttons { display: none; }
+}
+@media (min-width: 1200px) {
+  .row-hero__header .row-hero__buttons { margin-left: 5px; margin-bottom: 10px; }
+}
+
+.row-hero__content {
+  position: relative;
+  grid-column: 1 / span 4;
+  grid-row: 2;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .row-hero__content { grid-column: 5 / span 4; grid-row: 1; padding-bottom: 5px; }
+}
+@media (min-width: 1200px) {
+  .row-hero__content { grid-column: 10 / span 3; padding-bottom: 12px; }
+}
+
+.row-hero__text { font-size: 14px; line-height: 17px; }
+@media (min-width: 768px) { .row-hero__text { line-height: normal; } }
+@media (min-width: 1200px) { .row-hero__text { font-size: 15px; } }
+
+/* ---- Promo + products ------------------------------------
+   Two halves of one row. The editorial half bleeds through the page
+   margin to the viewport edge; the product half stays on the grid.
+   That single broken edge is what stops the row reading as two cards. */
+/* minmax(0, 1fr) rather than a bare 1fr: the products grid inside is
+   wider at max-content than the page is, and an auto track would take
+   that width and push the whole document sideways. */
+.row-promo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+@media (min-width: 768px) { .row-promo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.row-promo__promo {
+  position: relative;
+  display: grid;
+  color: var(--color-white);
+}
+@media (min-width: 768px) {
+  .row-promo__promo {
+    width: calc(100% + var(--margin));
+    margin-left: calc(var(--margin) * -1);
+  }
+}
+
+/* Stretch beats the ratio when the products column is the taller of the
+   two, so the panel matches its neighbour's height on a wide screen and
+   falls back to a fixed 355:444 crop once the row stacks. */
+.row-promo__promoMedia {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  align-self: stretch;
+  aspect-ratio: 355 / 444;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.row-promo__promoContent {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  align-self: end;
+  display: grid;
+  row-gap: 20px;
+  padding: 26px 16px;
+}
+@media (min-width: 768px) { .row-promo__promoContent { row-gap: 15px; padding: 16px var(--margin); } }
+@media (min-width: 1200px) {
+  .row-promo__promoContent {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: 0;
+    padding: 28px var(--margin);
+  }
+}
+
+.row-promo__promoTitle {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 20px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+@media (min-width: 768px) { .row-promo__promoTitle { font-size: 32px; } }
+@media (min-width: 1200px) { .row-promo__promoTitle { font-size: 40px; } }
+
+.row-promo__promoText {
+  grid-row: 2;
+  font-size: 14px;
+  line-height: 17px;
+}
+@media (min-width: 1200px) {
+  .row-promo__promoText { grid-column: 2; font-size: 15px; line-height: normal; }
+}
+
+.row-promo__promoCTA { grid-row: 3; justify-self: start; }
+@media (min-width: 768px) { .row-promo__promoCTA { margin-top: 5px; } }
+@media (min-width: 1200px) { .row-promo__promoCTA { grid-column: 2; margin-top: 25px; } }
+
+.row-promo__products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 24px;
+  align-self: start;
+}
+@media (min-width: 768px) { .row-promo__products { row-gap: 10px; } }
+@media (min-width: 1200px) { .row-promo__products { row-gap: 12px; } }
+
+/* Mirrored variant: products left, panel right, and the panel now
+   bleeds off the right edge instead of the left. Below the breakpoint
+   the row stacks and neither bleed applies, so this is md-up only. */
+@media (min-width: 768px) {
+  .row-promo.--promo-last .row-promo__promo { grid-column: 2; margin-left: 0; }
+  .row-promo.--promo-last .row-promo__products { grid-column: 1; grid-row: 1; }
+}
+
+/* ---- Product tile ----------------------------------------
+   The thumbnail carries a grey plate so a tile that has not loaded is
+   a considered blank rather than a hole in the grid. */
+.product-preview {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 5px;
+  align-self: start;
+}
+@media (min-width: 768px) { .product-preview { gap: 7px; } }
+@media (min-width: 1200px) { .product-preview { gap: 6px; } }
+
+.product-preview__link {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: grid;
+  grid-template-rows: subgrid;
+  gap: inherit;
+}
+
+.product-preview__thumbnail {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 348 / 435;
+  overflow: clip;
+  background: var(--gray-200);
+}
+
+.product-preview__content {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+@media (min-width: 1200px) { .product-preview__content { gap: 0; } }
+
+.product-preview__title,
+.product-preview__price { font-size: 13px; font-weight: 400; }
+@media (min-width: 1200px) {
+  .product-preview__title,
+  .product-preview__price { font-size: 14px; }
+}
+
+/* Rollover variant. Name, price and swatches move on top of the image
+   and are invisible until the tile is hovered — the grid then reads as
+   pure photography, with the retail detail available on demand. */
+.product-preview.--rollover { grid-template-rows: auto; }
+.product-preview.--rollover .product-preview__link { grid-row: 1 / span 1; }
+
+.product-preview.--rollover .product-preview__content {
+  grid-row: 1;
+  align-self: end;
+  justify-self: start;
+  padding: 8px 10px;
+  color: var(--color-black);
+}
+.product-preview.--rollover .product-preview__title { font-size: 16px; }
+
+.product-preview.--rollover .product-preview__content,
+.product-preview.--rollover .product-preview__colors {
+  opacity: 0;
+  transition: opacity .25s linear;
+}
+.product-preview.--rollover:hover .product-preview__content,
+.product-preview.--rollover:hover .product-preview__colors,
+.product-preview.--rollover:focus-within .product-preview__content,
+.product-preview.--rollover:focus-within .product-preview__colors {
+  opacity: 1;
+  transition: opacity .4s linear;
+}
+
+/* Colour swatches. The active marker is a pseudo-element on the list
+   rather than a class on the swatch, so it slides between positions
+   instead of blinking from one to the next. */
+.product-preview__colors {
+  --active-index: 0;
+  --margin-bottom: 8px;
+  --margin-x: 8px;
+  --marker-width: 10px;
+  --swatch-gap: 3px;
+  --swatch-width: 22px;
+
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--swatch-gap);
+  margin: 0 var(--margin-x) var(--margin-bottom);
+}
+@media (min-width: 768px) {
+  .product-preview__colors { --margin-bottom: 10px; --margin-x: 5px; --marker-width: 14px; --swatch-width: 35px; }
+}
+@media (min-width: 1200px) {
+  .product-preview__colors { --margin-bottom: 14px; --margin-x: 12px; --swatch-gap: 4px; --swatch-width: 47px; }
+}
+
+.product-preview__colors::after {
+  content: "";
+  position: absolute;
+  left: calc((var(--swatch-width) - var(--marker-width)) / 2);
+  bottom: -5px;
+  width: var(--marker-width);
+  height: 1.5px;
+  background: var(--color-black);
+  pointer-events: none;
+  transform: translateX(calc(var(--active-index) * (var(--swatch-width) + var(--swatch-gap))));
+  transition: transform .35s var(--ease-out);
+}
+
+.product-preview__colors > li { flex: 0 0 var(--swatch-width); width: var(--swatch-width); }
+
+.product-preview__color {
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: currentColor;
+  transform-origin: bottom center;
+  transition: transform .25s cubic-bezier(.25, .46, .45, .94);
+}
+@media (min-width: 768px) {
+  .product-preview__color {
+    height: 21px;
+    background: linear-gradient(180deg, transparent 8px, currentColor 8px, currentColor 14px, transparent 14px);
+  }
+}
+.product-preview__color:hover { transform: scaleY(2); }
+
+/* ---- Featured products ----------------------------------- */
+.row-featured {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.row-featured__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.row-featured__title { font-size: 16px; font-weight: 400; }
+@media (min-width: 1200px) { .row-featured__title { font-size: 18px; } }
+.row-featured__cta { margin-left: auto; }
+
+.row-featured__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 20px;
+}
+@media (min-width: 768px) { .row-featured__list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ---- About -----------------------------------------------
+   Copy and imagery occupy the same grid row. The header is on top and
+   the two figures underneath, so the section is a single field of
+   photograph with the type resting on it. */
+.row-textmedia { color: var(--color-white); }
+
+.row-textmedia__header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  z-index: 2;
+  position: relative;
+  align-self: start;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: start;
+  row-gap: 15px;
+  padding: 30px 0;
+}
+@media (min-width: 768px) { .row-textmedia__header { row-gap: 10px; padding: 20px 0; } }
+@media (min-width: 1200px) { .row-textmedia__header { padding: 30px 0; } }
+
+.row-textmedia__title { font-size: 16px; font-weight: 400; }
+@media (min-width: 768px) { .row-textmedia__title { grid-column: 1 / span 4; grid-row: 1; } }
+@media (min-width: 1200px) { .row-textmedia__title { font-size: 18px; } }
+
+.row-textmedia__text {
+  max-width: 375px;
+  font-size: 14px;
+  margin-right: 10px;
+}
+@media (min-width: 768px) {
+  .row-textmedia__text { grid-column: 1 / span 4; max-width: 320px; margin-right: 20px; }
+}
+@media (min-width: 1200px) {
+  .row-textmedia__text { grid-column: 4 / span 3; grid-row: 1; font-size: 15px; margin-right: 30px; }
+}
+
+.row-textmedia__cta { margin-top: 5px; justify-self: start; }
+@media (min-width: 768px) {
+  .row-textmedia__cta { grid-column: 5 / span 4; grid-row: 1; justify-self: end; margin-top: 0; }
+}
+@media (min-width: 1200px) { .row-textmedia__cta { grid-column: 7 / span 6; } }
+
+.row-textmedia__leftMedia,
+.row-textmedia__rightMedia {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 1;
+  overflow: clip;
+  pointer-events: none;
+}
+.row-textmedia__leftMedia {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: calc(100% + var(--margin) * 2);
+  margin-left: calc(var(--margin) * -1);
+}
+/* A flat wash rather than a gradient: the copy runs the full height of
+   this panel, so it needs contrast everywhere, not only at the foot. */
+.row-textmedia__leftMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / .2);
+}
+.row-textmedia__rightMedia {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: calc(100% + var(--margin) * 2);
+  margin-left: calc(var(--margin) * -1);
+}
+
+@media (min-width: 768px) {
+  .row-textmedia__leftMedia,
+  .row-textmedia__rightMedia { aspect-ratio: 408 / 510; align-self: stretch; }
+  .row-textmedia__leftMedia { grid-column: 1 / span 4; width: calc(100% + var(--margin)); }
+  /* The negative margin survives the breakpoint: it pulls the panel left
+     across the gutter so the two figures butt together, and the extra
+     width then carries the pair out to the right page edge. */
+  .row-textmedia__rightMedia {
+    grid-column: 5 / span 4;
+    grid-row: 1;
+    width: calc(100% + var(--margin) + var(--gap));
+  }
+}
+@media (min-width: 1200px) {
+  .row-textmedia__leftMedia,
+  .row-textmedia__rightMedia { aspect-ratio: 717 / 896; }
+  .row-textmedia__leftMedia { grid-column: 1 / span 6; }
+  .row-textmedia__rightMedia { grid-column: 7 / span 6; }
+}
+
+/* ---- Text columns ----------------------------------------
+   Four cards. On a phone the row is a snap rail three columns wide so
+   the fourth card peeks and the swipe is discoverable; from the tablet
+   breakpoint it settles into a plain four-up grid. */
+.row-columns__track {
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin: 0 calc(var(--margin) * -1);
+  padding: 0 var(--margin);
+}
+.row-columns__track::-webkit-scrollbar { display: none; }
+
+.row-columns__item {
+  /* Three of the four columns, gutters included, so the fourth card
+     shows an edge and the rail reads as scrollable without a control. */
+  flex: 0 0 calc((100% - var(--gap) * 3) / 4 * 3 + var(--gap) * 2);
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .row-columns__track {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+  .row-columns__item { flex: none; }
+}
+
+.text-column { display: flex; flex-direction: column; gap: 8px; }
+@media (min-width: 1200px) { .text-column { gap: 12px; } }
+
+.text-column__title { font-size: 16px; font-weight: 400; }
+@media (min-width: 1200px) { .text-column__title { font-size: 18px; } }
+
+.text-column__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 264 / 326;
+  overflow: clip;
+  background: var(--gray-200);
+}
+.text-column__img { transition: scale .9s var(--ease-inout); }
+.text-column:hover .text-column__img { scale: 1.05; }
+
+.text-column__text {
+  margin-right: 8px;
+  font-size: 12px;
+  line-height: 15px;
+}
+@media (min-width: 768px) { .text-column__text { font-size: 13px; line-height: normal; } }
+@media (min-width: 1200px) { .text-column__text { font-size: 14px; margin-right: 35px; } }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+
+/* The top padding is the section gap, so the distance from the last row
+   to the footer matches every other gap on the page. */
+.site-footer {
+  row-gap: 30px;
+  padding-top: var(--section-gap);
+  padding-bottom: 20px;
+  font-size: 13px;
+  line-height: 15px;
+}
+@media (min-width: 1200px) {
+  .site-footer { row-gap: 50px; padding-bottom: 12px; font-size: 14px; }
+}
+
+.site-footer > * { grid-column: 1 / -1; }
+
+.site-footer__nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 35px;
+}
+@media (min-width: 768px) {
+  .site-footer__nav { grid-column: 1 / span 4; row-gap: 30px; }
+}
+@media (min-width: 1200px) {
+  .site-footer__nav { grid-column: 4 / span 6; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.site-footer__menu { display: flex; flex-direction: column; gap: 12px; }
+
+.site-footer__newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+@media (min-width: 768px) { .site-footer__newsletter { grid-column: 5 / span 4; gap: 24px; } }
+@media (min-width: 1200px) { .site-footer__newsletter { grid-column: 10 / span 3; gap: 30px; } }
+
+.site-footer__newsletterTitle,
+.site-footer__configTitle {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+@media (min-width: 768px) {
+  .site-footer__newsletterTitle,
+  .site-footer__configTitle { line-height: 15px; }
+}
+
+.site-footer__newsletterInput {
+  width: 100%;
+  padding-bottom: 6px;
+  border-bottom: 1px solid currentColor;
+}
+.site-footer__newsletterInput::placeholder { color: var(--gray-600); }
+
+.site-footer__config {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+@media (min-width: 768px) { .site-footer__config { grid-column: 5 / span 4; order: 3; } }
+@media (min-width: 1200px) {
+  .site-footer__config { grid-column: 10 / span 3; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .site-footer__countriesWrap { grid-column: span 2; }
+}
+
+.site-footer__configGroup { display: flex; flex-direction: column; gap: 5px; }
+@media (min-width: 1200px) { .site-footer__configGroup { gap: 10px; } }
+
+.localization-switcher__select {
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+}
+
+.site-footer__bottom {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gap);
+  font-size: 11px;
+}
+@media (min-width: 768px) { .site-footer__bottom { grid-column: 1 / span 4; align-self: end; } }
+@media (min-width: 1200px) {
+  .site-footer__bottom {
+    grid-column: 1 / span 5;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    order: 1;
+    font-size: 12px;
+  }
+  .site-footer__copyright { grid-column: span 3; }
+}
+
+.site-footer__credits {
+  justify-self: end;
+  text-transform: uppercase;
+}
+@media (min-width: 768px) { .site-footer__credits { justify-self: start; } }
+@media (min-width: 1200px) { .site-footer__credits { grid-column: 4 / span 2; } }
+
+/* Two labels stacked in a clipped box; hover rolls the second up into
+   the first's place. Same height either way, so nothing reflows. */
+.credits__wrap {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  height: 1.2em;
+}
+.credits__label,
+.credits__value {
+  display: block;
+  transition: transform .35s var(--ease-inout);
+}
+.credits:hover .credits__label,
+.credits:hover .credits__value { transform: translateY(-100%); }
+
+/* ============================================================
+   Reveals
+
+   Media enters slightly overscaled and settles. It is the only motion
+   the page owns that is not a response to the pointer, and it is set
+   deliberately slow — a fast version reads as a glitch at this scale.
+   ============================================================ */
+
+.will-reveal .as-bg {
+  scale: 1.06;
+  transition: scale 1.2s var(--ease-expo);
+}
+.will-reveal.is-inview .as-bg { scale: 1; }
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -5,7 +5,8 @@
       "name": "rodin",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 5180
+      "port": 5180,
+      "autoPort": true
     },
     {
       "name": "ensemble",
@@ -18,6 +19,24 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["-y", "serve", "public/boutique", "-l", "5183"],
       "port": 5183
+    },
+    {
+      "name": "run-club",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "public/run-club", "-l", "5184"],
+      "port": 5184
+    },
+    {
+      "name": "action-figure",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "public/action-figure", "-l", "5185"],
+      "port": 5185
+    },
+    {
+      "name": "rich-tradition",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "public/rich-tradition", "-l", "5186"],
+      "port": 5186
     },
     {
       "name": "commercial-studio",

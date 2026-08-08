@@ -12,5 +12,10 @@ export default defineConfig({
   // so renaming the repo never breaks the build.
   base: './',
 
-  server: { port: 5180 },
+  server: {
+    // Take the port the harness assigns via PORT, so a second session can run
+    // this alongside one that already holds 5180. Pinning it here was what made
+    // the port a hard requirement rather than a preference.
+    port: process.env.PORT ? Number(process.env.PORT) : 5180,
+  },
 })

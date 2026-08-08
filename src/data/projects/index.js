@@ -2,6 +2,8 @@ import { auralis } from './auralis.js'
 import { ensemble } from './ensemble.js'
 import { boutique } from './boutique.js'
 import { commercialStudio } from './commercialStudio.js'
+import { actionFigure } from './actionFigure.js'
+import { runClub } from './runClub.js'
 
 /**
  * Every showcased page, in the order they appear.
@@ -12,6 +14,11 @@ import { commercialStudio } from './commercialStudio.js'
  * A project with `hidden: true` stays in the codebase but drops out of the
  * pager, which is how a page gets shelved without deleting anything.
  */
-export const projects = [auralis, ensemble, boutique, commercialStudio].filter(
-  (project) => !project.hidden,
-)
+export const projects = [
+  auralis,
+  ensemble,
+  boutique,
+  commercialStudio,
+  runClub,
+  actionFigure,
+].filter((project) => !project.hidden)

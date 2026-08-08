@@ -1,0 +1,1225 @@
+/* ============================================================
+   Rich Tradition — landing page rebuild
+
+   Three decisions read off the source snapshot's stylesheet carry
+   the whole page:
+
+   1. Four colours. A cream page, a red, a gold, and whatever the
+      photography brings. Nothing else is ever drawn.
+   2. A viewport-relative everything. `html { font-size: 10px }`, and
+      then every size on the page is `max(floor, min(Nvw, ceiling))`.
+      There are no size-specific rules — the type, the spacing and the
+      grid are all the same clamp shape, so one layout survives every
+      width instead of three breakpoint layouts pretending to be one.
+   3. One easing curve. `cubic-bezier(.19, 1, .22, 1)` — expo-out —
+      runs the reveals, the hovers, the card fan and the plate collapse.
+      A page this loud needs its motion to sound like one instrument.
+   ============================================================ */
+
+:root {
+  /* ---- Colour. Measured from the snapshot. ---- */
+  --c-bg: #fbf5e7;          /* cream page */
+  --c-text-alt: #fbf5e7;    /* same cream, used as type over photography */
+  --c-accent: #d70321;      /* the red that carries every headline */
+  --c-secondary: #cba058;   /* gold — chrome, ornament, type on red */
+  --c-accent-dark: #9f0005;
+  --c-placeholder: #363636;
+
+  /* Set per-section by the showcase; everything that flips colour
+     with the background reads this rather than --c-accent. */
+  --text-color: var(--c-accent);
+
+  /* ---- Grid. Column count and page width move; nothing else does. ---- */
+  --columns: 4;
+  --gutter: 2rem;
+  --width: 90vw;
+
+  --offset: calc((100vw - var(--width)) / 2);
+  --offset-half: calc((100vw - var(--width)) / 4);
+  --offset-double: calc(100vw - var(--width));
+  --gutter-half: calc(var(--gutter) / 2);
+  --gutter-double: calc(var(--gutter) * 2);
+
+  --height: 100svh;
+  --radius: 2rem;
+
+  --col: calc((var(--width) - (var(--columns) - 1) * var(--gutter)) / var(--columns));
+  --col-1: calc(var(--col) * 1 + var(--gutter) * 0);
+  --col-2: calc(var(--col) * 2 + var(--gutter) * 1);
+  --col-3: calc(var(--col) * 3 + var(--gutter) * 2);
+  --col-4: calc(var(--col) * 4 + var(--gutter) * 3);
+  --col-5: calc(var(--col) * 5 + var(--gutter) * 4);
+  --col-6: calc(var(--col) * 6 + var(--gutter) * 5);
+  --col-7: calc(var(--col) * 7 + var(--gutter) * 6);
+  --col-8: calc(var(--col) * 8 + var(--gutter) * 7);
+
+  /* ---- Motion. One curve does almost everything. ---- */
+  --ease-expo: cubic-bezier(.19, 1, .22, 1);
+  --ease-quart: cubic-bezier(.165, .84, .44, 1);
+  --ease-snap: cubic-bezier(1, 0, 0, 1);
+
+  /* ---- Type. Archivo stands in for the source's commercial face. ---- */
+  --ff: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+@media screen and (min-width: 960px) {
+  :root { --columns: 8; --gutter: 2rem; --width: 95vw; }
+}
+
+@media screen and (min-width: 1280px) {
+  :root { --columns: 12; --gutter: max(2rem, min(2vw, 4rem)); --width: 96vw; }
+}
+
+/* ============================================================
+   Reset
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
+html {
+  /* The root of the whole scale. Every rem below is a tenth of this. */
+  font-size: 10px;
+  line-height: 1;
+  -webkit-text-size-adjust: 100%;
+}
+
+body, h1, h2, h3, p, ul, li, figure, blockquote {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+ul { list-style: none; }
+h1, h2, h3, h4 { font-size: 1em; font-weight: inherit; }
+a, a:visited { color: inherit; text-decoration: none; }
+img, svg, picture { display: block; max-width: 100%; }
+img { height: auto; }
+
+button {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+body {
+  min-height: 100%;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  overscroll-behavior-x: contain;
+  background: var(--c-bg);
+  color: var(--c-accent);
+  font-family: var(--ff);
+  font-size: max(2rem, min(2vw, 3rem));
+  font-variation-settings: 'wdth' 94, 'wght' 800;
+  line-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::-webkit-scrollbar { display: none; }
+body.--locked { overflow: hidden; }
+
+::selection { background: var(--c-secondary); color: var(--c-accent); }
+
+/* ============================================================
+   Utilities — the snapshot's atomic layer, kept because the page
+   is genuinely built out of it rather than out of components.
+   ============================================================ */
+
+.tt-u { text-transform: uppercase; }
+.ta-c { text-align: center; }
+.ta-r { text-align: right; }
+
+.c-alt { color: var(--c-text-alt); }
+.c-accent { color: var(--c-accent); }
+.c-secondary { color: var(--c-secondary); }
+
+/* Type scale. Every step is the same clamp shape: a rem floor so it
+   never collapses on a phone, a vw middle so it tracks the viewport,
+   a rem ceiling so it stops growing on a 5K display. */
+.fs-340 { font-size: max(7rem, min(17vw, 34rem)); line-height: 85%; }
+.fs-300 { font-size: max(8rem, min(15vw, 30rem)); line-height: 85%; }
+.fs-260 { font-size: max(7rem, min(13vw, 26rem)); line-height: 85%; }
+.fs-240 { font-size: max(10rem, min(10vw, 24rem)); line-height: 85%; }
+.fs-110 { font-size: max(6rem, min(6vw, 11rem)); line-height: 90%; }
+.fs-90  { font-size: max(5rem, min(5vw, 9rem)); line-height: 90%; }
+.fs-35  { font-size: max(2rem, min(2vw, 3.5rem)); line-height: 100%; }
+.fs-24  { font-size: max(1.6rem, min(1.6vw, 2.4rem)); line-height: 100%; }
+.fs-20  { font-size: max(1.6rem, min(1.8vw, 2rem)); line-height: 100%; }
+
+/* The display sizes are set tighter than the text sizes; at 30rem a
+   default sidebearing reads as a gap. */
+.fs-340, .fs-300, .fs-260, .fs-240, .fs-110, .fs-90 {
+  font-variation-settings: 'wdth' 92, 'wght' 880;
+  letter-spacing: -0.022em;
+  /* Negative tracking eats the word space along with everything else,
+     and at 190px a lost space welds two words together. This puts it
+     back without loosening the letters. */
+  word-spacing: 0.06em;
+}
+
+/* Vertical rhythm. The same clamp shape again — margin-bottom only,
+   so a section's spacing belongs to the section above it and pages
+   can be reordered without anyone auditing margins. */
+.sp-200 { margin-bottom: max(10rem, min(10vw, 20rem)); }
+.sp-160 { margin-bottom: max(8rem, min(8vw, 16rem)); }
+.sp-120 { margin-bottom: max(6rem, min(6vw, 12rem)); }
+.sp-100 { margin-bottom: max(5rem, min(5vw, 10rem)); }
+.sp-80  { margin-bottom: max(4rem, min(4vw, 8rem)); }
+.sp-60  { margin-bottom: max(3rem, min(3vw, 6rem)); }
+.sp-40  { margin-bottom: max(2.4rem, min(2.4vw, 4rem)); }
+.sp-20  { margin-bottom: max(1.5rem, min(1.5vw, 3rem)); }
+.sp-14  { margin-bottom: max(1rem, min(1vw, 1.4rem)); }
+
+.col-1 { width: var(--col-1); }
+.col-2 { width: var(--col-2); }
+.col-3 { width: var(--col-3); }
+.col-4 { width: var(--col-4); }
+
+@media screen and (max-width: 959.8px) { .col-4-m { width: var(--col-4); } }
+@media screen and (min-width: 960px) and (max-width: 1279.8px) { .col-6-t { width: var(--col-6); } }
+@media screen and (min-width: 1280px) { .col-8-d { width: var(--col-8); } }
+
+.container {
+  position: relative;
+  width: var(--width);
+  margin: 0 auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   Media — every photograph on the page goes through this.
+
+   Two stacked layers in one grid area: a blurred thumbnail underneath
+   and the real picture on top at opacity 0. The picture fades in when
+   it decodes, so an image never pops in against the cream; it resolves
+   out of its own blur.
+   ============================================================ */
+
+.media {
+  position: relative;
+  display: grid;
+  grid-template-areas: 'media';
+  overflow: hidden;
+}
+
+.media__picture,
+.media__thumb {
+  grid-area: media;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media__picture {
+  z-index: 10;
+  opacity: 1;
+  will-change: opacity;
+  transition: opacity .75s var(--ease-expo);
+}
+
+.media__picture.is-loading { opacity: 0; }
+
+.media__thumb { z-index: 5; filter: blur(20px); transform: scale(1.06); }
+
+.picture__wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.picture__image {
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+}
+
+/* ============================================================
+   Split text
+
+   The page's signature move. Every headline is cut into characters
+   and every paragraph into lines; each piece sits inside a mask that
+   clips it, starts 115% below its slot, and rises into place. The
+   stagger is arithmetic, not scripted:
+
+       delay = index * --stagger + --delay * --speed
+
+   so a headline's own delay pushes its whole run back without
+   touching the per-character rhythm, and three headlines can be
+   choreographed against each other by setting one number each.
+   ============================================================ */
+
+.st { visibility: hidden; }
+.st.is-inview { visibility: visible; }
+
+.st .char-mask,
+.st .line-mask {
+  position: relative;
+  display: inline-block;
+  clip-path: inset(-20% -20% -10% -20%);
+}
+
+.st .line-mask {
+  display: block;
+  clip-path: inset(-20% 0 0 0);
+}
+
+/* A word is a run of inline-block masks, which the browser would
+   otherwise happily break between — mid-word, mid-glyph. This is the
+   rule that keeps "TRADITION" from becoming "TRADITI / ON". */
+.st .word { position: relative; display: inline-block; white-space: nowrap; }
+
+.st .char,
+.st .line {
+  position: relative;
+  display: inline-block;
+  transform: translate3d(0, 115%, 0);
+  will-change: transform;
+}
+
+.st.is-inview .char,
+.st.is-inview .line {
+  transform: translateZ(0);
+  transition: transform var(--speed, 1.25s) var(--ease-expo)
+              calc(var(--index) * var(--stagger, .025s) + var(--delay, 0) * var(--speed, 1.25s));
+}
+
+/* A masked line has to know how tall it is before the lines exist, so
+   paragraphs carry their leading as a property rather than inheriting
+   a computed pixel value from a display-sized parent. Character splits
+   set theirs inline, per headline. */
+.st[data-split='lines'] { line-height: var(--line-height, 110%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .st .char, .st .line { transform: none; transition: none; }
+}
+
+/* ============================================================
+   Rolling links
+
+   Two copies of the label, one in the box and one 120% below it,
+   both inside a clip. Hover translates the pair; the copy arrives
+   as the original leaves. `::after` reads `data-label`, so a link
+   needs no duplicate markup to do it.
+   ============================================================ */
+
+/* `inline-block` is load-bearing, not tidiness: `clip-path` on a
+   non-replaced inline box resolves against a fragment that has no
+   height of its own here, and the label vanishes entirely. */
+.l {
+  position: relative;
+  display: inline-block;
+  padding-bottom: .2rem;
+  clip-path: inset(-10% 0 0 0);
+}
+
+.l.underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  height: 2px;
+  background: var(--color, currentColor);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease-expo);
+}
+
+.l.underline.is-active::after,
+.l.underline:hover::after { transform: scaleX(1); }
+
+.lt {
+  position: relative;
+  display: flex;
+  transition: transform 1s var(--ease-expo);
+}
+
+.lt::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 0;
+  top: 120%;
+}
+
+@media (pointer: fine) {
+  .l:hover .lt { transform: translate3d(0, -120%, 0); }
+}
+
+/* Same mechanic, tuned for the display-size CTA labels. */
+.ml { position: relative; display: inline-block; padding-bottom: .2rem; clip-path: inset(0 0 -8% 0); }
+.ml-i { position: relative; display: flex; transition: transform 1s var(--ease-expo); }
+.ml-i::after { content: attr(data-label); position: absolute; left: 0; top: 110%; }
+
+@media (pointer: fine) {
+  .ml:hover .ml-i { transform: translate3d(0, -110%, 0); }
+}
+
+/* ============================================================
+   Ornament — the crown mark. Scales in when it enters view; used as
+   a divider, a menu bullet and the seal's centre.
+   ============================================================ */
+
+.icon-crown {
+  /* The fill goes on the <svg>, not on a descendant selector: the mark
+     arrives through <use>, and CSS does not reach into the shadow tree
+     that creates. Inheritance does. */
+  fill: var(--text-color);
+  width: max(2.2rem, min(2.2vw, 3.4rem));
+  height: auto;
+  transform: scale(0);
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 1s var(--ease-quart);
+}
+
+.icon-crown.is-inview { transform: scale(1); }
+
+/* ============================================================
+   Intro
+
+   A red field that holds the wordmark for a beat and then lifts.
+   It exists to give the hero photograph a clean entrance rather
+   than to hide a load.
+   ============================================================ */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: var(--height);
+  color: var(--c-secondary);
+  background: var(--c-accent);
+  transition: transform 1.1s var(--ease-expo), visibility 0s linear 1.1s;
+}
+
+.intro__logo {
+  position: relative;
+  z-index: 10;
+  width: max(30rem, min(30vw, 60rem));
+  text-align: center;
+  opacity: 0;
+  transform: translate3d(0, 30%, 0);
+  transition: opacity .9s var(--ease-expo), transform 1.1s var(--ease-expo);
+}
+
+.intro__sup {
+  display: block;
+  font-size: max(1.2rem, min(1.2vw, 2.2rem));
+  letter-spacing: .18em;
+  line-height: 200%;
+  text-transform: uppercase;
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+}
+
+.intro__word {
+  display: block;
+  font-size: max(4rem, min(7vw, 12rem));
+  line-height: 82%;
+  letter-spacing: -.025em;
+  text-transform: uppercase;
+  font-variation-settings: 'wdth' 88, 'wght' 900;
+}
+
+.intro.is-ready .intro__logo { opacity: 1; transform: translateZ(0); }
+
+.intro.is-done { transform: translate3d(0, -100%, 0); visibility: hidden; }
+
+.intro__loading {
+  position: absolute;
+  bottom: var(--offset);
+  z-index: 10;
+  font-size: max(1.6rem, min(1.6vw, 2.4rem));
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity .6s var(--ease-expo);
+}
+
+.intro.is-ready .intro__loading { opacity: 1; }
+
+/* ============================================================
+   Chrome — nav, plate, menu, cursor
+   ============================================================ */
+
+.nav {
+  position: fixed;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  width: 100vw;
+  padding: var(--offset);
+  color: var(--c-secondary);
+  font-size: max(1.6rem, min(1.6vw, 2.4rem));
+  text-transform: uppercase;
+}
+
+.nav__items { display: flex; gap: 4rem; }
+
+@media screen and (max-width: 959.8px) { .nav { display: none; } }
+
+/* The plate. A red block pinned to the top centre holding the
+   wordmark. On scroll it narrows to a tall sliver and the lockup
+   rides up out of it, leaving the monogram — one element doing the
+   job most sites hand to a second, smaller header. */
+#menu-label {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  margin: 0 auto;
+  padding: 4%;
+  width: max(24rem, min(24vw, 48rem));
+}
+
+@media screen and (min-width: 960px) { #menu-label { padding: 1.5%; } }
+
+.menu-label__inner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.menu-label__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  background: var(--c-accent);
+  transform-origin: center;
+  will-change: width, height;
+  transition: width .6s var(--ease-expo), height .6s var(--ease-expo);
+}
+
+.menu-label__bg.is-collapsed { height: 80%; width: max(6rem, min(6vw, 10rem)); }
+
+@media screen and (min-width: 960px) {
+  .menu-label__bg.is-collapsed { height: 70%; }
+}
+
+.menu-label__hamburger {
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  width: max(6rem, min(6vw, 10rem));
+  transition: transform .75s var(--ease-expo);
+}
+
+@media screen and (min-width: 960px) { .menu-label__hamburger { gap: 1rem; } }
+.menu-label__hamburger:hover { transform: scaleX(.8); }
+
+.menu-label__line {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 2px;
+  background: var(--c-secondary);
+  transform-origin: center;
+  transition: transform 1s var(--ease-expo);
+}
+
+/* Open state: the two rules pinch toward each other and tilt. Not a
+   cross — an X would say "close window"; this says "put it back". */
+.is-menu-open .menu-label__line:first-child { transform: translate3d(0, .6rem, 0) rotate(-8deg); }
+.is-menu-open .menu-label__line:last-child  { transform: translate3d(0, -.6rem, 0) rotate(8deg); }
+
+@media screen and (max-width: 959.8px) {
+  .is-menu-open .menu-label__line:first-child { transform: translate3d(0, .35rem, 0) rotate(-8deg); }
+  .is-menu-open .menu-label__line:last-child  { transform: translate3d(0, -.35rem, 0) rotate(8deg); }
+}
+
+.menu-label__logos {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+  width: 100%;
+  transition: transform .4s var(--ease-snap);
+}
+
+/* The wordmark itself, set in the display face rather than drawn.
+
+   Leading is declared on the words, not on the lockup: a percentage
+   line-height inherits as the computed pixel value, so putting 82% on
+   the container would hand every child the parent's 20px leading and
+   collapse the two display lines on top of each other. */
+.wordmark {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--c-secondary);
+  text-transform: uppercase;
+  transition: transform .45s var(--ease-snap), opacity .3s linear;
+}
+
+.wordmark__line {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: .5em;
+  width: 100%;
+}
+
+.wordmark__sup {
+  font-size: max(.8rem, min(.8vw, 1.6rem));
+  letter-spacing: .14em;
+  line-height: 140%;
+  text-align: center;
+  font-variation-settings: 'wdth' 88, 'wght' 700;
+}
+
+.wordmark__word {
+  font-size: max(3rem, min(3vw, 6rem));
+  line-height: .82em;
+  letter-spacing: -.02em;
+  font-variation-settings: 'wdth' 88, 'wght' 900;
+}
+
+/* The second line is set to the full width of the plate, which is what
+   makes the lockup read as a block rather than as two words. */
+.wordmark__word--wide { font-variation-settings: 'wdth' 76, 'wght' 900; }
+
+.wordmark__mark {
+  fill: var(--c-secondary);
+  width: max(1.6rem, min(1.6vw, 3.2rem));
+  height: auto;
+  margin-top: .35em;
+}
+
+/* The monogram that survives the collapse. It is the only thing left
+   in the plate once the lockup has ridden out of the top. */
+.wordmark__mono {
+  fill: var(--c-secondary);
+  grid-area: 1 / 1;
+  align-self: center;
+  justify-self: center;
+  width: max(2.6rem, min(2.6vw, 5rem));
+  opacity: 0;
+  transform: scale(.55);
+  transition: opacity .3s linear, transform .5s var(--ease-expo);
+}
+
+.menu-label__logos.is-collapsed .wordmark {
+  opacity: 0;
+  transform: translate3d(0, -130%, 0);
+}
+
+.menu-label__logos.is-collapsed .wordmark__mono {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity .3s linear .3s, transform .55s var(--ease-expo) .3s;
+}
+
+/* Fullscreen menu. Red field, three rules, gold type. */
+#menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100vw;
+  height: 100dvh;
+  padding-bottom: max(8rem, min(8vw, 16rem));
+  background: var(--c-accent);
+  color: var(--c-secondary);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .6s var(--ease-expo), visibility 0s linear .6s;
+}
+
+.is-menu-open #menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity .6s var(--ease-expo), visibility 0s linear 0s;
+}
+
+.menu__list { width: var(--width); }
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gutter);
+  width: 100%;
+  padding: 1.6rem 0;
+  border-bottom: 1px solid var(--c-secondary);
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translate3d(0, 40%, 0);
+  transition: opacity .6s var(--ease-expo), transform .8s var(--ease-expo);
+}
+
+.is-menu-open .menu__item {
+  opacity: 1;
+  transform: translateZ(0);
+  transition-delay: calc(var(--index) * .07s + .12s);
+}
+
+.menu__item .icon-crown { --text-color: var(--c-secondary); flex: none; }
+.menu__item .icon-crown:first-child { transform: scale(1) rotate(-90deg); }
+.menu__item .icon-crown:last-child { transform: scale(1) rotate(90deg); }
+
+/* Custom cursor. Desktop only, and only over things that asked for
+   it — a link with `data-cursor-text` hides the system cursor and
+   gets a gold disc carrying its own verb. */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 45;
+  opacity: 1;
+  pointer-events: none;
+  transform: translate3d(calc(var(--x) * 1px), calc(var(--y) * 1px), 0);
+  transform-origin: center;
+}
+
+@media screen and (max-width: 1279.8px) { .cursor { display: none; } }
+
+.cursor__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 10rem;
+  background: var(--c-secondary);
+  color: var(--c-accent);
+  font-size: max(1.4rem, min(1.4vw, 2rem));
+  text-transform: uppercase;
+  white-space: nowrap;
+  will-change: transform;
+  transform: translate3d(-50%, -50%, 0) scale(0);
+  transition: transform .5s var(--ease-expo);
+}
+
+.cursor.is-active .cursor__text { transform: translate3d(-50%, -50%, 0) scale(1); }
+
+[data-cursor-text] { cursor: none !important; }
+
+/* ============================================================
+   Hero
+
+   A photograph at the source's own 1920:1290, floored at the
+   viewport height, with the headline sitting on its lower third.
+   ============================================================ */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  aspect-ratio: 1920 / 1290;
+  min-height: var(--height);
+  max-width: 100vw;
+  overflow: hidden;
+  background: var(--c-secondary);
+}
+
+.hero__inner {
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100vw;
+  height: 100%;
+  padding-bottom: var(--offset-double);
+}
+
+@media screen and (min-width: 960px) {
+  .hero__inner { padding-bottom: var(--col-1); }
+}
+
+.hero__media {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.hero__media .media,
+.hero__media .picture__wrapper { height: 100%; }
+
+/* The parallax rig. `.pr` is translated by scroll and pre-scaled so
+   the translation never exposes an edge. */
+.pr { height: 100%; will-change: transform; transform-origin: 50% 50%; }
+.pr-el { display: flex; align-items: flex-start; justify-content: center; height: 100%; overflow: hidden; }
+
+.hero__title { color: var(--c-text-alt); }
+
+.title-large__line { display: block; }
+
+/* The first line of a large title is a three-up: a small block left,
+   the word, a small block right. Below 960 the two small blocks stack
+   above and below it instead, because at four columns there is no room
+   beside. This rule has to follow `.title-large__line` — they carry
+   the same specificity, so source order is what decides. */
+.title-large__line--first {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gutter-half);
+}
+
+@media screen and (min-width: 960px) {
+  .title-large__line--first {
+    gap: var(--gutter);
+    grid-template-columns: max(10rem, min(10vw, 20rem)) auto max(10rem, min(10vw, 20rem));
+  }
+}
+
+/* The two standing claims either side of the first line. They live in
+   a 10vw column, so the face is narrowed rather than the type shrunk —
+   at this size a smaller point size would stop reading as a claim. */
+.title-large__sup {
+  display: block;
+  font-variation-settings: 'wdth' 84, 'wght' 800;
+  letter-spacing: .01em;
+  line-height: 120%;
+}
+
+.title-large__sup--right { text-align: left; }
+.title-large__sup--left { text-align: right; }
+
+/* Below 960 there is no room beside the word, so the grid falls to one
+   column and the two claims stack above and below it. */
+@media screen and (max-width: 959.8px) {
+  .title-large__sup { text-align: center; }
+}
+
+/* ============================================================
+   Text block — crown, small caption, justified-centre paragraph
+   ============================================================ */
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.text__title { font-size: max(1.6rem, min(1.6vw, 2.4rem)); letter-spacing: .04em; }
+
+.text__paragraph {
+  max-width: var(--width);
+  font-size: max(1.6rem, min(1.6vw, 2.4rem));
+}
+
+@media screen and (min-width: 960px) { .text__paragraph { max-width: var(--col-6); } }
+@media screen and (min-width: 1280px) { .text__paragraph { max-width: var(--col-8); } }
+
+/* ============================================================
+   Cards
+
+   Three photographs stacked on one another, rotated apart. The fan
+   is the entrance: they start as a deck (left +12°, centre −30°,
+   right −14°, all in the same box) and on entering view the outer
+   two translate a full width out and counter-rotate while the centre
+   levels. Two seconds, one curve, no library.
+   ============================================================ */
+
+.cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100vw;
+  padding-bottom: max(6rem, min(6vw, 12rem));
+}
+
+@media screen and (max-width: 959.8px) { .cards { overflow: hidden; } }
+
+.cards__inner { position: relative; }
+
+.card, .cards__inner {
+  aspect-ratio: 580 / 770;
+  width: var(--col-2);
+}
+
+@media screen and (min-width: 1280px) {
+  .card, .cards__inner { width: var(--col-3); }
+}
+
+.card {
+  border-radius: max(1.5rem, min(1.5vw, 3rem));
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 2s var(--ease-expo), scale 1s var(--ease-expo);
+}
+
+.card--left   { position: absolute; top: 0; z-index: 1; transform: rotate(12deg) translateZ(0); }
+.card--center { z-index: 2; transform: rotate(-30deg); }
+.card--right  { position: absolute; top: 0; z-index: 3; transform: rotate(-14deg) translateZ(0); }
+
+.is-inview .card--left   { transform: rotate(-14deg) translate3d(-100%, 0, 0); }
+.is-inview .card--center { transform: rotate(0deg); }
+.is-inview .card--right  { transform: rotate(14deg) translate3d(100%, 0, 0); }
+
+@media (pointer: fine) { .card:hover { scale: 1.1; } }
+
+/* ============================================================
+   Tasting CTAs
+
+   A ribbon that unfolds. Closed, the clip-path is a flat band with
+   its notches parked at 12%/88%; open, the notches travel out past
+   the edges into a double chevron while the button un-squeezes from
+   scaleX(.8). The label only fades in once the shape has settled, so
+   the geometry reads first and the word second.
+   ============================================================ */
+
+.home__tasting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gutter);
+  width: 100%;
+}
+
+.home__tasting__link {
+  padding: calc(var(--gutter) / 1.5) calc(var(--gutter) * 1.5);
+  background: var(--c-accent);
+  border-bottom: 2px solid var(--c-accent);
+  color: var(--c-secondary);
+  font-size: max(1.6rem, min(1.6vw, 2.4rem));
+  text-align: center;
+  clip-path: polygon(88% 0, 88% 50%, 88% 100%, 12% 100%, 12% 50%, 12% 0);
+  transform: scaleX(.8);
+  transition: clip-path 2s var(--ease-expo), transform 1s var(--ease-expo);
+}
+
+.home__tasting__link.is-inview {
+  clip-path: polygon(100% 1%, 92% 50%, 100% 100%, 0 100%, 8% 50%, 0 0);
+  transform: scaleX(1);
+}
+
+.home__tasting__link__cta { opacity: 0; transition: opacity 2s var(--ease-expo); }
+.home__tasting__link.is-inview .home__tasting__link__cta { opacity: 1; }
+
+/* ============================================================
+   Sticky table
+
+   The photograph pins for a screen while the type sits on it, and
+   the image releases from scale(1.3) over three seconds — slow
+   enough that it reads as the room settling rather than a zoom.
+   ============================================================ */
+
+.home-sticky { position: relative; }
+
+@media screen and (min-width: 960px) {
+  .home-sticky { position: sticky; top: 0; }
+}
+
+.home-sticky__inner {
+  position: relative;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  overflow: hidden;
+}
+
+@media screen and (min-width: 960px) {
+  .home-sticky__inner { position: sticky; height: 100vh; }
+}
+
+.home-sticky__text {
+  position: absolute;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: max(3rem, min(3vw, 6rem));
+}
+
+.home-sticky__text .icon-crown { --text-color: var(--c-text-alt); }
+
+.home-sticky .media { width: 100%; height: 100%; transform: scale(1.3); }
+.home-sticky .is-inview .media,
+.home-sticky__inner.is-inview .media { transform: scale(1); transition: transform 3s var(--ease-expo); }
+
+.home-sticky__showcase { position: relative; z-index: 2; }
+
+/* ============================================================
+   Product showcase
+
+   Three rows: format tabs, the jar, the fillings. The background
+   colour belongs to the filling and crossfades over two seconds, and
+   `--text-color` rides with it so the type and the tab underlines
+   re-key themselves without a second rule.
+   ============================================================ */
+
+.product-showcase {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gutter);
+  width: 100vw;
+  max-width: 100vw;
+  height: 70vh;
+  overflow: hidden;
+  clip-path: inset(0);
+  color: var(--text-color);
+  transition: background 2s var(--ease-expo) .25s, color 2s var(--ease-expo) .25s;
+}
+
+@media screen and (min-width: 960px) {
+  .product-showcase {
+    position: sticky;
+    top: 0;
+    gap: var(--gutter-double);
+    grid-template-rows: auto 50vh auto;
+    height: 100vh;
+  }
+}
+
+.product-showcase__type,
+.product-showcase__flavors { display: flex; justify-content: center; }
+
+.product-showcase__type { align-self: end; align-items: center; }
+.product-showcase__flavors { align-self: start; gap: var(--gutter-double); }
+
+.product-showcase__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: max(7rem, min(17vw, 34rem));
+  line-height: 85%;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media screen and (max-width: 959.8px) {
+  .product-showcase__content { margin-bottom: var(--gutter-double); padding-bottom: var(--col-1); }
+}
+
+.product-showcase__type-list { display: flex; gap: var(--gutter-double); width: var(--col-4); }
+@media screen and (max-width: 959.8px) { .product-showcase__type-list { display: none; } }
+
+.product-showcase__icon { margin: 0 max(4rem, min(4vw, 8rem)); }
+
+.product-showcase__title {
+  pointer-events: none;
+  user-select: none;
+  font-variation-settings: 'wdth' 92, 'wght' 880;
+  letter-spacing: -.022em;
+}
+
+/* The jar sits over the headline, not beside it — the type is the
+   backdrop and the product is the subject. */
+.product-showcase__medias {
+  position: absolute;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--col-3);
+  height: 100%;
+}
+
+@media screen and (max-width: 959.8px) { .product-showcase__medias { bottom: -30%; } }
+@media screen and (min-width: 960px) { .product-showcase__medias { width: var(--col-4); } }
+@media screen and (min-width: 1280px) { .product-showcase__medias { width: var(--col-4); } }
+
+.media__current { display: flex; }
+.media__current__image { transition: transform 1.25s var(--ease-expo); }
+.media__current:hover .media__current__image { transform: scale(1.05) rotate(-4deg); }
+
+/* A switch throws the jar off one side and brings it back from the
+   other; the direction follows the tab you pressed. */
+.product-showcase__medias.is-switching .media__current__image {
+  transform: translate3d(var(--exit, 60vw), 0, 0) rotate(6deg);
+  transition: transform .55s var(--ease-expo);
+}
+
+.product-showcase button {
+  position: relative;
+  font-size: max(1.6rem, min(1.6vw, 2.4rem));
+  text-transform: uppercase;
+}
+
+.product-showcase button::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -.4rem;
+  display: flex;
+  width: 100%;
+  height: 2px;
+  background: var(--text-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease-expo), background 2s var(--ease-expo) .25s;
+}
+
+.product-showcase button.is-active::after { transform: scaleX(1); }
+
+/* ============================================================
+   Award
+   ============================================================ */
+
+.home-award {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--offset-double);
+  background: var(--c-bg);
+}
+
+@media screen and (min-width: 1280px) { .home-award { min-height: 100lvh; } }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+
+.footer {
+  position: relative;
+  z-index: 10;
+  max-width: 100vw;
+  padding-top: max(6rem, min(6vw, 12rem));
+  padding-bottom: max(2.4rem, min(2.4vw, 4rem));
+  background: var(--c-bg);
+  overflow: hidden;
+}
+
+.footer .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-secondary);
+}
+
+.footer__menu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  gap: var(--gutter);
+  font-size: max(1.6rem, min(1.6vw, 2.4rem));
+  text-transform: uppercase;
+}
+
+@media screen and (min-width: 960px) {
+  .footer__menu { font-size: max(2rem, min(2vw, 3rem)); gap: var(--gutter-double); }
+}
+
+.footer__menu a { width: fit-content; }
+.footer__logo { width: max(3rem, min(3vw, 7rem)); }
+.footer__menu .footer__logo { transform: translateY(-10%); --text-color: var(--c-secondary); }
+
+.footer__text { width: 100%; }
+.footer__text__line { display: flex; align-items: center; justify-content: center; gap: var(--gutter-double); text-align: center; text-transform: uppercase; color: var(--c-accent); }
+
+.footer__link__legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2em;
+  text-transform: uppercase;
+  flex-wrap: wrap;
+}
+
+.footer__fondo,
+.footer__fondo__badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer__fondo__badge { gap: 1rem; }
+.footer__fondo__flag { width: var(--col-1); }
+.footer__fondo__flag__label { display: flex; text-align: center; }
+
+.footer__fondo__badges {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: var(--col-4);
+}
+
+.footer__fondo__title {
+  padding: max(1.5rem, min(1.5vw, 3rem)) 0;
+  border-top: 1px solid var(--c-accent);
+  border-bottom: 1px solid var(--c-accent);
+}
+
+.footer__legal { text-align: center; text-transform: uppercase; color: var(--c-accent); line-height: 140%; }
+
+@media screen and (min-width: 960px) { .footer__legal br { display: none; } }
+
+/* ============================================================
+   Seal — the rotating stamp over the table photograph
+   ============================================================ */
+
+.logo-seal { width: max(9rem, min(9vw, 16rem)); height: auto; }
+.logo-seal__text { animation: seal-rotate 10s linear infinite; transform-origin: center; will-change: transform; }
+
+/* The SVG's own user units, not CSS pixels — 200 wide, so 17 here is
+   a little over 8% of the seal's diameter at any rendered size. */
+.logo-seal text { font-size: 17px; letter-spacing: .1em; font-variation-settings: 'wdth' 92, 'wght' 800; fill: var(--c-text-alt); }
+.logo-seal .logo-seal__mark { fill: var(--c-text-alt); }
+
+@keyframes seal-rotate { from { transform: rotate(0); } to { transform: rotate(1turn); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-seal__text { animation: none; }
+}

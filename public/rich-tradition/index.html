@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich Tradition | Stuffed Piquillo Peppers</title>
+<meta name="description" content="Rich Tradition has been stuffing piquillo peppers in Navarre since 1987. Four formats, four fillings, ready to eat straight from the jar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- One family on both axes. The source runs a single commercial cut for
+     the whole page; Archivo's width axis is what lets one family cover
+     both the 34rem headline and the 1.6rem caption without a second face. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- ==================== SVG defs ====================
+     The crown ornament and the monogram, defined once and referenced by
+     <use> everywhere they appear. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- A pepper crown flattened to five points. Divider, menu bullet,
+         and the centre of the seal. -->
+    <symbol id="crown" viewBox="0 0 34 20">
+      <path d="M17 0 L11 9.5 L2 5.5 L6 20 H28 L32 5.5 L23 9.5 Z"/>
+    </symbol>
+    <!-- The monogram: the same crown sitting on a T-bar. -->
+    <symbol id="mono" viewBox="0 0 34 44">
+      <path d="M17 0 L11 9.5 L2 5.5 L6 20 H28 L32 5.5 L23 9.5 Z"/>
+      <path d="M4 24 H30 V32 H21.5 V44 H12.5 V32 H4 Z"/>
+    </symbol>
+    <path id="seal-ring" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/>
+  </defs>
+</svg>
+
+<!-- ==================== Intro ====================
+     Holds a red field for a beat so the hero photograph gets a clean
+     entrance, then lifts. A curtain, not a loader. -->
+<div class="intro" id="intro">
+  <div class="intro__logo">
+    <span class="intro__sup">Since 1987</span>
+    <span class="intro__word">Rich</span>
+    <span class="intro__word">Tradition</span>
+  </div>
+  <div class="intro__loading">New tradition</div>
+</div>
+
+<!-- ==================== Cursor ====================
+     Desktop only, and only over elements that opt in. -->
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__text"><span class="cursor__label" id="cursor-label"></span></div>
+</div>
+
+<!-- ==================== Menu overlay ==================== -->
+<aside id="menu" aria-hidden="true" inert>
+  <ul class="menu__list sp-40">
+    <li class="menu__item fs-240" style="--index:1">
+      <svg class="icon-crown is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+      <a href="#top"><span class="l"><span class="lt" data-label="Home">Home</span></span></a>
+      <svg class="icon-crown is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+    </li>
+    <li class="menu__item fs-240" style="--index:2">
+      <svg class="icon-crown is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+      <a href="#products"><span class="l"><span class="lt" data-label="Products">Products</span></span></a>
+      <svg class="icon-crown is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+    </li>
+    <li class="menu__item fs-240" style="--index:3">
+      <svg class="icon-crown is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+      <a href="#story"><span class="l"><span class="lt" data-label="Our Story">Our Story</span></span></a>
+      <svg class="icon-crown is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+    </li>
+  </ul>
+</aside>
+
+<!-- ==================== Nav ====================
+     Split by intent and pushed into the two far corners, because the
+     middle of the bar belongs to the plate. -->
+<header class="nav">
+  <nav class="nav__items" aria-label="Primary">
+    <a href="#top"><span class="l underline is-active" style="--color:var(--c-secondary)"><span class="lt" data-label="Home">Home</span></span></a>
+    <a href="#products"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Products">Products</span></span></a>
+  </nav>
+  <nav class="nav__items" aria-label="Secondary">
+    <a href="#story"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Our Story">Our Story</span></span></a>
+    <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Contact">Contact</span></span></a>
+  </nav>
+</header>
+
+<!-- ==================== Plate ====================
+     The red block at the top centre is both the wordmark's ground and
+     the menu button. On scroll it narrows to a sliver and the lockup
+     rides up out of it, leaving the monogram behind. -->
+<div id="menu-label">
+  <div class="menu-label__inner">
+    <button class="menu-label__hamburger" type="button" id="burger" aria-label="Menu" aria-controls="menu" aria-expanded="false">
+      <span class="menu-label__line"></span>
+      <span class="menu-label__line"></span>
+    </button>
+    <a href="#top" class="menu-label__logos" id="logos" aria-label="Rich Tradition, homepage">
+      <!-- The lockup is a three-up over a second line: the two standing
+           claims flank the first word, the second word runs full width
+           beneath it, and the mark closes it. Same arrangement as the
+           page's own display headlines, at a twentieth of the size. -->
+      <span class="wordmark">
+        <span class="wordmark__line">
+          <span class="wordmark__sup">Since<br>1987</span>
+          <span class="wordmark__word">Rich</span>
+          <span class="wordmark__sup">New<br>tradition</span>
+        </span>
+        <span class="wordmark__word wordmark__word--wide">Tradition</span>
+        <svg class="wordmark__mark" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg>
+      </span>
+      <svg class="wordmark__mono" viewBox="0 0 34 44" aria-hidden="true"><use href="#mono"/></svg>
+    </a>
+  </div>
+  <div class="menu-label__bg" id="plate"></div>
+</div>
+
+<main id="top">
+
+  <!-- ==================== Hero ====================
+       The photograph runs at the source's own 1920:1290 and is floored
+       at the viewport height. The headline sits on its lower third, in
+       cream, flanked on the first line by the two standing claims. -->
+  <section class="hero sp-100">
+    <div class="hero__inner">
+      <h1 class="ta-c hero__title fs-300 tt-u">
+        <span class="title-large__line title-large__line--first">
+          <span class="title-large__sup title-large__sup--left st fs-35" data-split="chars" data-observe="once">Since<br>1987</span>
+          <span class="title-large__word st" data-split="chars" data-observe="once" style="line-height:70%">From</span>
+          <span class="title-large__sup title-large__sup--right st fs-35" data-split="chars" data-observe="once">New<br>tradition</span>
+        </span>
+        <span class="title-large__line">
+          <span class="st" data-split="chars" data-observe="once" data-delay="0.1" style="line-height:70%">Navarre to</span>
+        </span>
+        <span class="title-large__line">
+          <span class="st" data-split="chars" data-observe="once" data-delay="0.2" style="line-height:70%">All of Spain</span>
+        </span>
+      </h1>
+    </div>
+    <div class="hero__media">
+      <div class="pr-el">
+        <div class="pr" data-parallax="0.16">
+          <div class="media">
+            <img class="media__thumb" src="./assets/hero.jpg" alt="" aria-hidden="true" width="1920" height="1290">
+            <img class="media__picture picture__image is-loading" src="./assets/hero.jpg" alt="A table laid with charcuterie, cheese and open jars of stuffed piquillo peppers" width="1920" height="1290" draggable="false">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Standfirst ==================== -->
+  <div class="text tt-u sp-160" id="story">
+    <svg class="icon-crown sp-14" viewBox="0 0 34 20" data-observe="once" aria-hidden="true"><use href="#crown"/></svg>
+    <h2 class="text__title sp-40">The importance of the pepper</h2>
+    <p class="text__paragraph ta-c st" data-split="lines" data-observe="once" style="--speed:1.25s;--stagger:0.1s;--line-height:110%">At Rich Tradition we are back. Renewed. And we have done it while keeping the tradition and the flavour. From Navarre to the world, we are here to bring you the best stuffed piquillo peppers you have ever tasted. We no longer have a grandmother, but we still have her recipe.</p>
+  </div>
+
+  <!-- ==================== Card fan ====================
+       A deck of three photographs that opens on entry. -->
+  <section class="cards sp-160" aria-label="The range">
+    <div class="cards__inner" data-observe="once">
+      <a href="#products" class="card__wrapper" data-cursor-text="Discover">
+        <div class="media card card--left">
+          <img class="media__picture picture__image is-loading" src="./assets/card-jar.jpg" alt="A jar of stuffed piquillo peppers being opened at the table" draggable="false">
+        </div>
+      </a>
+      <a href="#products" class="card__wrapper" data-cursor-text="Discover">
+        <div class="media card card--center">
+          <img class="media__picture picture__image is-loading" src="./assets/card-tin.jpg" alt="A plate of stuffed piquillo peppers with a fork lifting one out" draggable="false">
+        </div>
+      </a>
+      <a href="#products" class="card__wrapper" data-cursor-text="Discover">
+        <div class="media card card--right">
+          <img class="media__picture picture__image is-loading" src="./assets/card-pepper.jpg" alt="A stuffed piquillo pepper held between two fingers" draggable="false">
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== Invitation ==================== -->
+  <h2 class="ta-c sp-40 fs-260 tt-u">
+    <span class="title-large__line title-large__line--first">
+      <span class="title-large__sup title-large__sup--left st" style="font-size:max(2rem,min(2vw,3rem))" data-split="chars" data-observe="once">Since<br>1987</span>
+      <span class="title-large__word st" data-split="chars" data-observe="once" style="line-height:70%">Taste</span>
+      <span class="title-large__sup title-large__sup--right st" style="font-size:max(2rem,min(2vw,3rem))" data-split="chars" data-observe="once">New<br>tradition</span>
+    </span>
+    <span class="title-large__line">
+      <span class="st" data-split="chars" data-observe="once" style="line-height:70%">The flavour</span>
+    </span>
+    <span class="title-large__line">
+      <span class="st" data-split="chars" data-observe="once" style="line-height:70%">Of the new</span>
+    </span>
+    <span class="title-large__line">
+      <span class="st" data-split="chars" data-observe="once" style="line-height:70%">Tradition</span>
+    </span>
+  </h2>
+
+  <div class="text tt-u sp-200">
+    <svg class="icon-crown sp-40" viewBox="0 0 34 20" data-observe="once" aria-hidden="true"><use href="#crown"/></svg>
+    <p class="text__paragraph ta-c st" data-split="lines" data-observe="once" style="--speed:1.25s;--stagger:0.1s;--line-height:110%">Come and try our stuffed piquillo peppers and find the best flavour there is. A range of delicious products, ready to eat straight from the jar. Do not miss the chance to lick your fingers clean.</p>
+  </div>
+
+  <!-- ==================== Tasting CTAs ==================== -->
+  <section class="home__tasting sp-160">
+    <a href="#products" class="home__tasting__link ta-c" data-observe>
+      <span class="ml home__tasting__link__cta tt-u ta-c">
+        <span class="ml-i" data-label="Come and taste">Come and taste</span>
+      </span>
+    </a>
+    <a href="#contact" class="home__tasting__link ta-c" data-observe>
+      <span class="ml home__tasting__link__cta tt-u ta-c">
+        <span class="ml-i" data-label="Where to buy">Where to buy</span>
+      </span>
+    </a>
+  </section>
+
+  <!-- ==================== Sticky table ====================
+       This section and the showcase below it are both sticky, so the
+       table photograph is still pinned when the yellow panel rises over
+       it. That hand-off is the page's only cut. -->
+  <section class="home-sticky" aria-label="New tradition, for sharing">
+    <div class="home-sticky__inner" data-observe>
+      <div class="home-sticky__text">
+        <span class="c-alt ta-c fs-110 tt-u st" data-split="chars" data-observe="once">New<br>tradition</span>
+        <svg class="logo-seal" viewBox="0 0 200 200" aria-hidden="true">
+          <g class="logo-seal__text">
+            <text><textPath href="#seal-ring" startOffset="0">RICH TRADITION &#183; NAVARRE &#183; SINCE 1987 &#183; PIQUILLO &#183; </textPath></text>
+          </g>
+          <use class="logo-seal__mark" href="#crown" x="66" y="88" width="68" height="40"/>
+        </svg>
+        <span class="c-alt ta-c fs-110 tt-u st" data-split="chars" data-observe="once">For<br>sharing</span>
+      </div>
+      <div class="media">
+        <img class="media__picture picture__image is-loading" src="./assets/table.jpg" alt="An aperitivo table with olives, peppercorns, cured meat and two open jars" draggable="false">
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Product showcase ====================
+       Format across the top, filling across the bottom, the jar in the
+       middle over a headline the size of the viewport. The background
+       colour belongs to the filling. -->
+  <div class="product-showcase home-sticky__showcase" id="products" style="background:#ffb82e">
+    <div class="product-showcase__type">
+      <div class="product-showcase__type-list" style="justify-content:flex-end;text-align:right">
+        <button type="button" class="tt-u is-active" data-format="Jar"><span class="l"><span class="lt" data-label="Jar">Jar</span></span></button>
+        <button type="button" class="tt-u" data-format="Tin"><span class="l"><span class="lt" data-label="Tin">Tin</span></span></button>
+      </div>
+      <svg class="icon-crown product-showcase__icon" viewBox="0 0 34 20" data-observe="once" aria-hidden="true"><use href="#crown"/></svg>
+      <div class="product-showcase__type-list">
+        <button type="button" class="tt-u" data-format="Pouch"><span class="l"><span class="lt" data-label="Pouch">Pouch</span></span></button>
+        <button type="button" class="tt-u" data-format="Platter"><span class="l"><span class="lt" data-label="Platter">Platter</span></span></button>
+      </div>
+    </div>
+
+    <div class="product-showcase__content ta-c tt-u">
+      <a href="#contact" class="product-showcase__medias" id="showcase-media" data-cursor-text="Discover">
+        <span class="media media__current">
+          <img class="media__current__image" id="showcase-image" src="./assets/product-jar.png" alt="A jar of beef-filled piquillo peppers" width="580" height="580">
+        </span>
+      </a>
+      <h2 class="product-showcase__title">
+        <span class="st" data-split="lines" data-observe="once" data-delay="0.1" style="--speed:1.25s;--stagger:0.1s;--line-height:85%">Piquillo</span>
+        <span class="st" data-split="lines" data-observe="once" data-delay="0.2" style="--speed:1.25s;--stagger:0.1s;--line-height:85%">Peppers</span>
+      </h2>
+    </div>
+
+    <div class="product-showcase__flavors">
+      <button type="button" class="tt-u" data-flavour="Salmon" data-color="#f0a3a0"><span class="l"><span class="lt" data-label="Salmon">Salmon</span></span></button>
+      <button type="button" class="tt-u" data-flavour="Tuna" data-color="#8fb8c9"><span class="l"><span class="lt" data-label="Tuna">Tuna</span></span></button>
+      <button type="button" class="tt-u" data-flavour="Quinoa" data-color="#b7c26a"><span class="l"><span class="lt" data-label="Quinoa">Quinoa</span></span></button>
+      <button type="button" class="tt-u is-active" data-flavour="Beef" data-color="#ffb82e"><span class="l"><span class="lt" data-label="Beef">Beef</span></span></button>
+    </div>
+  </div>
+
+  <!-- ==================== Award ==================== -->
+  <section class="home-award" data-observe>
+    <span class="c-accent ta-c tt-u fs-90 sp-100 col-8-d col-4-m col-6-t st" data-split="lines" data-observe="once"
+          style="--speed:1.25s;--stagger:0.1s;--line-height:90%">New recognition for our creativity</span>
+
+    <div class="media col-4 sp-100">
+      <img class="media__picture picture__image is-loading" src="./assets/award.png" alt="An award announcement card for the Rich Tradition packaging design" draggable="false">
+    </div>
+
+    <span class="c-accent ta-c tt-u fs-35 col-8-d col-4-m col-6-t st" data-split="lines" data-observe="once"
+          style="--speed:1.25s;--stagger:0.1s;--line-height:110%">Good taste, in every sense. We have done it again.<br>Our site has been named Site of the Day at Awwwards and Website of the Day at CSS Design Awards, two of the most respected platforms in digital design.<br>That recognition joins the prizes our packaging has just taken: Bronze at Pentawards and First Place at The Dieline Awards.<br>One run of work behind a single idea &mdash; to give our roots their value back through creativity, invention and brand work that earns the name.</span>
+  </section>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer__menu sp-40">
+        <a href="#contact" class="tt-u"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Instagram">Instagram</span></span></a>
+        <a href="#contact" class="tt-u"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="YouTube">YouTube</span></span></a>
+        <a href="#contact" class="tt-u"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Facebook">Facebook</span></span></a>
+      </div>
+
+      <div class="footer__text sp-60">
+        <div class="fs-110 c-accent ta-c st tt-u" data-split="chars" data-observe="once">#New tradition</div>
+        <div class="fs-110 c-accent ta-c sp-40 st tt-u" data-split="chars" data-observe="once">#RichTradition</div>
+
+        <div class="footer__text__line fs-24">
+          <span class="st" data-split="lines" data-observe="once" data-delay="0.3" style="--speed:1.25s;--stagger:0.1s;--line-height:120%">Rich Tradition Foods</span>
+        </div>
+        <div class="footer__text__line fs-24">
+          <span class="st" data-split="lines" data-observe="once" data-delay="0.4" style="--speed:1.25s;--stagger:0.1s;--line-height:120%">Avenida de la Estaci&oacute;n 34 &#183; 31340 Marcilla, Navarre</span>
+        </div>
+      </div>
+
+      <div class="footer__menu sp-60 tt-u">
+        <a href="#products"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Products">Products</span></span></a>
+        <a href="#story"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Story">Story</span></span></a>
+        <a href="#top" aria-label="Rich Tradition, homepage"><svg class="icon-crown footer__logo is-inview" viewBox="0 0 34 20" aria-hidden="true"><use href="#crown"/></svg></a>
+        <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Contact">Contact</span></span></a>
+        <a href="#top"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Home">Home</span></span></a>
+      </div>
+
+      <div class="footer__link__legal fs-24 sp-60">
+        <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Privacy Policy">Privacy Policy</span></span></a>
+        <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Cookie Policy">Cookie Policy</span></span></a>
+        <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Legal Notice">Legal Notice</span></span></a>
+        <a href="#contact"><span class="l underline" style="--color:var(--c-secondary)"><span class="lt" data-label="Data Rights">Data Rights</span></span></a>
+      </div>
+
+      <!-- The rural-development funding notice. Kept because it is a real
+           structural obligation for a producer of this kind, and because
+           it is the one place on the page where the type is allowed to
+           be small and plain. -->
+      <div class="footer__fondo sp-80">
+        <span class="footer__fondo__title tt-u c-accent col-4-m col-8-d col-6-t ta-c fs-24 sp-40">This company has received support co-financed at 31% by the European Agricultural Fund for Rural Development through the Navarre Rural Development Programme 2014&ndash;2020</span>
+        <span class="tt-u c-accent col-4-m ta-c fs-20 sp-60">Project co-financed by:</span>
+        <div class="footer__fondo__badges">
+          <div class="footer__fondo__badge">
+            <div class="media footer__fondo__flag">
+              <img class="media__picture picture__image is-loading" src="./assets/flag-europe.png" alt="Flag of the European Union" draggable="false">
+            </div>
+            <span class="footer__fondo__flag__label fs-20 col-2 c-accent tt-u">European Agricultural Fund for Rural Development: Europe investing in rural areas</span>
+          </div>
+          <div class="footer__fondo__badge">
+            <div class="media footer__fondo__flag">
+              <img class="media__picture picture__image is-loading" src="./assets/flag-region.png" alt="Emblem of the Government of Navarre" draggable="false">
+            </div>
+            <span class="footer__fondo__flag__label fs-20 col-2 c-accent tt-u">Department of Economic Development</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__legal sp-60 ta-c fs-20 tt-u c-accent">
+        &copy; Copyright 2026 Rich Tradition Foods S.A.<br> All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script src="./main.js"></script>
+</body>
+</html>

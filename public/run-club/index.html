@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run Club | Running Apparel</title>
+<meta name="description" content="Run Club makes running clothes for hot weather and long miles. Spring-Summer 26 is in stock now.">
+<!-- Book carries almost the whole page, so it is worth a hint. Medium is
+     nav and labels only and can wait for the stylesheet to ask for it. -->
+<link rel="preload" href="./fonts/PPNeueMontreal-Book.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- ==================== Site header ====================
+     Fixed, transparent over the hero, white once the page scrolls under it.
+     The bar itself never moves; only its background and colour change. -->
+<header class="site-header" id="site-header">
+  <div class="site-header__bg" aria-hidden="true"></div>
+
+  <!-- Search drops out of the bar rather than replacing it. -->
+  <div class="site-header__searchbar wrap g" id="searchbar" aria-hidden="true" inert>
+    <form class="search-form" action="#" method="get" autocomplete="off" onsubmit="return false">
+      <fieldset class="search-form__fieldset">
+        <input class="search-form__input" type="text" name="q" placeholder="Search by keyword">
+        <button class="btn --link search-form__btn" type="submit"><span class="btn__label">Search</span></button>
+      </fieldset>
+    </form>
+  </div>
+
+  <div class="site-header__wrap wrap">
+    <nav class="site-header__leftNav" aria-label="Shop">
+      <button class="site-header__burger" type="button" aria-label="Menu" aria-controls="site-nav" aria-expanded="false"></button>
+      <ul class="menu site-header__leftMenu">
+        <li class="menu-item"><a href="#shop">All</a></li>
+        <li class="menu-item">
+          <a href="#shop">Tops</a>
+          <ul>
+            <li class="menu-item" style="--index:0"><a href="#shop">T-Shirts &amp; Longsleeves</a></li>
+            <li class="menu-item" style="--index:1"><a href="#shop">Tank Tops</a></li>
+            <li class="menu-item" style="--index:2"><a href="#shop">Pullovers</a></li>
+          </ul>
+        </li>
+        <li class="menu-item">
+          <a href="#shop">Bottoms</a>
+          <ul>
+            <li class="menu-item" style="--index:0"><a href="#shop">Tights</a></li>
+            <li class="menu-item" style="--index:1"><a href="#shop">Shorts</a></li>
+          </ul>
+        </li>
+        <li class="menu-item">
+          <a href="#headwear">Accessories</a>
+          <ul>
+            <li class="menu-item" style="--index:0"><a href="#headwear">Headwear</a></li>
+            <li class="menu-item" style="--index:1"><a href="#shop">Socks</a></li>
+            <li class="menu-item" style="--index:2"><a href="#shop">Other</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <figure class="site-header__logo">
+      <a class="site-header__logoLink" href="#top" rel="home" title="Run Club">Run Club</a>
+    </figure>
+
+    <nav class="site-header__rightNav" aria-label="Account">
+      <ul class="menu site-header__rightMenu">
+        <li class="menu-item">
+          <a href="#about">The brand</a>
+          <ul>
+            <li class="menu-item" style="--index:0"><a href="#about">About us</a></li>
+            <li class="menu-item" style="--index:1"><a href="#more">Press</a></li>
+            <li class="menu-item" style="--index:2"><a href="#more">Stockists</a></li>
+          </ul>
+        </li>
+      </ul>
+      <button class="site-header__cartBtn" type="button" aria-label="Cart" aria-controls="site-cart" aria-expanded="false" data-cart-count="0">
+        <span>Cart</span>
+      </button>
+      <button class="site-header__searchBtn" type="button" aria-label="Search" aria-controls="searchbar" aria-expanded="false">
+        <span>Search</span>
+      </button>
+      <a class="site-header__accountLink" href="#more">Login</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ==================== Mobile navigation ==================== -->
+<div class="site-nav" id="site-nav" aria-hidden="true" inert>
+  <div class="site-nav__scroller">
+    <nav class="site-nav__wrap wrap" aria-label="Main">
+      <ul class="menu site-nav__menu">
+        <li class="menu-item"><a href="#shop">All</a></li>
+        <li class="menu-item">
+          <a href="#shop">Tops</a>
+          <ul>
+            <li class="menu-item"><a href="#shop">T-Shirts &amp; Longsleeves</a></li>
+            <li class="menu-item"><a href="#shop">Tank Tops</a></li>
+            <li class="menu-item"><a href="#shop">Pullovers</a></li>
+          </ul>
+        </li>
+        <li class="menu-item">
+          <a href="#shop">Bottoms</a>
+          <ul>
+            <li class="menu-item"><a href="#shop">Tights</a></li>
+            <li class="menu-item"><a href="#shop">Shorts</a></li>
+          </ul>
+        </li>
+        <li class="menu-item">
+          <a href="#headwear">Accessories</a>
+          <ul>
+            <li class="menu-item"><a href="#headwear">Headwear</a></li>
+            <li class="menu-item"><a href="#shop">Socks</a></li>
+            <li class="menu-item"><a href="#shop">Other</a></li>
+          </ul>
+        </li>
+        <li class="menu-item">
+          <a href="#about">The brand</a>
+          <ul>
+            <li class="menu-item"><a href="#about">About us</a></li>
+            <li class="menu-item"><a href="#more">Press</a></li>
+            <li class="menu-item"><a href="#more">Stockists</a></li>
+          </ul>
+        </li>
+        <li class="menu-item"><a href="#more">Account</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- ==================== Cart drawer ==================== -->
+<aside class="site-cart" id="site-cart" aria-hidden="true" inert aria-label="Cart">
+  <div class="site-cart__panel">
+    <header class="site-cart__head">
+      <p>Cart</p>
+      <button class="site-cart__close" type="button" aria-label="Close">Close</button>
+    </header>
+    <div class="site-cart__empty">
+      <p class="site-cart__emptyTitle">Nothing in here yet</p>
+      <p class="site-cart__emptyRule">-</p>
+      <p>Have a look at what is in stock.</p>
+      <a class="btn --link" href="#shop"><span class="btn__label">Shop all</span></a>
+    </div>
+  </div>
+</aside>
+
+<main id="top">
+
+  <!-- ==================== Hero ====================
+       Full-viewport photograph. The headline sits on the baseline of the
+       grid at the bottom-left, the standfirst in the last three columns,
+       so the two read as one line of information across the foot. -->
+  <section class="row row-hero wrap g" data-invert>
+    <!-- Two crops of the same shoot. The landscape frame cannot hold both
+         runners in a 390px-wide window, so narrow viewports get a portrait
+         negative instead of a hard centre crop. -->
+    <div class="row-hero__media" aria-hidden="true">
+      <picture class="row-hero__picture">
+        <source srcset="./assets/hero.jpg" media="(min-width: 768px)">
+        <img class="as-bg" src="./assets/hero-portrait.jpg" alt="" fetchpriority="high">
+      </picture>
+    </div>
+
+    <header class="row-hero__header">
+      <h1 class="row-hero__title">Spring-Summer</h1>
+      <p class="row-hero__subtitle">26</p>
+      <nav class="links-nav row-hero__buttons">
+        <a class="btn --link" href="#shop"><span class="btn__label">Shop now</span></a>
+      </nav>
+    </header>
+
+    <div class="row-hero__content">
+      <div class="row-hero__text wysiwyg">
+        <p>Summer asks different things of a running kit. This range is cut lighter, made from fabric that moves air, and finished so nothing chafes at hour two. We ran in all of it through a long, hot spring before any of it went on sale.</p>
+      </div>
+      <nav class="links-nav row-hero__buttons">
+        <a class="btn --link" href="#shop"><span class="btn__label">Shop now</span></a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ==================== Promo: Headwear ====================
+       Editorial panel and a two-up product pair share one row. The panel
+       bleeds to the left page edge; the products stay inside the grid. -->
+  <section class="row row-promo wrap" id="headwear">
+    <div class="row-promo__promo" data-invert>
+      <figure class="row-promo__promoMedia">
+        <img class="as-bg" src="./assets/promo-headwear.jpg" alt="" loading="lazy">
+      </figure>
+      <div class="row-promo__promoContent">
+        <h2 class="row-promo__promoTitle">Headwear</h2>
+        <div class="row-promo__promoText wysiwyg">
+          <p>SS26 Collection<br>-<br>Caps for hot weather, in mesh and light cotton twill. Low crown, soft brim, and a sweatband that holds up past the first wash. They work on a long run. They also work on the walk home, which is most of why we kept redrawing them.</p>
+        </div>
+        <a class="btn --link row-promo__promoCTA" href="#headwear"><span class="btn__label">shop headwear</span></a>
+      </div>
+    </div>
+
+    <div class="row-promo__products">
+      <article class="product-preview --rollover">
+        <a class="product-preview__link" href="#headwear">
+          <figure class="product-preview__thumbnail">
+            <img class="as-bg" src="./assets/product-rosemont.jpg" alt="Rosemont 4-Panel Hat" loading="lazy">
+          </figure>
+          <div class="product-preview__content">
+            <h3 class="product-preview__title">Rosemont 4-Panel Hat</h3>
+            <p class="product-preview__price"><span>$65.00 USD</span></p>
+          </div>
+        </a>
+      </article>
+
+      <article class="product-preview --rollover">
+        <a class="product-preview__link" href="#headwear">
+          <figure class="product-preview__thumbnail">
+            <img class="as-bg" src="./assets/product-verdun.jpg" alt="Verdun 6-Panel Hat" loading="lazy">
+          </figure>
+          <div class="product-preview__content">
+            <h3 class="product-preview__title">Verdun 6-Panel Hat</h3>
+            <p class="product-preview__price"><span>$65.00 USD</span></p>
+          </div>
+        </a>
+        <ul class="product-preview__colors" style="--active-index:0">
+          <li><button class="product-preview__color" type="button" aria-label="Sand" aria-pressed="true" style="color:#eae1c3"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Red" aria-pressed="false" style="color:#c11111"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Forest green" aria-pressed="false" style="color:#123005"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Navy" aria-pressed="false" style="color:#1e1e4c"></button></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==================== Promo: Meridian ====================
+       Same row, mirrored: products first, panel second. -->
+  <section class="row row-promo wrap --promo-last">
+    <div class="row-promo__promo" data-invert>
+      <figure class="row-promo__promoMedia">
+        <img class="as-bg" src="./assets/promo-meridian.jpg" alt="" loading="lazy">
+      </figure>
+      <div class="row-promo__promoContent">
+        <h2 class="row-promo__promoTitle">The Meridian Collection</h2>
+        <div class="row-promo__promoText wysiwyg">
+          <p>Race kit. Thin fabric, flat seams, nothing on it that flaps or rides up. We built the set for the day you have spent months counting toward, then trained in it all winter to make sure it held.</p>
+        </div>
+        <a class="btn --link row-promo__promoCTA" href="#shop"><span class="btn__label">shop the collection</span></a>
+      </div>
+    </div>
+
+    <div class="row-promo__products">
+      <article class="product-preview --rollover">
+        <a class="product-preview__link" href="#shop">
+          <figure class="product-preview__thumbnail">
+            <img class="as-bg" src="./assets/product-meridian-tank.jpg" alt="Meridian Tank Top" loading="lazy">
+          </figure>
+          <div class="product-preview__content">
+            <h3 class="product-preview__title">Meridian Tank Top</h3>
+            <p class="product-preview__price"><span>$120.00 USD</span></p>
+          </div>
+        </a>
+        <ul class="product-preview__colors" style="--active-index:0">
+          <li><button class="product-preview__color" type="button" aria-label="Black" aria-pressed="true" style="color:#000000"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Navy" aria-pressed="false" style="color:#1e1e4c"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Stone" aria-pressed="false" style="color:#e0d8c8"></button></li>
+        </ul>
+      </article>
+
+      <article class="product-preview --rollover">
+        <a class="product-preview__link" href="#shop">
+          <figure class="product-preview__thumbnail">
+            <img class="as-bg" src="./assets/product-meridian-longsleeve.jpg" alt="Meridian Longsleeve" loading="lazy">
+          </figure>
+          <div class="product-preview__content">
+            <h3 class="product-preview__title">Meridian Longsleeve</h3>
+            <p class="product-preview__price"><span>$140.00 USD</span></p>
+          </div>
+        </a>
+        <ul class="product-preview__colors" style="--active-index:0">
+          <li><button class="product-preview__color" type="button" aria-label="Black" aria-pressed="true" style="color:#000000"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Navy" aria-pressed="false" style="color:#1e1e4c"></button></li>
+          <li><button class="product-preview__color" type="button" aria-label="Stone" aria-pressed="false" style="color:#e0d8c8"></button></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==================== Featured: Cotton ====================
+       Plain merchandising rows. Title and a text link, then a flat grid:
+       two up on mobile, four up from the tablet breakpoint. -->
+  <section class="row row-featured wrap" id="shop">
+    <header class="row-featured__header">
+      <h2 class="row-featured__title">Cotton T-shirts</h2>
+      <a class="btn --link row-featured__cta" href="#shop"><span class="btn__label">Shop</span></a>
+    </header>
+    <ul class="row-featured__list">
+      <li>
+        <article class="product-preview">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-atwater.jpg" alt="Atwater T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Atwater T-Shirt</h3>
+              <p class="product-preview__price"><span>$75.00 USD</span></p>
+            </div>
+          </a>
+        </article>
+      </li>
+      <li>
+        <article class="product-preview">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-beacon.jpg" alt="Beacon T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Beacon T-Shirt</h3>
+              <p class="product-preview__price"><span>$75.00 USD</span></p>
+            </div>
+          </a>
+        </article>
+      </li>
+      <li>
+        <article class="product-preview">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-orchard.jpg" alt="Orchard T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Orchard T-Shirt</h3>
+              <p class="product-preview__price"><span>$75.00 USD</span></p>
+            </div>
+          </a>
+        </article>
+      </li>
+      <li>
+        <article class="product-preview">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-radius.jpg" alt="Radius T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Radius T-Shirt</h3>
+              <p class="product-preview__price"><span>$75.00 USD</span></p>
+            </div>
+          </a>
+        </article>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ==================== Featured: Performance ====================
+       Identical row, but every tile carries the rollover treatment: the
+       name, price and swatches live over the image and only appear on hover. -->
+  <section class="row row-featured wrap">
+    <header class="row-featured__header">
+      <h2 class="row-featured__title">Performance T-Shirts</h2>
+      <a class="btn --link row-featured__cta" href="#shop"><span class="btn__label">Shop</span></a>
+    </header>
+    <ul class="row-featured__list">
+      <li>
+        <article class="product-preview --rollover">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-cartier.jpg" alt="Cartier Cropped T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Cartier Cropped T-Shirt</h3>
+              <p class="product-preview__price"><span>$105.00 USD</span></p>
+            </div>
+          </a>
+          <ul class="product-preview__colors" style="--active-index:0">
+            <li><button class="product-preview__color" type="button" aria-label="Yellow" aria-pressed="true" style="color:#e8d67a"></button></li>
+            <li><button class="product-preview__color" type="button" aria-label="Baby blue" aria-pressed="false" style="color:#63b0e1"></button></li>
+          </ul>
+        </article>
+      </li>
+      <li>
+        <article class="product-preview --rollover">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-peel.jpg" alt="Peel Ringer T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Peel Ringer T-Shirt</h3>
+              <p class="product-preview__price"><span>$110.00 USD</span></p>
+            </div>
+          </a>
+          <ul class="product-preview__colors" style="--active-index:0">
+            <li><button class="product-preview__color" type="button" aria-label="Brown" aria-pressed="true" style="color:#492e0f"></button></li>
+            <li><button class="product-preview__color" type="button" aria-label="Baby blue" aria-pressed="false" style="color:#63b0e1"></button></li>
+            <li><button class="product-preview__color" type="button" aria-label="Cream" aria-pressed="false" style="color:#efe7d4"></button></li>
+          </ul>
+        </article>
+      </li>
+      <li>
+        <article class="product-preview --rollover">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-trackfield.jpg" alt="Track &amp; Field Cropped Ringer T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Track &amp; Field Cropped Ringer T-Shirt</h3>
+              <p class="product-preview__price"><span>$110.00 USD</span></p>
+            </div>
+          </a>
+          <ul class="product-preview__colors" style="--active-index:0">
+            <li><button class="product-preview__color" type="button" aria-label="Cream" aria-pressed="true" style="color:#efe7d4"></button></li>
+            <li><button class="product-preview__color" type="button" aria-label="Navy" aria-pressed="false" style="color:#1e1e4c"></button></li>
+          </ul>
+        </article>
+      </li>
+      <li>
+        <article class="product-preview --rollover">
+          <a class="product-preview__link" href="#shop">
+            <figure class="product-preview__thumbnail">
+              <img class="as-bg" src="./assets/product-lachine.jpg" alt="Lachine T-Shirt" loading="lazy">
+            </figure>
+            <div class="product-preview__content">
+              <h3 class="product-preview__title">Lachine T-Shirt</h3>
+              <p class="product-preview__price"><span>$105.00 USD</span></p>
+            </div>
+          </a>
+          <ul class="product-preview__colors" style="--active-index:0">
+            <li><button class="product-preview__color" type="button" aria-label="Royal blue" aria-pressed="true" style="color:#1f6fd0"></button></li>
+            <li><button class="product-preview__color" type="button" aria-label="Black" aria-pressed="false" style="color:#000000"></button></li>
+          </ul>
+        </article>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ==================== About ====================
+       Two square-ish media panels fill the row; the copy sits on top of
+       them, so the section is one block of image with type laid over it. -->
+  <section class="row row-textmedia wrap g" id="about" data-invert>
+    <header class="row-textmedia__header">
+      <h2 class="row-textmedia__title">About Us</h2>
+      <div class="row-textmedia__text wysiwyg">
+        <p>Run Club started with a handful of people running the same loop four mornings a week, making the kit they could not find in shops. That is still how it works.</p>
+      </div>
+      <a class="btn --link row-textmedia__cta" href="#about"><span class="btn__label">More about us</span></a>
+    </header>
+    <figure class="row-textmedia__leftMedia">
+      <img class="as-bg" src="./assets/about-left.jpg" alt="" loading="lazy">
+    </figure>
+    <figure class="row-textmedia__rightMedia">
+      <img class="as-bg" src="./assets/about-right.jpg" alt="" loading="lazy">
+    </figure>
+  </section>
+
+  <!-- ==================== Text columns ====================
+       Four service cards. A four-up grid from the tablet breakpoint; below
+       it the row becomes a snap-scrolling rail three columns wide. -->
+  <section class="row row-columns wrap" id="more">
+    <div class="row-columns__track">
+      <div class="row-columns__item">
+        <a class="text-column" href="#more">
+          <h2 class="text-column__title">Shipping &amp; returns</h2>
+          <figure class="text-column__media">
+            <img class="as-bg text-column__img" src="./assets/col-shipping.jpg" alt="" loading="lazy">
+          </figure>
+          <div class="text-column__text wysiwyg"><p>What it costs, how long it takes, how to send something back</p></div>
+        </a>
+      </div>
+      <div class="row-columns__item">
+        <a class="text-column" href="#more">
+          <h2 class="text-column__title">Contact</h2>
+          <figure class="text-column__media">
+            <img class="as-bg text-column__img" src="./assets/col-contact.jpg" alt="" loading="lazy">
+          </figure>
+          <div class="text-column__text wysiwyg"><p>Sizing, orders, anything else. We answer these ourselves</p></div>
+        </a>
+      </div>
+      <div class="row-columns__item">
+        <a class="text-column" href="#more">
+          <h2 class="text-column__title">Lookbook</h2>
+          <figure class="text-column__media">
+            <img class="as-bg text-column__img" src="./assets/col-lookbook.jpg" alt="" loading="lazy">
+          </figure>
+          <div class="text-column__text wysiwyg"><p>The full SS26 range, shot over one week in early summer</p></div>
+        </a>
+      </div>
+      <div class="row-columns__item">
+        <a class="text-column" href="#more">
+          <h2 class="text-column__title">Press</h2>
+          <figure class="text-column__media">
+            <img class="as-bg text-column__img" src="./assets/col-press.jpg" alt="" loading="lazy">
+          </figure>
+          <div class="text-column__text wysiwyg"><p>Where we have turned up in print, and who wrote it</p></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==================== Footer ====================
+     Three link columns in the middle six, newsletter and locale controls
+     in the last three, copyright pinned to the bottom-left. -->
+<footer class="site-footer wrap g">
+  <nav class="site-footer__nav" aria-label="Footer">
+    <ul class="menu site-footer__menu">
+      <li class="menu-item"><a href="#more">Contact Us</a></li>
+      <li class="menu-item"><a href="#more">Instagram</a></li>
+      <li class="menu-item"><a href="#more">FAQs</a></li>
+    </ul>
+    <ul class="menu site-footer__menu">
+      <li class="menu-item"><a href="#more">Shipping &amp; returns</a></li>
+      <li class="menu-item"><a href="#more">Start a return</a></li>
+    </ul>
+    <ul class="menu site-footer__menu">
+      <li class="menu-item"><a href="#more">Press</a></li>
+      <li class="menu-item"><a href="#more">Terms &amp; policies</a></li>
+    </ul>
+  </nav>
+
+  <div class="site-footer__newsletter">
+    <h4 class="site-footer__newsletterTitle">One email a month, no more</h4>
+    <form class="contact-form" onsubmit="return false">
+      <input class="site-footer__newsletterInput" type="email" name="email" placeholder="Your email address" aria-label="Email address" required>
+    </form>
+  </div>
+
+  <div class="site-footer__config">
+    <div class="site-footer__configGroup">
+      <h4 class="site-footer__configTitle">Select language</h4>
+      <select class="localization-switcher__select" aria-label="Language">
+        <option>English</option>
+        <option>Fran&ccedil;ais</option>
+      </select>
+    </div>
+    <div class="site-footer__configGroup site-footer__countriesWrap">
+      <h4 class="site-footer__configTitle">Select country</h4>
+      <select class="localization-switcher__select" aria-label="Country">
+        <option>Canada (CAD)</option>
+        <option selected>United States (USD)</option>
+        <option>United Kingdom (GBP)</option>
+        <option>France (EUR)</option>
+        <option>Japan (USD)</option>
+        <option>Australia (USD)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="site-footer__bottom">
+    <p class="site-footer__copyright">Copyright &copy; 2026 Run Club</p>
+    <p class="site-footer__credits">
+      <a class="credits" href="#top" aria-label="credits">
+        <span class="credits__wrap" aria-hidden="true">
+          <span class="credits__label">credits</span>
+          <span class="credits__value">Studio</span>
+        </span>
+      </a>
+    </p>
+  </div>
+</footer>
+
+<script src="./main.js"></script>
+</body>
+</html>
