@@ -16,6 +16,11 @@ export const actionFigure = {
   id: 'action-figure',
   previewSrc: '/action-figure/index.html',
 
+  // Shelved: out of the pager, still in the codebase. The page itself is
+  // untouched and still served at /action-figure/index.html. Delete this line
+  // to put it back.
+  hidden: true,
+
   kicker: 'Design System Template',
   title: 'Action Figure',
   subtitle: 'Creative Studio',
