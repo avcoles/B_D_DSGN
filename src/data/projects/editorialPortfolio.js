@@ -45,37 +45,37 @@ export const editorialPortfolio = {
     {
       principle: 'Narrative',
       rationale:
-        'Lead with the client list, not the showreel. Eleven names and one small photograph invert what a portfolio usually does, and it reads as confidence: the work is assumed to be good, so the only question left is which piece you want to see. Showing one image at a time also means nobody is comparing, only choosing.',
+        'Lead with the client list, not the showreel. Eleven names against one small photograph assumes the work is good and leaves you only the question of which piece to see.',
     },
     {
       principle: 'Color',
       rationale:
-        'Two colours, and a third you have to ask for. Black type on white, plus a warm brown that exists only inside the contact panel, so the one moment the site changes colour is the one moment it wants something from you. The header carries no colour at all. It is white type in difference blend mode, which reads black over the page and flips itself the instant the black menu field passes under it.',
+        'Two colours, and a third you have to ask for. Black on white throughout, with a warm brown that appears only inside the contact panel, so the one moment the site changes colour is the one moment it wants something from you.',
     },
     {
       principle: 'Typography',
       rationale:
-        'One face at one weight, and a second face used twice. Nav, list, clock and the roman half of the wordmark are all the same cut, so size and position carry the hierarchy on their own. The exception is the wordmark, where a high-contrast italic sits beside the grotesque with its x-height set to the roman’s cap height. Two cases in two faces, reading as one size.',
+        'One face at one weight, doing every job on the page. Nav, list, clock and both halves of the wordmark share a single cut, so size and position carry the hierarchy without help from weight.',
     },
     {
       principle: 'Grid',
       rationale:
-        'Twelve columns, and the list only takes eight of them. Starting the projects at the fifth column leaves two columns for the photograph and one of air between, which is what keeps a wrapping list of names from reading as a paragraph. One breakpoint moves three things at once: six columns to twelve, a 7rem gutter down to 2.4rem, a 2rem page margin out to 5rem.',
+        'Twelve columns, and the list takes only eight. Starting the projects at the fifth column leaves room for the photograph and a band of air between, which is what stops a wrapping list of names reading as a paragraph.',
     },
     {
       principle: 'White space',
       rationale:
-        'The screen is the unit, not the section. On a fixed page that never scrolls, the empty area is the composition rather than what is left after the content, and only three zones are occupied: the chrome across the top, the list in the upper middle, the wordmark on the floor. Everything right of the list and below it is empty on purpose.',
+        'The screen is the unit, not the section. On a page that never scrolls the empty area is the composition rather than what is left over, and only three zones are occupied at all.',
     },
     {
       principle: 'Behaviors / Interactions / Cursor',
       rationale:
-        'Hover is one property, and it stays put. Every link sits at 25% black and comes up to 100%. Nothing changes size, weight or colour, and the highlight does not follow the pointer: the last project entered stays lit after the cursor leaves, so the page always has one thing selected and the photograph always has something to show. The entrance is the only piece of spectacle. The wordmark is born small and centred, its letters rise into it one at a time, the two words part, and the lockup flips down to the floor at full size.',
+        'Hover is one property, and it stays put. Links rise from 25% black to full and the last one entered stays lit, so the page always has something selected and the photograph always has something to show.',
     },
     {
       principle: 'UX',
       rationale:
-        'Give the page one live detail and put it where the eye already rests. A Lisbon clock sits at the end of the footer rule with a colon blinking on the second. On a screen that never scrolls it is the only thing proving the page is running, and it quietly tells a client in another timezone what hour they are writing into. The contact panel works the same way: it wipes in diagonally instead of opening as a modal, and the form is laid out as a letter, with the address row a button that copies rather than a field you retype.',
+        'Give the page one live detail and put it where the eye already rests. A Lisbon clock ticking on the footer rule is the only proof the page is running, and it tells a client abroad what hour they are writing into.',
     },
   ],
 
@@ -91,7 +91,7 @@ export const editorialPortfolio = {
     ink3: 'rgb(0 0 0 / 0.25)',
     rule: 'rgb(0 0 0 / 0.14)',
     accent: '#b1684d',
-    display: "'Playfair Display', Georgia, 'Times New Roman', serif",
+    display: "'Dia', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     label: "'Dia', 'Helvetica Neue', Helvetica, Arial, sans-serif",
     labelTracking: '0em',
     btnRadius: '9999px',
@@ -99,28 +99,20 @@ export const editorialPortfolio = {
 
   system: {
     /**
-     * Two faces, three jobs. Body and Label are the same cut at the same
-     * weight; what separates them is position, which is the point the page
-     * is making. Display is the only place the italic appears.
+     * One cut, every job. Dia at 400 sets the nav, the list, the clock, the
+     * form and both halves of the wordmark, so nothing on the page is
+     * separated by family or weight; only size and position do that work.
+     *
+     * The italic ships and is declared in the page's stylesheet but nothing
+     * draws it, so it is not a specimen. A card would render upright anyway,
+     * since a face carries no style of its own here.
      */
     typography: {
       faces: [
         {
-          role: 'Display',
-          family: 'Playfair Display',
-          weights: '700 italic',
-          stack: "'Playfair Display', Georgia, 'Times New Roman', serif",
-        },
-        {
-          role: 'Body',
+          role: 'All text',
           family: 'Dia',
           weights: '400',
-          stack: "'Dia', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        },
-        {
-          role: 'Label',
-          family: 'Dia',
-          weights: '400 · 1.8rem at 25%',
           stack: "'Dia', 'Helvetica Neue', Helvetica, Arial, sans-serif",
         },
       ],
