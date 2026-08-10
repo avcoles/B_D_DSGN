@@ -30,6 +30,28 @@
   font-display: swap;
 }
 
+/* Dia is Editorial Portfolio's whole page, and it is here for the same
+   reason: commercial, so it ships with the repo rather than coming off a
+   CDN. These are TRIAL files. The Schick Toikka trial licence covers
+   internal testing and presentation and rules out public websites by name,
+   so buy the retail cut before this chrome is deployed anywhere. */
+
+@font-face {
+  font-family: 'Dia';
+  src: url('./fonts/DiaTrial-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dia';
+  src: url('./fonts/DiaTrial-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* ==========================================================================
    DESIGN TOKENS — showcase chrome
    Neutrals and type follow the DEPT® brand system; the accent is ours.

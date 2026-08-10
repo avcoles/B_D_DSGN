@@ -39,6 +39,49 @@
       "port": 5186
     },
     {
+      "name": "editorial-portfolio",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "public/editorial-portfolio", "-l", "5187"],
+      "port": 5187
+    },
+    {
+      "name": "ep-snapshot",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "serve",
+        "C:/Users/alexv/Desktop/000_Rodin-Dev/010_RossMason",
+        "-l",
+        "5188"
+      ],
+      "port": 5188
+    },
+    {
+      "name": "warehouse",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "public/warehouse", "-l", "5189"],
+      "port": 5189
+    },
+    {
+      "name": "wh-snapshot",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "serve",
+        "C:/Users/alexv/Desktop/000_Rodin-Dev/012_FluidGlass",
+        "-l",
+        "5190"
+      ],
+      "port": 5190
+    },
+    {
+      "name": "tempo",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "public/tempo"],
+      "port": 5187,
+      "autoPort": true
+    },
+    {
       "name": "commercial-studio",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["-y", "serve", "B:/CommercialStudio"],

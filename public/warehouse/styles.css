@@ -1,0 +1,2431 @@
+/* =============================================================================
+   Warehouse — structural & architectural glazing
+   -----------------------------------------------------------------------------
+   Rebuild of a Nuxt/Vue glazing site from a saved-page snapshot. Every value
+   below is read off the snapshot's stylesheet rather than eyeballed; where the
+   source used Vue's scoped-CSS attributes ([data-v-xxxx]) to keep component
+   class names from colliding, this file scopes by ancestor instead, which is
+   why `.container`, `.title` and `.background` appear several times under
+   different section selectors.
+
+   The one thing to understand before reading anything else is the unit. The
+   root font-size is a fraction of the viewport width, so 1rem is 10px at a
+   1600px viewport and everything on the page — type, gutters, image sizes,
+   grid gaps — scales with the window rather than stepping at breakpoints.
+   There are exactly two breakpoints, 600 and 601, and they only swap the
+   divisor and the column count.
+============================================================================= */
+
+/* ----------------------------------------------------------------- reset -- */
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+ol,
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+blockquote,
+body,
+dd,
+dl,
+figcaption,
+figure,
+h1,
+h2,
+h3,
+h4,
+input,
+li,
+ol,
+p,
+ul {
+  margin: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  text-rendering: optimizeSpeed;
+  text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  height: auto;
+  margin: 0;
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+button,
+input,
+textarea {
+  appearance: none;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+img,
+svg,
+video {
+  display: block;
+}
+
+svg {
+  overflow: visible;
+}
+
+section {
+  position: relative;
+}
+
+strong {
+  font-weight: 400;
+}
+
+/* The page title is set as a wordmark, so the real h1 is for screen readers. */
+h1 {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* ---------------------------------------------------------------- tokens -- */
+
+:root {
+  --size: 1600;
+
+  --color-black: #0b1012;
+  --color-white: #fff;
+  --color-cream: #f3f0ec;
+  --color-taupe: #d4cec6;
+  --color-grey: #212325;
+
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-none: cubic-bezier(0.25, 0.25, 0.75, 0.75);
+
+  /* One rem = one thousandth of the design width, times ten. At 1600px that
+     is exactly 10px; at 375px the divisor changes so the mobile layout gets
+     its own 1:1 scale rather than a shrunken desktop one. */
+  --font-s: calc((100vw / var(--size)) * 10);
+
+  --font-f-pro: "Figtree", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-f-mono: "Roboto Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --size: 375;
+  }
+}
+
+@media (min-width: 601px) {
+  :root {
+    --size: 1600;
+  }
+}
+
+html {
+  font-size: var(--font-s);
+}
+
+/* The document itself never scrolls. `.scroll` is a fixed, full-bleed pane and
+   the page moves inside it, which is what lets the bottom bar and the cursor
+   sit outside the scrolling context without a single fixed-position repaint. */
+body,
+html {
+  inset: 0;
+  overflow: hidden;
+  position: fixed;
+}
+
+body {
+  color: var(--color-grey);
+  font-family: var(--font-f-pro);
+}
+
+main {
+  background: var(--color-grey);
+  overflow: hidden;
+}
+
+main,
+main::before {
+  inset: 0;
+  position: absolute;
+}
+
+/* Dims the page behind the menu. */
+main::before {
+  background: color-mix(in srgb, var(--color-black) 40%, transparent);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease-in-out;
+  z-index: 2;
+}
+
+.is-menu main::before {
+  opacity: 1;
+}
+
+.scroll {
+  backface-visibility: hidden;
+  background: var(--color-cream);
+  inset: 0;
+  overflow: hidden;
+  overflow-y: auto;
+  position: fixed;
+  width: 100%;
+  will-change: transform;
+  z-index: 1;
+}
+
+.is-menu .content {
+  pointer-events: none;
+}
+
+/* ============================================================================
+   Shared type components
+   ========================================================================== */
+
+/* A small tracked uppercase label with a rotated square bullet. Used once per
+   section as the section's name. */
+.base-title {
+  align-items: center;
+  display: flex;
+  font-family: var(--font-f-mono);
+  font-size: 1.4rem;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.base-title::before {
+  background: currentcolor;
+  content: "";
+  display: block;
+  height: 0.6rem;
+  margin-right: 1.2rem;
+  transform: rotate(45deg) translateY(-0.2rem);
+  width: 0.6rem;
+}
+
+/* Three variants of one button: a solid black plate, a translucent white one,
+   and a bare label with no plate at all. The label is two stacked copies of
+   the same text in a 1rem window; hover slides the pair up so the second copy
+   takes the first one's place. */
+.base-button {
+  align-items: center;
+  display: inline-flex;
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-style: normal;
+  font-weight: 500;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  line-height: 1rem;
+  text-transform: uppercase;
+}
+
+.base-button.is-alpha {
+  background: none;
+  padding: 1.5rem 0;
+}
+
+.base-button.is-black {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+@media (max-width: 600px) {
+  .base-button.is-black {
+    padding: 1.5rem 1.8rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .base-button.is-black {
+    padding: 1.5rem 2.4rem;
+  }
+}
+
+.base-button.is-white {
+  background: color-mix(in srgb, var(--color-white) 20%, transparent);
+  color: var(--color-white);
+  padding: 1.5rem 2.4rem;
+}
+
+.base-button .arrow-svg {
+  height: 1.1rem;
+  margin-right: 1.2rem;
+  transform: translateY(-0.1rem);
+  width: 1.4rem;
+}
+
+.base-button .label {
+  height: 1rem;
+  overflow: hidden;
+}
+
+.base-button .line {
+  display: block;
+  height: 1.5rem;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .base-button .line {
+    transition: transform 0.6s var(--ease-out-quart);
+  }
+
+  .base-button:hover .line {
+    transform: translateY(-1.5rem);
+  }
+}
+
+/* The source shipped GSAP's DrawSVG and left dash values on these two shapes —
+   the shaft at `18.5px, 0.1px` (fully drawn) and the diamond at
+   `11.1213px, 11.2213px` (half). What triggered the draw is in the script chunk
+   the snapshot did not keep, so no dash animation is invented here: the arrow
+   is simply drawn, and the label slide carries the hover on its own. */
+
+/* --------------------------------------------------------- split headings -- */
+
+/* Every display heading is split into one element per line so the lines can be
+   masked and staggered. The mask carries vertical padding so ascenders and
+   descenders are not clipped, and an equal negative margin so that padding
+   costs nothing in the layout — the heading measures exactly line-height per
+   line, as if the masks were not there. */
+.base-heading .line-mask,
+.blockquote .line-mask {
+  display: block;
+  margin: -2rem 0;
+  overflow: clip;
+  padding: 1rem 0;
+  position: relative;
+  text-align: inherit;
+}
+
+.base-heading .line,
+.blockquote .line {
+  display: block;
+  position: relative;
+  transform: translateY(200%);
+  will-change: transform;
+}
+
+.base-heading[data-reveal] .line,
+.blockquote .line {
+  transition: transform 1.1s var(--ease-out-quart);
+}
+
+.base-heading.is-inview .line,
+.blockquote.is-inview .line {
+  transform: translateY(0);
+}
+
+/* The stagger. Nine steps covers the longest quote on the page. */
+.base-heading .line-mask:nth-child(1) .line,
+.blockquote .line-mask:nth-child(1) .line {
+  transition-delay: 0s;
+}
+.base-heading .line-mask:nth-child(2) .line,
+.blockquote .line-mask:nth-child(2) .line {
+  transition-delay: 0.07s;
+}
+.base-heading .line-mask:nth-child(3) .line,
+.blockquote .line-mask:nth-child(3) .line {
+  transition-delay: 0.14s;
+}
+.base-heading .line-mask:nth-child(4) .line,
+.blockquote .line-mask:nth-child(4) .line {
+  transition-delay: 0.21s;
+}
+.base-heading .line-mask:nth-child(5) .line,
+.blockquote .line-mask:nth-child(5) .line {
+  transition-delay: 0.28s;
+}
+.base-heading .line-mask:nth-child(6) .line,
+.blockquote .line-mask:nth-child(6) .line {
+  transition-delay: 0.35s;
+}
+.base-heading .line-mask:nth-child(7) .line,
+.blockquote .line-mask:nth-child(7) .line {
+  transition-delay: 0.42s;
+}
+
+/* ============================================================================
+   Chrome: cursor, bottom bar, menu
+   ========================================================================== */
+
+.cursor {
+  align-items: center;
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  background: linear-gradient(180deg, #ffffff26, #fff3);
+  color: var(--color-white);
+  display: flex;
+  justify-content: center;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  transition: opacity 0.2s linear;
+  z-index: 99;
+}
+
+@media (max-width: 600px) {
+  .cursor {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .cursor {
+    height: 4.4rem;
+    margin: 2rem 0 0 2rem;
+    width: 10rem;
+  }
+}
+
+.cursor.is-touch {
+  display: none;
+}
+
+.cursor.is-visible {
+  opacity: 1;
+}
+
+.cursor .label {
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------ bottom bar -- */
+
+.header {
+  align-items: center;
+  color: var(--color-white);
+  display: flex;
+  height: 5rem;
+  justify-content: center;
+  left: 50%;
+  overflow: hidden;
+  position: fixed;
+  transform: translate3d(-50%, 0, 0);
+  user-select: none;
+  width: 27.6rem;
+  z-index: 5;
+}
+
+@media (max-width: 600px) {
+  .header {
+    bottom: 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .header {
+    bottom: 4rem;
+  }
+}
+
+.header .background {
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  background: color-mix(in srgb, var(--color-black) 80%, transparent);
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+}
+
+/* The left slot. Brandmark and scroll-to-top arrow share it and swap on a
+   vertical slide, so the slot is never empty and never shows both. */
+.header .logo,
+.header .arrow {
+  align-items: center;
+  display: flex;
+  height: 5rem;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  transition: transform 0.6s var(--ease-in-out-quart);
+  width: 5rem;
+}
+
+.header .brandmark-svg {
+  height: 2.4rem;
+  width: 2.4rem;
+}
+
+.header .arrow {
+  transform: translateY(100%);
+}
+
+.header .arrow-svg {
+  height: 1.2rem;
+  width: 1.1rem;
+}
+
+.is-scrolled .header .logo {
+  transform: translateY(-100%);
+}
+
+.is-scrolled .header .arrow {
+  transform: translateY(0);
+}
+
+.is-menu .header .logo,
+.is-menu .header .arrow {
+  transform: translateY(-100%);
+}
+
+/* The centre slot. */
+.header .title {
+  align-items: center;
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  height: 5rem;
+  letter-spacing: 0.08em;
+  line-height: 5rem;
+  overflow: hidden;
+  text-align: center;
+  text-transform: uppercase;
+  transition: opacity 0.4s var(--ease-out-quad);
+  width: 17rem;
+  will-change: transform;
+}
+
+.header .title-inner {
+  display: inline-flex;
+  height: 5rem;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.is-menu .header .title {
+  opacity: 0;
+}
+
+/* The right slot. Burger and close swap the same way as the left pair. */
+.header .burger,
+.header .close {
+  align-items: center;
+  display: flex;
+  height: 5rem;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  transition: transform 0.6s var(--ease-in-out-quart);
+  width: 5rem;
+}
+
+.header .close {
+  transform: translateY(100%);
+}
+
+.is-menu .header .burger {
+  transform: translateY(-100%);
+}
+
+.is-menu .header .close {
+  transform: translateY(0);
+}
+
+.header .burger-svg {
+  height: 1.1rem;
+  position: absolute;
+  width: 2rem;
+}
+
+.header .close-svg {
+  height: 1.3rem;
+  position: absolute;
+  width: 1.3rem;
+}
+
+/* --------------------------------------------------------------- the menu -- */
+
+/* The menu is the bottom bar grown upward: same centre line, same blurred
+   plate, scaled from the bar's own bottom edge so the two read as one object. */
+.menu {
+  bottom: 10rem;
+  color: var(--color-white);
+  left: 50%;
+  padding: 6rem;
+  pointer-events: none;
+  position: fixed;
+  transform: translate3d(-50%, 0, 0);
+  visibility: hidden;
+  z-index: 9;
+}
+
+@media (max-width: 600px) {
+  .menu {
+    padding: 6rem 4rem 3rem;
+    width: 32rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .menu {
+    width: 40rem;
+  }
+}
+
+.is-menu .menu {
+  visibility: visible;
+}
+
+.menu .background {
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  background: color-mix(in srgb, var(--color-black) 80%, transparent);
+  inset: 0;
+  position: absolute;
+  transform: scale(0, 0);
+  transform-origin: center bottom;
+  transition: transform 0.8s var(--ease-in-out-quart);
+  z-index: -1;
+}
+
+.is-menu .menu .background {
+  transform: scale(1, 1);
+}
+
+.menu .title {
+  color: color-mix(in srgb, currentcolor 60%, transparent);
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  margin-bottom: 2rem;
+  opacity: 0;
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+  visibility: hidden;
+}
+
+.is-menu .menu .title {
+  opacity: 1;
+  transition-delay: 0.35s;
+  visibility: visible;
+}
+
+.menu .mask {
+  display: flex;
+  overflow: hidden;
+}
+
+.is-menu .menu .mask {
+  pointer-events: auto;
+}
+
+.menu .main .item {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+/* The active page gets a small rotated square in the left padding. */
+.menu .main .item::before {
+  background: currentcolor;
+  content: "";
+  height: 0.6rem;
+  left: -2rem;
+  opacity: 0;
+  position: absolute;
+  transform: rotate(45deg);
+  transition: opacity 0.25s;
+  width: 0.6rem;
+}
+
+.is-menu .menu .main .item.is-active::before {
+  opacity: 0.6;
+  transition-delay: 0.5s;
+  transition-duration: 0.5s;
+}
+
+.menu .main .link {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-f-pro);
+  font-size: 3.2rem;
+  font-weight: 400;
+  height: 3.6rem;
+  letter-spacing: -0.02em;
+  line-height: 3.6rem;
+  overflow: hidden;
+}
+
+/* Hovering the list dims every item; hovering one brings it back. */
+@media (hover: hover) {
+  .menu .main .link {
+    transition: color 0.5s;
+  }
+
+  .menu .main:hover .mask {
+    color: color-mix(in srgb, currentcolor 40%, transparent);
+  }
+
+  .menu .main:hover .mask:hover {
+    color: color-mix(in srgb, currentcolor 100%, transparent);
+  }
+}
+
+.menu .main .link .line {
+  transition: transform 0.7s var(--ease-out-quart);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .menu .main .link:hover .line {
+    transform: translateY(-3.6rem);
+  }
+}
+
+.menu .sub {
+  color: color-mix(in srgb, currentcolor 60%, transparent);
+  column-count: 2;
+}
+
+@media (max-width: 600px) {
+  .menu .sub {
+    column-gap: 0;
+    margin: 3rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .menu .sub {
+    margin: 4rem 0 6rem;
+  }
+}
+
+.menu .sub .mask {
+  margin: 0.2rem 0;
+}
+
+.menu .sub .link {
+  font-family: var(--font-f-pro);
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* A rule that wipes in from the left and out to the right. */
+@media (hover: hover) {
+  .menu .sub .link {
+    position: relative;
+  }
+
+  .menu .sub .link::after {
+    background: currentcolor;
+    content: "";
+    height: 1px;
+    inset: auto auto 0 0;
+    position: absolute;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.5s cubic-bezier(1, 0, 0, 1);
+    width: 100%;
+    will-change: transform;
+  }
+
+  .menu .sub .link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
+/* Menu items rise into place, staggered, once the plate has opened. */
+.menu .main .link,
+.menu .sub .link {
+  transform: translateY(150%);
+  transition: transform 0.9s var(--ease-out-quart);
+}
+
+.is-menu .menu .main .link,
+.is-menu .menu .sub .link {
+  transform: translateY(0);
+}
+
+.menu .main .item:nth-child(1) .link {
+  transition-delay: 0.2s;
+}
+.menu .main .item:nth-child(2) .link {
+  transition-delay: 0.26s;
+}
+.menu .main .item:nth-child(3) .link {
+  transition-delay: 0.32s;
+}
+.menu .main .item:nth-child(4) .link {
+  transition-delay: 0.38s;
+}
+.menu .main .item:nth-child(5) .link {
+  transition-delay: 0.44s;
+}
+.menu .sub .mask:nth-child(1) .link {
+  transition-delay: 0.5s;
+}
+.menu .sub .mask:nth-child(2) .link {
+  transition-delay: 0.54s;
+}
+.menu .sub .mask:nth-child(3) .link {
+  transition-delay: 0.58s;
+}
+.menu .sub .mask:nth-child(4) .link {
+  transition-delay: 0.62s;
+}
+
+.menu .base-button {
+  opacity: 0;
+  transition: opacity 0.5s;
+  visibility: hidden;
+  width: 100%;
+}
+
+.is-menu .menu .base-button {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.6s;
+  visibility: visible;
+}
+
+/* ============================================================================
+   Page header — the wordmark at the very top of the document
+   ========================================================================== */
+
+.page-header {
+  align-items: center;
+  display: flex;
+  height: 6rem;
+  inset: 0 4rem auto;
+  justify-content: center;
+  position: absolute;
+  z-index: 5;
+}
+
+.page-header.is-white {
+  color: var(--color-white);
+}
+
+.page-header .logo {
+  position: absolute;
+}
+
+/* The source drew its name as a traced SVG at 14rem x 3rem. Set as live text,
+   the same optical size is a 3.4rem cap with the display face's own tracking
+   pulled in — see the README for how the two were matched. */
+.page-header .wordmark {
+  display: block;
+  font-family: var(--font-f-pro);
+  font-size: 3.4rem;
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 3rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .page-header .base-button {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .page-header .base-button {
+    position: absolute;
+    right: 0;
+  }
+}
+
+/* ============================================================================
+   Hero
+   ========================================================================== */
+
+.home-header {
+  color: var(--color-white);
+}
+
+.home-header .container {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .home-header .container {
+    margin: 0 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .container {
+    margin: 0 4rem;
+  }
+}
+
+.home-header .row {
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .home-header .row {
+    display: flex;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .row {
+    display: grid;
+    grid-column-gap: 2rem;
+    grid-template-columns: repeat(24, 1fr);
+  }
+}
+
+.home-header .row:first-child {
+  align-items: flex-end;
+  height: 100svh;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .home-header .row:first-child {
+    padding: 14rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .row:first-child {
+    padding: 16rem 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-header .row:nth-child(2) {
+    border-top: 1px solid color-mix(in srgb, var(--color-white) 20%, transparent);
+    flex-direction: column;
+    padding: 1.5rem 0 6rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .row:nth-child(2) {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 0 32.8rem;
+  }
+}
+
+/* The rule under the hero stops short of the left edge: it is 86rem wide and
+   anchored right, so it spans the standfirst and the section name but leaves
+   the left third of the page open. */
+.home-header .row:nth-child(2)::before {
+  border-top: 1px solid color-mix(in srgb, var(--color-white) 20%, transparent);
+  inset: 0 0 auto auto;
+  position: absolute;
+  width: 86rem;
+}
+
+@media (min-width: 601px) {
+  .home-header .row:nth-child(2)::before {
+    content: "";
+  }
+}
+
+.home-header .base-heading {
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .home-header .base-heading {
+    font-size: 4rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .base-heading {
+    font-size: 6.4rem;
+    font-weight: 400;
+    grid-column: 6 / 20;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-header .indicator {
+    bottom: 10.5rem;
+    color: color-mix(in srgb, var(--color-white) 40%, transparent);
+    font-family: var(--font-f-mono);
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    position: absolute;
+    text-transform: uppercase;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .indicator {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-header .base-title {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .base-title {
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    top: 2rem;
+    transform: translate(-50%);
+  }
+}
+
+@media (max-width: 600px) {
+  .home-header .text {
+    font-size: 1.6rem;
+    line-height: 1.3;
+  }
+}
+
+@media (min-width: 601px) {
+  .home-header .text {
+    font-size: 1.8rem;
+    grid-column: 20 / 25;
+    line-height: 1.3;
+  }
+}
+
+.home-header .background {
+  background: var(--color-grey);
+  inset: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* A single ramp to black across the whole frame at half strength, rather than
+   a scrim at the foot. It is what keeps white type legible over the glass
+   without visibly darkening the photograph. */
+.home-header .background::before {
+  background: linear-gradient(180deg, transparent 0, #000);
+  content: "";
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.home-header .asset {
+  inset: 0;
+  opacity: 0.8;
+  position: absolute;
+  will-change: transform;
+}
+
+.home-header .base-image {
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+}
+
+/* ============================================================================
+   Text CTA
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .text-cta {
+    margin: 8rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .text-cta {
+    margin: 15rem 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .text-cta .container {
+    margin: 0 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .text-cta .container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 4rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .text-cta .base-heading {
+    font-size: 3.2rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 3rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .text-cta .base-heading {
+    font-size: 6.4rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 4rem 0;
+    width: 100.6rem;
+  }
+}
+
+/* ============================================================================
+   Product collection
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .product-collection {
+    margin: 8rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection {
+    margin: 15rem 0;
+  }
+}
+
+.product-collection .container {
+  border-top: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+  padding-top: 2rem;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .product-collection .container {
+    margin: 0 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .container {
+    margin: 0 4rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-collection .content {
+    margin: 2rem 0 4rem;
+  }
+}
+
+/* The standfirst is placed by coordinate rather than by grid column, because it
+   has to sit in the gap the four staggered tiles leave open. */
+@media (min-width: 601px) {
+  .product-collection .content {
+    inset: 22rem 23.2rem auto auto;
+    position: absolute;
+    width: 30.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-collection .richtext {
+    margin-bottom: 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .richtext {
+    margin-bottom: 5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-collection .richtext p {
+    font-size: 1.6rem;
+    line-height: 1.3;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .richtext p {
+    font-size: 1.8rem;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-collection .blocks {
+    align-items: flex-start;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .blocks {
+    display: grid;
+    grid-column-gap: 2rem;
+    grid-template-columns: repeat(24, 1fr);
+    padding-top: 8rem;
+  }
+}
+
+.product-collection .block {
+  align-items: center;
+  aspect-ratio: 500 / 617;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 601px) {
+  .product-collection .block:first-child {
+    grid-column: 8 / 15;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-collection .block:nth-child(2) {
+    margin-top: 8.4rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .block:nth-child(2) {
+    grid-column: 18 / 24;
+    margin-top: 45rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-collection .block:nth-child(3) {
+    margin-top: -8.4rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .block:nth-child(3) {
+    grid-column: 1 / 7;
+    margin-top: 4.5rem;
+  }
+
+  .product-collection .block:nth-child(4) {
+    grid-column: 12 / 17;
+    margin-top: -17rem;
+  }
+}
+
+.product-collection .title {
+  color: var(--color-white);
+  position: absolute;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .product-collection .title {
+    font-size: 2.4rem;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 601px) {
+  .product-collection .title {
+    font-size: 4rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+}
+
+.product-collection .base-image {
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .product-collection .base-image {
+    transition: transform 0.8s var(--ease-out-quart);
+  }
+
+  .product-collection .block:hover .base-image {
+    transform: scale(1.04);
+  }
+}
+
+/* ============================================================================
+   Showroom banner
+   ========================================================================== */
+
+/* Two viewports tall on desktop with a sticky one-viewport stage inside it.
+   That second viewport of scroll is the entire budget for the video growing
+   from 55% to full bleed; nothing else moves down the page while it happens. */
+.banner-showroom {
+  background: var(--color-grey);
+  color: var(--color-white);
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .banner-showroom {
+    height: 100svh;
+    padding-top: 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom {
+    height: 200svh;
+    padding-top: 4rem;
+  }
+}
+
+.banner-showroom .base-title {
+  border-top: 1px solid color-mix(in srgb, var(--color-cream) 20%, transparent);
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .base-title {
+    margin: 0 2rem;
+    padding-top: 1.5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .base-title {
+    margin: 0 4rem;
+    padding-top: 2rem;
+  }
+}
+
+.banner-showroom .container {
+  align-items: center;
+  display: flex;
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .container {
+    inset: 0;
+    position: absolute;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .container {
+    height: 100svh;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .border {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .border {
+    background: color-mix(in srgb, var(--color-white) 20%, transparent);
+    height: 1px;
+    margin-top: -20rem;
+    position: absolute;
+    transform: scaleX(0);
+    width: 152rem;
+    will-change: transform;
+  }
+}
+
+.banner-showroom .content {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .content {
+    align-items: center;
+    flex-direction: column;
+    margin: 0 2rem;
+    text-align: center;
+  }
+
+  .banner-showroom .column {
+    position: absolute;
+  }
+
+  .banner-showroom .column:first-child {
+    top: -17rem;
+  }
+
+  .banner-showroom .column:nth-child(2) {
+    top: 15rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .content {
+    margin: 0 4rem;
+  }
+
+  .banner-showroom .column {
+    will-change: transform;
+  }
+
+  .banner-showroom .column:nth-child(2) {
+    text-align: right;
+  }
+}
+
+.banner-showroom .base-heading {
+  margin: 1rem 0;
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .base-heading {
+    font-size: 2.4rem;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .base-heading {
+    font-size: 4rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    width: 45rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .address {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .address {
+    margin-bottom: 3rem;
+  }
+}
+
+.banner-showroom .title {
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+}
+
+.banner-showroom .text {
+  color: color-mix(in srgb, currentcolor 80%, transparent);
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.banner-showroom .base-button {
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  background: linear-gradient(180deg, #ffffff26, #fff3);
+  margin-left: auto;
+  pointer-events: all;
+}
+
+.banner-showroom .background {
+  inset: 0;
+  pointer-events: auto;
+  position: absolute;
+  will-change: transform;
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .background {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 0 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .background {
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 600px) {
+  .banner-showroom .icon {
+    align-items: center;
+    backdrop-filter: blur(2rem);
+    -webkit-backdrop-filter: blur(2rem);
+    background: color-mix(in srgb, var(--color-grey) 20%, transparent);
+    color: var(--color-white);
+    display: flex;
+    height: 5rem;
+    justify-content: center;
+    position: absolute;
+    width: 5rem;
+    z-index: 1;
+  }
+
+  .banner-showroom .play-svg {
+    height: 0.9rem;
+    width: 0.9rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .icon {
+    display: none;
+  }
+}
+
+/* The source played a Vimeo file here and kept the still only as a poster. The
+   still is all the snapshot preserved, so it takes the video's box. */
+@media (max-width: 600px) {
+  .banner-showroom .base-image {
+    height: 18.6rem;
+    object-fit: cover;
+    opacity: 0.7;
+    position: absolute;
+    width: 33.5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-showroom .base-image {
+    height: 100%;
+    inset: 0;
+    object-fit: cover;
+    position: absolute;
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   Featured projects
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .featured-projects {
+    margin: 3rem 0 8rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects {
+    margin: 4rem 0 15rem;
+  }
+}
+
+.featured-projects .container {
+  border-top: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+}
+
+@media (max-width: 600px) {
+  .featured-projects .container {
+    margin: 0 2rem;
+    padding-top: 1.5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects .container {
+    align-items: flex-start;
+    display: grid;
+    grid-column-gap: 2rem;
+    grid-template-columns: repeat(24, 1fr);
+    margin: 0 4rem;
+    padding-top: 2rem;
+  }
+
+  .featured-projects .base-title {
+    grid-column: 1 / 11;
+  }
+
+  .featured-projects .content {
+    grid-column: 11 / 25;
+  }
+}
+
+@media (max-width: 600px) {
+  .featured-projects .base-heading {
+    font-size: 3.2rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 6rem 0 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects .base-heading {
+    font-size: 6.4rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 1rem 0 4rem;
+  }
+}
+
+.featured-projects .projects {
+  border-top: 1px solid color-mix(in srgb, var(--color-grey) 10%, transparent);
+}
+
+@media (max-width: 600px) {
+  .featured-projects .projects {
+    margin-top: 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects .projects {
+    grid-column: 1 / 25;
+    margin-top: 12rem;
+  }
+}
+
+/* Everything in a row sits at 40% or 20% opacity until the row is hovered, at
+   which point one rule — `:hover *` — brings the whole row to full strength
+   and darkens its rule. */
+.featured-projects .project {
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-grey) 10%, transparent);
+  display: flex;
+  position: relative;
+  transition: border-color 0.4s var(--ease-out-quad);
+}
+
+@media (max-width: 600px) {
+  .featured-projects .project {
+    padding: 2.6rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects .project {
+    padding: 2.4rem 0;
+  }
+}
+
+@media (hover: hover) {
+  .featured-projects .project * {
+    transition: opacity 0.4s var(--ease-out-quad);
+  }
+
+  .featured-projects .project:hover {
+    border-color: color-mix(in srgb, var(--color-grey) 60%, transparent);
+  }
+
+  .featured-projects .project:hover * {
+    opacity: 1;
+  }
+}
+
+.featured-projects .title {
+  font-size: 2.4rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 601px) {
+  .featured-projects .title {
+    opacity: 0.4;
+    width: 38.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .featured-projects .products {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects .products {
+    display: flex;
+  }
+}
+
+.featured-projects .product {
+  border: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+  border-radius: 2rem;
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  height: 2.6rem;
+  letter-spacing: 0.08em;
+  line-height: 1.5rem;
+  opacity: 0.4;
+  padding: 0.5rem 1rem;
+  position: relative;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.featured-projects .product:not(:last-child) {
+  margin-right: 1rem;
+}
+
+/* The hover thumbnail. It is absolutely positioned but given no `top`, so it
+   keeps its static position — and because the row is a centred flex line, a
+   296px-tall image in a 77px row centres itself, overhanging the row equally
+   above and below. Nothing has to be measured or tracked; one opacity does it. */
+.featured-projects .image {
+  height: 29.6rem;
+  left: 29.7rem;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 0.3s ease-out;
+  width: 23.6rem;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .featured-projects .image {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .featured-projects .project:hover .image {
+    opacity: 1;
+  }
+}
+
+.featured-projects .base-image {
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-projects .arrow-svg {
+  height: 1.1rem;
+  width: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .featured-projects .arrow-svg {
+    margin: 0 2rem 0 auto;
+  }
+}
+
+@media (min-width: 601px) {
+  .featured-projects .arrow-svg {
+    margin: 0 3rem 0 auto;
+    opacity: 0.2;
+  }
+}
+
+/* ============================================================================
+   Assets duo
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .assets-duo {
+    margin: 3rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .assets-duo {
+    margin: 4rem 0;
+  }
+}
+
+.assets-duo .container {
+  align-items: flex-start;
+}
+
+@media (max-width: 600px) {
+  .assets-duo .container {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .assets-duo .container {
+    display: grid;
+    gap: 2rem;
+    grid-column-gap: 2rem;
+    grid-template-columns: repeat(24, 1fr);
+    margin: 0 4rem;
+  }
+}
+
+.assets-duo .block {
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .assets-duo .is-portrait-6 .block:first-child {
+    width: 12.4rem;
+  }
+
+  .assets-duo .is-portrait-6 .block:nth-child(2) {
+    width: 19.6rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .assets-duo .is-portrait-6 .block:first-child {
+    grid-column: 5 / 13;
+    will-change: transform;
+  }
+
+  .assets-duo .is-portrait-6 .block:nth-child(2) {
+    grid-column: 13 / 25;
+  }
+}
+
+/* ============================================================================
+   Reviews
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .reviews {
+    margin: 8rem 0;
+  }
+
+  .assets-duo + .reviews {
+    margin-top: 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews {
+    margin: 15rem 0;
+    user-select: none;
+  }
+
+  .assets-duo + .reviews {
+    margin-top: 4rem;
+  }
+}
+
+.reviews .container {
+  border-top: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .reviews .container {
+    margin: 0 2rem;
+    padding-top: 1.5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews .container {
+    margin: 0 4rem;
+    padding-top: 2rem;
+  }
+}
+
+.reviews .head {
+  align-items: flex-start;
+  display: flex;
+  position: relative;
+  z-index: 1;
+}
+
+.reviews .indicator {
+  color: color-mix(in srgb, var(--color-grey) 60%, transparent);
+  font-family: var(--font-f-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+@media (max-width: 600px) {
+  .reviews .indicator {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews .indicator {
+    left: 38.5rem;
+  }
+}
+
+.reviews .arrow-nav {
+  display: flex;
+  gap: 1rem;
+  inset: 0 0 auto auto;
+  margin-left: auto;
+  position: absolute;
+}
+
+.reviews .arrow-nav .button {
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+  display: flex;
+  height: 5rem;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.4s var(--ease-out-quad);
+  width: 5rem;
+}
+
+@media (hover: hover) {
+  .reviews .arrow-nav .button:hover {
+    border-color: color-mix(in srgb, var(--color-grey) 60%, transparent);
+  }
+}
+
+.reviews .arrow-nav .button:first-child {
+  transform: rotate(180deg);
+}
+
+.reviews .arrow-nav .arrow-svg {
+  height: 0.9rem;
+  width: 1.4rem;
+}
+
+/* Every quote is stacked in the same place and only one is visible. The stack
+   has no intrinsic height, so its height is written from the active block and
+   transitioned — which is what makes the section grow and shrink as you page
+   through quotes of different lengths. */
+.reviews .blocks {
+  position: relative;
+}
+
+/* The height tween is gated on `is-ready` so the first measurement — which
+   happens once the webfont has settled — snaps rather than animating a
+   several-hundred-pixel height change while the page is still arriving. */
+.is-ready .reviews .blocks {
+  transition: height 0.7s var(--ease-in-out-quart);
+}
+
+@media (min-width: 601px) {
+  .reviews .blocks {
+    margin-top: 9rem;
+  }
+}
+
+.reviews .block {
+  position: absolute;
+  top: 0;
+  visibility: hidden;
+  width: 100%;
+}
+
+.reviews .block.is-active {
+  visibility: inherit;
+}
+
+@media (min-width: 601px) {
+  .reviews .block {
+    display: grid;
+    grid-column-gap: 2rem;
+    grid-template-columns: repeat(24, 1fr);
+  }
+}
+
+.reviews .quote-svg {
+  height: 2rem;
+  width: 2.7rem;
+}
+
+@media (max-width: 600px) {
+  .reviews .quote-svg {
+    margin: 5rem 0 3rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews .quote-svg {
+    inset: 0.5rem auto auto 32rem;
+    position: absolute;
+  }
+}
+
+.reviews .blockquote {
+  margin: 1rem 0;
+}
+
+@media (max-width: 600px) {
+  .reviews .blockquote {
+    font-size: 3.2rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    min-height: 25rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews .blockquote {
+    font-size: 6.4rem;
+    grid-column: 7 / 23;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+}
+
+.reviews .content {
+  align-items: center;
+  display: flex;
+}
+
+@media (max-width: 600px) {
+  .reviews .content {
+    margin-top: 5rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews .content {
+    grid-column: 7 / 23;
+    margin-top: 7rem;
+  }
+}
+
+.reviews .author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.reviews .quotee {
+  font-size: 2.4rem;
+  line-height: 1.2;
+}
+
+.reviews .function {
+  color: color-mix(in srgb, var(--color-grey) 60%, transparent);
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+}
+
+@media (max-width: 600px) {
+  .reviews .rating {
+    border-top: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .reviews .rating {
+    bottom: 0;
+    position: absolute;
+    right: 0;
+  }
+}
+
+.reviews .link {
+  align-items: center;
+  display: flex;
+  font-family: var(--font-f-mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-decoration: underline;
+  text-transform: uppercase;
+  text-underline-offset: 0.3rem;
+}
+
+.reviews .google-svg {
+  height: 2rem;
+  margin-right: 1.2rem;
+  width: 2rem;
+}
+
+/* ============================================================================
+   Banner CTA
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .banner-cta {
+    margin: 3rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-cta {
+    margin: 4rem 0;
+  }
+}
+
+.banner-cta .container {
+  border: 1px solid color-mix(in srgb, var(--color-grey) 20%, transparent);
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .banner-cta .container {
+    border-left: none;
+    border-right: none;
+    margin: 0 2rem;
+    padding: 8rem 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-cta .container {
+    margin: 0 4rem;
+    padding: 18rem 4.4rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .banner-cta .base-heading {
+    font-size: 4rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 3rem 0 4rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-cta .base-heading {
+    font-size: 6.4rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 3rem 0 5rem;
+    width: 70.6rem;
+  }
+}
+
+.banner-cta .buttons {
+  white-space: nowrap;
+}
+
+.banner-cta .is-alpha {
+  margin-left: 2rem;
+}
+
+/* Two lines echoing a glazing sightline, at the same 20% grey as the border. */
+@media (max-width: 600px) {
+  .banner-cta-svg {
+    display: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .banner-cta-svg {
+    color: color-mix(in srgb, var(--color-grey) 20%, transparent);
+    height: 61rem;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42.8rem;
+  }
+}
+
+/* ============================================================================
+   Footer
+   ========================================================================== */
+
+.footer {
+  background: var(--color-black);
+  color: var(--color-white);
+  height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+.footer .container {
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+  will-change: transform;
+}
+
+.footer .logo {
+  height: 4.2rem;
+  position: absolute;
+  top: 3rem;
+  width: 4.2rem;
+  z-index: 3;
+}
+
+.footer .bottom {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  pointer-events: all;
+  z-index: 3;
+}
+
+@media (max-width: 600px) {
+  .footer .bottom {
+    color: var(--color-white);
+  }
+
+  .footer .copyright {
+    bottom: 4rem;
+    left: 2rem;
+    opacity: 0.8;
+    position: absolute;
+  }
+
+  .footer .nav {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    inset: auto 2rem 25svh;
+    justify-content: center;
+    position: absolute;
+  }
+}
+
+@media (min-width: 601px) {
+  .footer .bottom {
+    color: color-mix(in srgb, var(--color-white) 60%, transparent);
+    display: flex;
+    inset: auto 4rem 4rem;
+    position: absolute;
+  }
+}
+
+.footer .social,
+.footer .legal {
+  display: inline-flex;
+}
+
+@media (max-width: 600px) {
+  .footer .social {
+    margin-bottom: 0.5rem;
+  }
+
+  .footer .item {
+    margin-left: 1.5rem;
+  }
+
+  .footer .item:first-child {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .footer .legal {
+    position: absolute;
+    right: 14rem;
+  }
+
+  .footer .item {
+    margin-left: 2rem;
+  }
+
+  .footer .link {
+    position: relative;
+  }
+
+  .footer .link::after {
+    background: currentcolor;
+    content: "";
+    height: 1px;
+    inset: auto auto 0 0;
+    position: absolute;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.5s cubic-bezier(1, 0, 0, 1);
+    width: 100%;
+    will-change: transform;
+  }
+}
+
+@media (min-width: 601px) and (hover: hover) {
+  .footer .link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
+.footer .exo-ape {
+  position: absolute;
+}
+
+@media (max-width: 600px) {
+  .footer .exo-ape {
+    bottom: 4rem;
+    opacity: 0.8;
+    right: 2rem;
+  }
+}
+
+@media (min-width: 601px) {
+  .footer .exo-ape {
+    right: 0;
+  }
+}
+
+.footer .background,
+.footer .background::before {
+  inset: 0;
+  position: absolute;
+}
+
+.footer .background::before {
+  content: "";
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .footer .background::before {
+    background: #0006;
+  }
+}
+
+@media (min-width: 601px) {
+  .footer .background::before {
+    background: linear-gradient(180deg, #fff0 50%, #000000b3);
+  }
+}
+
+.footer .base-image {
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom;
+}
+
+/* The wordmark is a window cut into the page: the same photograph, lightened by
+   a 20% white wash, clipped to the letterforms and dropped to 30% opacity. The
+   source did this by masking a white plate with a traced SVG of its own name;
+   clipping live text gets the same composite and survives a rename. */
+.footer .wordmark {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)),
+    url("assets/footer.jpg");
+  background-position: center bottom;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 400;
+  inset: auto 0 11rem;
+  line-height: 0.78;
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .footer .wordmark {
+    bottom: 50%;
+    font-size: 15.2rem;
+    letter-spacing: -0.055em;
+    opacity: 0.5;
+    transform: translateY(50%);
+  }
+}
+
+@media (min-width: 601px) {
+  .footer .wordmark {
+    font-size: 33.8rem;
+    letter-spacing: -0.055em;
+    opacity: 0.3;
+  }
+}
+
+/* --------------------------------------------------------- motion opt-out -- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .base-heading .line,
+  .blockquote .line {
+    transform: none !important;
+  }
+}

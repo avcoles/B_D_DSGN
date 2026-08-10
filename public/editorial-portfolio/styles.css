@@ -1,0 +1,1302 @@
+/* ============================================================
+   Editorial Portfolio: landing page rebuild
+
+   Reconstruction of a digital artist's index page from a saved-page
+   snapshot. The source is a Nuxt 2 app on DatoCMS running Tailwind 2,
+   GSAP and Flip; this is hand-authored HTML, CSS and JavaScript with
+   no framework and no animation library.
+
+   Four decisions read off the snapshot carry the whole page:
+
+   1. Nothing scrolls. The page is one fixed screen. `article` is
+      `position: fixed; inset: 0`, the list floats over it and the
+      wordmark sits on the floor. Every size therefore has to be a
+      function of the viewport, because there is no second screen to
+      spill into.
+
+   2. So the root font-size is the viewport. `html` is
+      `1000vw / --size`, where --size is 390 on a phone and 1500 on a
+      desktop, clamped to 14px so it stops growing on a 5K display.
+      Every rem below is that scale. There is not one type-specific
+      media query in the file.
+
+   3. Two colours and a photograph. Black type on white, and the
+      header inverts itself against whatever is under it with
+      `mix-blend-mode: difference` rather than carrying a second
+      palette. The only other colour on the site is the brown the
+      contact panel wipes in on.
+
+   4. Hover is one property. Every link sits at 25% black and comes
+      up to 100%, whether it is in the nav, the list or the footer.
+      Nothing changes colour, weight or size. The page stays a quiet
+      field of grey text with one thing lit in it.
+   ============================================================ */
+
+/* ---- The scale ------------------------------------------------
+   `--size` is the width the design was drawn at. 1rem is a
+   thousandth of the viewport in those units, so a 5.8rem headline is
+   always 5.8/1500 of the screen and every proportion on the page
+   survives a resize untouched.
+
+   The desktop clamp reads oddly and is worth spelling out:
+   clamp(MIN, PREFERRED, MAX) with a *constant* preferred value of
+   14px means the fluid term is the ceiling. Below a 2100px viewport
+   the page tracks the window; above it the root freezes at 14px.
+   --------------------------------------------------------------- */
+:root {
+  --size: 390;
+
+  /* Motion. Two curves do everything.
+
+     --ease-gil is the site's own CustomEase, "M0,0 C0.549,0.054
+     0.014,1 1,1", an aggressive out-curve that covers most of its
+     distance in the first fifth and then glides. It runs the intro.
+
+     --ease-rise is the list's, a quart/expo out. It runs the reveal
+     and, at .55s, the underlines. */
+  --ease-gil: cubic-bezier(0.549, 0.054, 0.014, 1);
+  --ease-rise: cubic-bezier(0.075, 0.82, 0.165, 1);
+  --ease-uline: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+
+  /* The reveal arithmetic, named once. A list item's delay is
+     --stagger * its index; the intro's letters use --letter-stagger
+     the same way. */
+  --stagger: 0.075s;
+  --letter-stagger: 0.07s;
+
+  --brown: rgb(177, 104, 77);
+  --gray-2: #868686;
+}
+
+@media (min-width: 650px) {
+  :root { --size: 1500; }
+}
+
+/* ---- The face ---------------------------------------------------
+   Dia, by Schick Toikka. One cut sets the entire page: nav, list,
+   clock, form, and both halves of the wordmark. The italic is
+   declared below and shipped, but nothing draws it at the moment.
+
+   TRIAL FILES. The Schick Toikka trial licence covers internal
+   testing and presentation only, and it names websites explicitly:
+   a public page that renders text in these files is not licensed.
+   Buy the retail cut at schick-toikka.com before this ships.
+
+   Two cuts, one weight each. The trial subset stops at A-Z, a-z, 0-9
+   and five punctuation marks, so the colon in the clock, the arrows
+   in the contact panel and the @ in the address all fall through to
+   the next face in the stack. At 18px nobody will catch it. Rewrite
+   any large copy that needs a question mark rather than let one
+   render in Arial at 70px.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Dia';
+  src: url('./fonts/DiaTrial-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dia';
+  src: url('./fonts/DiaTrial-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+html {
+  font-size: calc(1000vw / var(--size));
+  font-family: 'Dia', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* The source turns kerning off globally. It matters here: the
+     wordmark is set as individually transformed letters, and a
+     kerning pair that only exists when two glyphs share a text run
+     would shift them the moment the intro splits them apart. */
+  font-kerning: none;
+  -webkit-text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+@media (min-width: 650px) {
+  html { font-size: clamp(7px, 14px, calc(1000vw / var(--size))); }
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body,
+html {
+  overscroll-behavior: none;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  font-size: 1.8rem;
+  line-height: 1.5;
+  color: #000;
+  background-color: #fff;
+
+  /* The page never scrolls, but the gutter is reserved anyway so
+     that laying a scrolling overlay (the contact panel) over it does
+     not shift the layout underneath by a scrollbar's width. */
+  overflow: hidden scroll;
+}
+
+::selection { background-color: #d8d8d8; }
+
+h1, h2, h3, p, figure, ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+ul { list-style: none; }
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  appearance: none;
+  width: 100%;
+}
+
+svg {
+  display: block;
+  fill: currentColor;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ============================================================
+   Layout primitives
+
+   Three of them, and between them they place every element on the
+   page. The page margin (2rem, 5rem past the breakpoint) is declared
+   once each and shared, so the header inset, the grid and the footer
+   can never drift apart.
+   ============================================================ */
+
+.site-max,
+.site-gutter {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+
+/* Six columns on a phone, twelve past 650px, and the gutter moves
+   the opposite way, from 7rem down to 2.4rem, because six columns of
+   a phone need air between them and twelve of a desktop need edges
+   to align against. */
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0 7rem;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+
+@media (min-width: 650px) {
+  .site-max,
+  .site-gutter { padding-inline: 5rem; }
+
+  .site-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0 2.4rem;
+    padding-inline: 5rem;
+  }
+}
+
+/* The wordmark is drawn as individually transformed letters and hidden
+   from the accessibility tree; this carries the name for anything that
+   is not looking at pixels. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Any box that wants a photograph to fill it. The child is absolute
+   and cover-fitted, so the parent's aspect ratio, usually a
+   percentage padding, is what decides the crop. */
+.media-fill {
+  position: relative;
+}
+
+.media-fill img,
+.media-fill video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ============================================================
+   Links
+
+   All the hover behaviour there is. A link sits at 25% black until
+   it is the one you mean, then it goes to 100%. Same .35s ease-out
+   on every tier: nav, list, footer.
+   ============================================================ */
+
+.site-link,
+.t-fade {
+  transition: opacity 0.35s ease-out;
+}
+
+.site-link { opacity: 0.25; }
+
+.site-link:hover,
+.site-link[aria-current='page'],
+.site-link.is-active { opacity: 1; }
+
+/* ---- The double underline -------------------------------------
+   The one piece of decoration on the page, and it is a small piece
+   of choreography rather than a state change. Two rules sit in the
+   same place. At rest the first is drawn and the second is not. On
+   hover the drawn one wipes out to the right while the other wipes
+   in from the left a fifth of a second behind it, so the line looks
+   like it is being redrawn rather than switched off and on.
+
+   Leaving reverses it, and the .5s delay on the return is what stops
+   a fast pass across the button from flickering.
+   --------------------------------------------------------------- */
+.uline-double {
+  display: inline-flex;
+  position: relative;
+  white-space: nowrap;
+}
+
+.uline-double::before,
+.uline-double::after {
+  content: '';
+  position: absolute;
+  bottom: -0.2em;
+  left: 0;
+  right: 0;
+  height: 0.05em;
+  min-height: 1px;
+  background-color: currentColor;
+  transition: transform 0.55s var(--ease-uline);
+}
+
+.uline-double::before {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition-delay: 0.5s;
+}
+
+.uline-double::after {
+  transform: scaleX(0);
+  transform-origin: right;
+  transition-delay: 0s;
+}
+
+.uline-double:hover::before {
+  transform: scaleX(0);
+  transform-origin: right;
+  transition-delay: 0s;
+}
+
+.uline-double:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition-delay: 0.2s;
+}
+
+/* Below the breakpoint the message button loses its rules entirely.
+   there is no hover to explain them. */
+@media (max-width: 649px) {
+  .uline-double.--no-s::before,
+  .uline-double.--no-s::after { content: none; }
+}
+
+/* ============================================================
+   Header
+
+   Fixed, above everything, and (the good idea) painted in
+   `mix-blend-mode: difference` over white type. Against the white
+   page it reads black; the instant a photograph or the black
+   transition field passes under it, it inverts itself. One header
+   serves every background the site can produce, and no script has to
+   watch what is behind it.
+   ============================================================ */
+
+.sh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  padding-top: 2.5rem;
+  color: #fff;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+@media (min-width: 650px) {
+  .sh { padding-top: 3.5rem; }
+}
+
+.sh__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sh__logo {
+  position: relative;
+  display: flex;
+}
+
+/* The logo is three words in one mask. They arrive one after another
+   from below on load and leave upward together when the route or the
+   menu takes the wordmark's place. */
+.sh__logo-words {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.logo-slide {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The mark that replaces the words while the menu is open. Set in
+   the page's own two faces rather than drawn, so it stays live text.
+   Absolute so it occupies no space when hidden. */
+.sh__logo-mark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 17.6rem;
+  transform: translateY(-50%);
+  overflow: hidden;
+  line-height: 1;
+  font-size: 2.05rem;
+  letter-spacing: -0.01em;
+  visibility: hidden;
+}
+
+@media (min-width: 650px) {
+  .sh__logo-mark {
+    width: 12rem;
+    font-size: 1.4rem;
+  }
+}
+
+.sh__logo-mark em {
+  font-size: 1.29em;
+}
+
+.is-menu-open .sh__logo-words { visibility: hidden; }
+.is-menu-open .sh__logo-mark { visibility: visible; }
+
+.sh__nav {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+  column-gap: 0.5rem;
+  transform: translate(-50%, -50%);
+}
+
+.sh__contact { display: none; }
+
+.sh__menu {
+  position: relative;
+  color: #fff;
+}
+
+@media (min-width: 650px) {
+  .sh__nav { display: flex; }
+  .sh__contact { display: inline-flex; }
+  .sh__menu { display: none; }
+}
+
+/* ============================================================
+   The page
+
+   One fixed screen, contents pushed to the floor. Everything that
+   is not the wordmark is layered over it absolutely, which is why
+   the list can sit at the top of the screen while being, in source
+   order, the middle child of a bottom-aligned flex box.
+   ============================================================ */
+
+.page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+/* ---- The intro stage -------------------------------------------
+   Two empty boxes and a gap, centred in the viewport. They hold no
+   content and draw nothing; they exist so the intro has somewhere to
+   measure. The wordmark starts life scaled down into these two boxes
+   and flips out of them to the floor.
+
+   The widths are the source's: 18rem and 26.5rem, with 7.5rem of
+   lead-in, and the pair is nudged apart by 12.5rem each way as the
+   letters finish arriving.
+   ----------------------------------------------------------------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.stage__row {
+  position: relative;
+  display: flex;
+}
+
+.stage__a { width: 9rem; }
+.stage__b { width: 13.25rem; }
+
+@media (min-width: 650px) {
+  .stage__row { padding-left: 7.5rem; }
+  .stage__a { width: 18rem; }
+  .stage__b { width: 26.5rem; }
+}
+
+/* Both boxes need a height for the intro to centre against; the
+   ratio is the wordmark's own. */
+.stage__a::before,
+.stage__b::before {
+  content: '';
+  display: block;
+  padding-top: 31%;
+}
+
+/* ---- The index -------------------------------------------------
+   The hover thumbnail and the project list, laid on the same grid.
+   `pointer-events: none` on the wrapper and `auto` on the list is
+   deliberate: the thumbnail must never intercept the pointer, or
+   moving between two project names across the top-left corner
+   would break the hover chain.
+   ----------------------------------------------------------------- */
+.index {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.index__grid {
+  align-items: start;
+  padding-top: 12rem;
+}
+
+.index__thumb {
+  position: relative;
+  grid-column: span 2;
+  padding-right: 3rem;
+}
+
+/* 4:5 portrait, held open by percentage padding so the box is sized
+   before a single image has loaded and the list never reflows. */
+.index__ratio {
+  position: relative;
+  padding-top: 125%;
+}
+
+/* Eleven photographs stacked in one box. None of them is hidden.
+   the one you are looking at is simply the one on top, and hovering
+   a project raises its own image above the pile. No opacity, no
+   crossfade, no state to keep in sync: a z-index write per hover.
+   The pile starts with the last image showing, which is what the
+   source does too. */
+.index__stack {
+  position: absolute;
+  inset: 0;
+}
+
+.index__stack img {
+  background-color: #f2f2f2;
+}
+
+/* Eight columns starting at the fifth, and then the projects simply
+   wrap. There is no column count and no row logic: the list is a
+   flex-wrap run of links with a 1rem word space, so the ragged
+   right edge is a consequence of the names rather than a layout
+   decision, and adding a project re-flows the block for free. */
+.list {
+  grid-column: 5 / span 8;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1rem;
+  pointer-events: auto;
+
+  /* The pair that makes the rows overlap. Each item is pulled up a
+     rem and the whole list is pushed down one, so the leading
+     between rows tightens without the first row moving. */
+  margin-top: -1rem;
+  padding-top: 1rem;
+}
+
+.list li {
+  margin-top: -1rem;
+  overflow: hidden;
+}
+
+.list-li {
+  display: flex;
+  font-size: 5.8rem;
+  line-height: 1.25;
+}
+
+/* The highlight does not follow the pointer, it stays. Leaving a
+   name lit after the cursor has gone means the page always has one
+   project selected and the thumbnail always has something to show.
+   A plain :hover rule would drop both back to nothing the moment the
+   mouse left the column. */
+.list-li span { opacity: 0.25; }
+.list-li.is-active span { opacity: 1; }
+
+/* Below 650px the source's own list is unusable. It keeps the
+   twelve-column placement on a six-column grid and runs off the
+   right edge of a screen that cannot scroll. Two corrections, and
+   they are the only invented numbers in the file: the list takes the
+   full six columns, and it drops to 3.2rem so eleven projects fit a
+   screen that has no second page. The thumbnail goes, because a
+   touch device has no hover to drive it. */
+@media (max-width: 649px) {
+  .index__thumb { display: none; }
+
+  .list {
+    grid-column: 1 / span 6;
+  }
+
+  .list-li { font-size: 3.2rem; }
+}
+
+/* ---- The floor -------------------------------------------------- */
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 650px) {
+  .footer { padding-bottom: 4rem; }
+}
+
+.footer__row {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 650px) {
+  .footer__row { display: flex; }
+}
+
+.footer__nav {
+  position: relative;
+  display: flex;
+  column-gap: 0.5rem;
+}
+
+/* The colon between the hours and the minutes blinks on the second,
+   which is the whole reason the clock is worth having: it is the one
+   thing on a page with no scroll that proves the page is live. */
+.time-dots { animation: blink 1s infinite; }
+
+@keyframes blink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ============================================================
+   The wordmark
+
+   40.5% and 59.5% of the content width, meeting in the middle with
+   no gap, and filling the floor edge to edge. In the source both
+   words are outlined SVG; here they are live text fitted to their
+   own columns, which is what makes the per-letter intro possible
+   without shipping a second copy of the artwork.
+
+   Both words are the same cut at different sizes, and the second is
+   chosen for having neither an ascender nor a descender, exactly as
+   the source is, because the lockup sits flush on both edges.
+   ============================================================ */
+
+.lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+@media (min-width: 650px) {
+  .lockup {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* Each column is its own containment context, so the word inside is
+   sized in cqw, a share of its column rather than of the viewport.
+   That is what an SVG scaling to its box does, and it means the
+   lockup survives the container getting a different width (which it
+   does, at the breakpoint) without a second font-size rule. */
+.lockup__col {
+  container-type: inline-size;
+}
+
+.lockup__col--a { width: 65%; }
+.lockup__col--b {
+  width: 100%;
+  margin-top: 0.3rem;
+}
+
+@media (min-width: 650px) {
+  .lockup__col--a { width: 40.5%; }
+  .lockup__col--b {
+    width: 59.5%;
+    margin-top: 0;
+  }
+}
+
+/* The word is justified, not tracked.
+
+   Fitting live type to a fixed box by hand means solving for a
+   letter-spacing value, and that value is wrong the moment the word,
+   the face or the column changes. Flex does the same job as a rule:
+   `space-between` hands every leftover pixel to the gaps between the
+   letters, so the first glyph starts on the left page margin and the
+   last one finishes on the right, whatever the word says.
+
+   The font sizes below therefore only have to be close. They are
+   picked for the type, deliberately a hair under the natural fit so
+   there is always a small positive amount to distribute rather than
+   an overflow to clip. */
+.lockup__word {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+/* Three measurements per word, and none of them is a preference.
+
+     font-size      chosen for the cap height, then left alone;
+                    justification absorbs the width error
+     margin-block   crops the font's leading down to the glyphs, and
+                    is solved for the baseline rather than split
+                    evenly, so both words sit on one line
+     margin-inline  cancels the outer side bearings, so what lands on
+                    the page margin is the ink and not the glyph box
+
+   The block margins are the fiddly pair. `line-height: 1` puts the
+   baseline at 0.8 of the em in this face, so a word set larger has
+   its baseline further down its own box. Splitting the trim evenly
+   would leave the second word floating several pixels high. The top
+   margin is solved so both baselines land 169.95px below the shared
+   column top, and the bottom margin is whatever is left over to make
+   the box the height the source's artboard was.
+
+   The intro leans on this. Both words are anchored off the lockup
+   rather than centred in their own stage boxes, so a baseline they
+   share at rest is one they hold through the entire flip. */
+.lockup__word--a {
+  font-size: 47.51cqw;
+  margin: -0.1608em -0.0165em -0.1883em -0.09em;
+}
+
+.lockup__word--b {
+  font-size: 40.68cqw;
+  margin: -0.2921em -0.0465em -0.1864em -0.085em;
+}
+
+/* Every letter carries its own mask rather than sharing one on the
+   word. That is what lets the whole lockup fly during the intro: a
+   mask on the column would clip the wordmark to the floor while it
+   is still up in the middle of the screen, and a mask on the word
+   would have to be trimmed to the glyphs and would cut their tops
+   off. A per-letter box is a full em tall, so the glyph clears it,
+   and 105% puts the letter cleanly outside it. */
+.lockup__letter {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.lockup__letter > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ============================================================
+   Overlays
+
+   Two of them, both full-screen, both above the header. The mobile
+   menu is a plain black field; the contact panel is the only
+   coloured surface the site owns.
+   ============================================================ */
+
+.mm {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  overflow: hidden;
+  background-color: #000;
+  color: #fff;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
+}
+
+.mm.is-open {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.5s ease-out, visibility 0s;
+}
+
+.mm__inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  padding-bottom: 2rem;
+}
+
+.mm__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mm__list li { overflow: hidden; }
+
+.mm-link {
+  display: flex;
+  font-size: 6rem;
+  line-height: 1.05;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.mm-link span { opacity: 0.25; }
+.mm-link[aria-current='page'] span,
+.mm-link:hover span { opacity: 1; }
+
+/* ---- The contact panel -----------------------------------------
+   A wipe, not a fade. Two corner percentages drive one clip-path
+   polygon, and because they run at different speeds (the left edge
+   arrives in 1s, the right in 1.25s) the panel comes down as a
+   diagonal rather than a shutter. Registering them with @property is
+   what makes them animatable at all; a plain custom property would
+   jump from 0% to 100%.
+   ----------------------------------------------------------------- */
+@property --clip-left {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --clip-right {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+.contact {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--brown);
+  color: #000;
+  will-change: transform;
+  visibility: hidden;
+
+  --clip-left: 0%;
+  --clip-right: 0%;
+  clip-path: polygon(0 0, 100% 0, 100% var(--clip-left), 0 var(--clip-right));
+
+  transition:
+    --clip-left 1s var(--ease-rise),
+    --clip-right 1.25s var(--ease-rise),
+    visibility 0s linear 1.25s;
+}
+
+.contact.is-open {
+  --clip-left: 100%;
+  --clip-right: 100%;
+  visibility: visible;
+  transition:
+    --clip-left 1s var(--ease-rise),
+    --clip-right 1.25s var(--ease-rise),
+    visibility 0s;
+}
+
+.contact__head {
+  position: relative;
+  flex-shrink: 0;
+  padding-block: 2.5rem;
+}
+
+@media (min-width: 650px) {
+  .contact__head {
+    padding-block: 3.5rem;
+    border-bottom: 1px solid currentColor;
+  }
+}
+
+.contact__head-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contact__mark {
+  position: relative;
+  display: inline-flex;
+  width: 17.6rem;
+  font-size: 2.05rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 650px) {
+  .contact__mark {
+    width: 12rem;
+    font-size: 1.4rem;
+  }
+}
+
+.contact__mark em {
+  font-size: 1.29em;
+}
+
+.contact__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+@media (min-width: 650px) {
+  .contact__body { flex-direction: row; }
+}
+
+.contact__lede {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 3.5rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 650px) {
+  .contact__lede {
+    padding-block: 6rem;
+    border-right: 1px solid currentColor;
+  }
+}
+
+.contact__title {
+  width: 100%;
+  font-size: 4rem;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+@media (min-width: 650px) {
+  .contact__title { font-size: 7rem; }
+}
+
+.contact__meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+@media (min-width: 650px) {
+  .contact__meta { margin-top: 0; }
+}
+
+.contact__note {
+  width: 100%;
+  max-width: 35rem;
+}
+
+.contact__socials {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (min-width: 650px) {
+  .contact__socials { display: flex; }
+}
+
+/* The arrow itself never moves. A second copy of it does. One slides out
+   to the right as its twin slides in from the left, 100ms apart, so
+   the mark appears to be replaced rather than nudged. */
+.icon-h {
+  display: flex;
+  align-items: center;
+}
+
+.icon-h__slot {
+  position: relative;
+  margin-right: 0.7rem;
+  overflow: hidden;
+}
+
+.icon-h__icon { transition: transform 0.65s cubic-bezier(0.19, 1, 0.22, 1); }
+.icon-h__icon:first-child { transition-delay: 0.1s; }
+
+.icon-h__icon:nth-child(2) {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  transition-delay: 0s;
+}
+
+.icon-h:hover .icon-h__icon:first-child {
+  transform: translateX(100%);
+  transition-delay: 0s;
+}
+
+.icon-h:hover .icon-h__icon:nth-child(2) {
+  transform: translateX(0);
+  transition-delay: 0.1s;
+}
+
+.contact__form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+@media (min-width: 650px) {
+  .contact__form {
+    max-width: 65rem;
+    padding-bottom: 6rem;
+  }
+}
+
+.input-item {
+  position: relative;
+  border-bottom: 1px solid currentColor;
+}
+
+.input-item:first-of-type {
+  border-top: 1px solid currentColor;
+  cursor: pointer;
+}
+
+@media (min-width: 650px) {
+  .input-item:first-of-type { border-top: 0; }
+}
+
+.input-item__label {
+  position: absolute;
+  top: 50%;
+  padding-left: 2rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+@media (min-width: 650px) {
+  .input-item__label { padding-left: 5.5rem; }
+}
+
+.input-item__label--block {
+  top: 4rem;
+  transform: none;
+}
+
+.input-item__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 9.5rem;
+  padding-left: 6rem;
+  padding-right: 2rem;
+}
+
+.input-item input {
+  height: 9.5rem;
+  padding-block: 2rem;
+  padding-left: 8.1rem;
+  padding-right: 2rem;
+}
+
+.input-item input#subject { padding-left: 10rem; }
+
+.input-item textarea {
+  padding: 9rem 2rem 2rem;
+  resize: vertical;
+  min-height: 20rem;
+}
+
+@media (min-width: 650px) {
+  .input-item__row {
+    padding-left: 9.5rem;
+    padding-right: 8.1rem;
+  }
+
+  .input-item input {
+    padding-left: 11.5rem;
+    padding-right: 8.1rem;
+  }
+
+  .input-item input#subject { padding-left: 13.5rem; }
+
+  .input-item textarea { padding: 8.5rem 8.1rem 2rem 5.5rem; }
+}
+
+.contact ::placeholder { color: rgb(0 0 0 / 0.3); }
+
+/* A pill that fills with its own inverse from a point. The clip is a
+   circle grown from nothing to half the box, so on a 1:1 element it
+   reaches the corners exactly as it finishes. */
+.hclip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: #000;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.hclip__clip {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  transform: translateY(-50%);
+  background-color: #fff;
+  color: #000;
+  aspect-ratio: 1;
+  will-change: transform;
+  clip-path: circle(0 at 50% 50%);
+  transition: clip-path 0.75s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.hclip:hover .hclip__clip { clip-path: circle(50% at 50% 50%); }
+
+.contact__pill {
+  height: 5rem;
+  padding-inline: 2.8rem;
+  padding-bottom: 0.125em;
+}
+
+.contact__submit-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding: 4rem 2rem;
+  border-bottom: 1px solid currentColor;
+}
+
+@media (min-width: 650px) {
+  .contact__submit-wrap {
+    padding: 0;
+    border-bottom: 0;
+  }
+}
+
+.contact__submit {
+  width: 100%;
+  height: 7rem;
+  padding-bottom: 0.125em;
+}
+
+@media (min-width: 650px) {
+  .contact__submit {
+    max-width: 35rem;
+    height: 8.1rem;
+  }
+}
+
+.contact__socials-mobile {
+  display: flex;
+  justify-content: space-between;
+  padding: 4rem 2rem;
+}
+
+@media (min-width: 650px) {
+  .contact__socials-mobile { display: none; }
+}
+
+/* ============================================================
+   The intro
+
+   The site's signature: the wordmark is born small and centred, its
+   letters rise into it one at a time, the two words part, and then
+   the whole lockup flips down to the floor at full size.
+
+   Every value below is the source's. The letters are 1.3s apart-and-
+   staggered at 70ms; the parting is 1s; the flip is 1.5s; all four
+   run on the same curve. The flip's start transform is written by
+   JavaScript, because where the wordmark starts is a measurement,
+   not a constant. See main.js.
+   ============================================================ */
+
+/* The resting states below all live under `.is-intro`, which the
+   inline script in the document head adds before the first paint and
+   the timeline removes when it has finished. Nothing here survives
+   the intro, so the page's resting DOM carries no leftover transform
+   and a later resize cannot disturb it.
+
+   Everything the intro moves is hidden by a mask rather than by
+   opacity: the letters by their own boxes, the list items by their
+   `li`. Only the two pieces of chrome actually fade. */
+.is-intro .sh,
+.is-intro .footer__row { opacity: 0; }
+
+.is-intro .lockup__letter > span { transform: translateY(105%); }
+
+.is-intro .lockup__col {
+  transform: translateX(var(--part, 0));
+  transform-origin: top left;
+}
+
+/* The flip itself. The wordmark is laid out where it belongs, on the
+   floor at full size, and then transformed back into the two small
+   centred boxes. Playing the intro drops the transform and the
+   browser interpolates the whole journey in one composited step, so
+   there is no per-frame measuring and no layout thrash. */
+.is-intro .lockup__word {
+  transform: var(--flip, none);
+  transform-origin: top left;
+}
+
+.is-playing .lockup__letter > span {
+  transform: translateY(0);
+  transition: transform 1.3s var(--ease-gil);
+  transition-delay: calc(var(--i) * var(--letter-stagger));
+}
+
+.is-playing .lockup__col {
+  transform: translateX(0);
+  transition: transform 1s var(--ease-gil);
+  transition-delay: var(--part-delay);
+}
+
+.is-playing .lockup__word {
+  transform: none;
+  transition: transform 1.5s var(--ease-gil);
+  transition-delay: var(--flip-delay);
+}
+
+/* The chrome arrives on a straight ramp while the wordmark is still
+   travelling. It fades rather than moves, so it never competes. */
+.is-playing .sh,
+.is-playing .footer__row {
+  opacity: 1;
+  transition: opacity 1s linear;
+}
+
+.is-playing .sh { transition-delay: var(--fade-delay); }
+.is-playing .footer__row { transition-delay: calc(var(--fade-delay) + 0.1s); }
+
+/* The list is its own timeline in the source and stays one here:
+   items start a full row below their line and are let go 75ms apart,
+   on the list's own curve rather than the intro's. */
+.is-intro .list li > * { transform: translateY(105%); }
+
+.is-playing .list li > * {
+  transform: translateY(0);
+  transition: transform 1.25s var(--ease-rise);
+  transition-delay: calc(var(--list-delay) + var(--i) * var(--stagger));
+}
+
+/* The logo's three words come in on the same idea, a beat later. */
+.is-intro .logo-slide { transform: translateY(100%); }
+
+.is-playing .logo-slide {
+  transform: translateY(0);
+  transition: transform 1s var(--ease-gil);
+  transition-delay: calc(var(--fade-delay) + var(--i) * var(--stagger));
+}
+
+/* Reduced motion gets the resting page and nothing else. Every
+   transform above is an entrance; none of them carries meaning that
+   is lost by skipping it. */
+@media (prefers-reduced-motion: reduce) {
+  .is-intro .sh,
+  .is-intro .footer__row { opacity: 1; }
+
+  .is-intro .lockup__letter > span,
+  .is-intro .lockup__col,
+  .is-intro .lockup__word,
+  .is-intro .list li > *,
+  .is-intro .logo-slide { transform: none; }
+
+  .time-dots { animation: none; }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

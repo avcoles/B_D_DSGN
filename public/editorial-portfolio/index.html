@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="format-detection" content="telephone=no">
+<title>Mila Navas, digital artist</title>
+<meta name="description" content="Mila Navas is a digital artist working in 3D, film and art direction.">
+<!-- One typeface, self-hosted from ./fonts, and nothing fetched from
+     anywhere else. Dia Regular sets the entire page, both halves of the
+     wordmark included. The italic cut ships alongside it and is declared
+     in styles.css, but nothing on the page currently asks for it.
+
+     These are trial cuts. Read the licence note at the top of styles.css
+     before this goes anywhere public. -->
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- This runs before the stylesheet can paint, so the entrance states in
+     styles.css only apply when there is a script around to release them.
+     With JavaScript off the page renders at rest and stays readable. -->
+<script>document.documentElement.classList.add('js', 'is-intro')</script>
+
+<!-- ==================== Header ====================
+     Fixed above everything and painted in difference blend mode. It reads
+     black on the white page, then inverts itself the moment the black
+     menu field rises underneath, so one header covers every background
+     the site can put behind it. -->
+<header class="sh" id="top">
+  <div class="site-max sh__inner">
+
+    <a class="sh__logo" href="#top" aria-label="Mila Navas, home">
+      <!-- What she does, rather than what she is called. Three words
+           sharing one mask, arriving one after another on load. -->
+      <span class="sh__logo-words">
+        <span class="logo-slide" style="--i:0">Stills,</span>
+        <span class="logo-slide" style="--i:1">Film,</span>
+        <span class="logo-slide" style="--i:2">Direction</span>
+      </span>
+      <!-- The name takes their place while the menu is open. -->
+      <span class="sh__logo-mark" aria-hidden="true">MILA<em>navas</em></span>
+    </a>
+
+    <ul class="sh__nav">
+      <li><a class="site-link" href="#top" aria-current="page">Work,</a></li>
+      <li><a class="site-link" href="#top">Journal,</a></li>
+      <li><a class="site-link" href="#top">Shop,</a></li>
+      <li><a class="site-link" href="#top">Studio,</a></li>
+      <li><a class="site-link" href="#top">Sandbox</a></li>
+    </ul>
+
+    <button class="sh__contact uline-double" type="button" data-contact-open>
+      Drop me a line
+    </button>
+
+    <button class="sh__menu" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu">
+      menu
+    </button>
+
+  </div>
+</header>
+
+<!-- ==================== The page ====================
+     One fixed screen. Nothing here scrolls, which is what lets the
+     wordmark be treated as the floor and the list as something floating
+     over it instead of a document flowing past. -->
+<article class="page">
+
+  <!-- Where the intro starts. Two empty boxes with a gap between them,
+       centred in the viewport. They never draw anything. The script
+       measures them to work out where the wordmark should be born
+       before it flips down to the floor. -->
+  <div class="stage" aria-hidden="true">
+    <div class="stage__row">
+      <div class="stage__a" data-stage-a></div>
+      <div class="stage__b" data-stage-b></div>
+    </div>
+  </div>
+
+  <!-- ---- The index ----
+       Two things on one grid. The hover thumbnail takes columns 1 and 2,
+       the project list takes 5 through 12. -->
+  <div class="index">
+    <div class="site-grid index__grid">
+
+      <div class="index__thumb">
+        <div class="index__ratio">
+          <!-- Eleven photographs stacked in one 4:5 box. Pointing at a
+               project raises its own image to the top of the pile.
+               Nothing fades and no state is hidden. The whole
+               mechanism is one z-index write. -->
+          <div class="index__stack media-fill" data-stack>
+            <img src="./assets/project-01.jpg" alt="" decoding="async">
+            <img src="./assets/project-02.jpg" alt="" decoding="async">
+            <img src="./assets/project-03.jpg" alt="" decoding="async">
+            <img src="./assets/project-04.jpg" alt="" decoding="async">
+            <img src="./assets/project-05.jpg" alt="" decoding="async">
+            <img src="./assets/project-06.jpg" alt="" decoding="async">
+            <img src="./assets/project-07.jpg" alt="" decoding="async">
+            <img src="./assets/project-08.jpg" alt="" decoding="async">
+            <img src="./assets/project-09.jpg" alt="" decoding="async">
+            <img src="./assets/project-10.jpg" alt="" decoding="async">
+            <img src="./assets/project-11.jpg" alt="" decoding="async">
+          </div>
+        </div>
+      </div>
+
+      <!-- Eleven links that wrap. The rag down the right edge is
+           whatever the names happen to produce, so adding a project
+           costs one list item and no layout work. -->
+      <ul class="list" data-list>
+        <li style="--i:0"><a class="list-li" href="#top"><span class="t-fade">Aurum,</span></a></li>
+        <li style="--i:1"><a class="list-li" href="#top"><span class="t-fade">Grand Union,</span></a></li>
+        <li style="--i:2"><a class="list-li" href="#top"><span class="t-fade">Cold Harbour,</span></a></li>
+        <li style="--i:3"><a class="list-li" href="#top"><span class="t-fade">Halden Winter,</span></a></li>
+        <li style="--i:4"><a class="list-li" href="#top"><span class="t-fade">Verity,</span></a></li>
+        <li style="--i:5"><a class="list-li" href="#top"><span class="t-fade">MOTA,</span></a></li>
+        <li style="--i:6"><a class="list-li" href="#top"><span class="t-fade">ROSA Botanica,</span></a></li>
+        <li style="--i:7"><a class="list-li" href="#top"><span class="t-fade">Kite,</span></a></li>
+        <li style="--i:8"><a class="list-li" href="#top"><span class="t-fade">Aeris,</span></a></li>
+        <li style="--i:9"><a class="list-li" href="#top"><span class="t-fade">Kestrel Assembly,</span></a></li>
+        <li style="--i:10"><a class="list-li" href="#top"><span class="t-fade">OVERTON</span></a></li>
+      </ul>
+
+    </div>
+  </div>
+
+  <!-- ---- The floor ---- -->
+  <div class="site-max footer">
+
+    <div class="footer__row">
+      <nav class="footer__nav">
+        <a class="site-link" href="#top">Covers,</a>
+        <a class="site-link" href="#top" aria-current="page">Names</a>
+      </nav>
+      <!-- Lisbon time, to the minute, with a colon that blinks on the
+           second. On a page that never scrolls it is the only thing
+           that shows the page is live. -->
+      <div class="clock">Lisbon, PT <span data-hours>00</span><span class="time-dots">:</span><span data-minutes>00</span></div>
+    </div>
+
+    <!-- The wordmark. 40.5% and 59.5% of the content width, meeting in
+         the middle, filling the floor. Every letter gets its own span so
+         the intro can raise them one at a time. -->
+    <div class="lockup" data-lockup>
+      <div class="lockup__col lockup__col--a" data-lockup-col>
+        <span class="lockup__word lockup__word--a" data-lockup-word aria-hidden="true"
+          ><span class="lockup__letter" style="--i:0"><span>M</span></span
+          ><span class="lockup__letter" style="--i:1"><span>I</span></span
+          ><span class="lockup__letter" style="--i:2"><span>L</span></span
+          ><span class="lockup__letter" style="--i:3"><span>A</span></span
+        ></span>
+      </div>
+      <div class="lockup__col lockup__col--b" data-lockup-col>
+        <span class="lockup__word lockup__word--b" data-lockup-word aria-hidden="true"
+          ><span class="lockup__letter" style="--i:4"><span>n</span></span
+          ><span class="lockup__letter" style="--i:5"><span>a</span></span
+          ><span class="lockup__letter" style="--i:6"><span>v</span></span
+          ><span class="lockup__letter" style="--i:7"><span>a</span></span
+          ><span class="lockup__letter" style="--i:8"><span>s</span></span
+        ></span>
+      </div>
+      <h1 class="sr-only">Mila Navas, digital artist</h1>
+    </div>
+
+  </div>
+</article>
+
+<!-- ==================== Mobile menu ====================
+     A black field carrying the same five destinations, plus the contact
+     control that sits inline in the desktop header. -->
+<nav class="mm" id="menu" aria-label="Menu" aria-hidden="true">
+  <div class="site-max mm__inner">
+    <ul class="mm__list">
+      <li><a class="mm-link" href="#top" aria-current="page"><span>Work</span></a></li>
+      <li><a class="mm-link" href="#top"><span>Journal</span></a></li>
+      <li><a class="mm-link" href="#top"><span>Shop</span></a></li>
+      <li><a class="mm-link" href="#top"><span>Studio</span></a></li>
+      <li><a class="mm-link" href="#top"><span>Sandbox</span></a></li>
+      <li><button class="mm-link" type="button" data-contact-open><span>Contact</span></button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ==================== Contact ====================
+     The only coloured surface on the site. It arrives as a diagonal
+     wipe: two corner percentages driving one clip-path at two different
+     speeds, so the panel is never a rectangle while it moves. -->
+<aside class="contact" aria-label="Contact" aria-hidden="true" data-contact>
+
+  <div class="contact__head">
+    <div class="site-max contact__head-inner">
+      <button class="contact__mark" type="button" data-contact-close aria-label="Close">MILA<em>navas</em></button>
+      <button class="uline-double --no-s" type="button" data-contact-close>Close</button>
+    </div>
+  </div>
+
+  <div class="contact__body">
+
+    <div class="site-gutter contact__lede">
+      <h2 class="contact__title">If there is something you want made, tell me about it</h2>
+      <div class="contact__meta">
+        <p class="contact__note">Commissions and collaborations, mostly. I read everything that comes in and usually answer inside a day.</p>
+        <ul class="contact__socials">
+          <li><a class="icon-h" href="#top"><span class="icon-h__slot"><span class="icon-h__icon">&rarr;</span><span class="icon-h__icon" aria-hidden="true">&rarr;</span></span>Instagram</a></li>
+          <li><a class="icon-h" href="#top"><span class="icon-h__slot"><span class="icon-h__icon">&rarr;</span><span class="icon-h__icon" aria-hidden="true">&rarr;</span></span>Vimeo</a></li>
+          <li><a class="icon-h" href="#top"><span class="icon-h__slot"><span class="icon-h__icon">&rarr;</span><span class="icon-h__icon" aria-hidden="true">&rarr;</span></span>Are.na</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <form class="contact__form" data-contact-form>
+
+      <!-- The address row is a button wearing a form field's clothes, so
+           the whole thing reads top to bottom as a letter: To, From,
+           Subject, Message. -->
+      <div class="input-item" data-copy>
+        <div class="input-item__label">To:</div>
+        <div class="input-item__row">
+          <span class="hclip contact__pill">
+            Mila Navas
+            <span class="hclip__clip" aria-hidden="true">Mila Navas</span>
+          </span>
+          <span data-copy-label>Copy address</span>
+        </div>
+      </div>
+
+      <div class="input-item">
+        <label class="input-item__label" for="from">From:</label>
+        <input type="email" id="from" name="from" placeholder="Your address" required>
+      </div>
+
+      <div class="input-item">
+        <label class="input-item__label" for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" placeholder="What it is about" required>
+      </div>
+
+      <div class="input-item">
+        <label class="input-item__label input-item__label--block" for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Whatever you have so far" required></textarea>
+      </div>
+
+      <div class="contact__submit-wrap">
+        <button class="hclip contact__submit" type="submit">
+          <span data-status>Send it</span>
+          <span class="hclip__clip" aria-hidden="true"><span data-status>Send it</span></span>
+        </button>
+      </div>
+
+      <ul class="contact__socials-mobile">
+        <li><a class="icon-h" href="#top"><span class="icon-h__slot"><span class="icon-h__icon">&rarr;</span><span class="icon-h__icon" aria-hidden="true">&rarr;</span></span>Instagram</a></li>
+        <li><a class="icon-h" href="#top"><span class="icon-h__slot"><span class="icon-h__icon">&rarr;</span><span class="icon-h__icon" aria-hidden="true">&rarr;</span></span>Vimeo</a></li>
+        <li><a class="icon-h" href="#top"><span class="icon-h__slot"><span class="icon-h__icon">&rarr;</span><span class="icon-h__icon" aria-hidden="true">&rarr;</span></span>Are.na</a></li>
+      </ul>
+
+    </form>
+  </div>
+</aside>
+
+<script src="./main.js"></script>
+</body>
+</html>

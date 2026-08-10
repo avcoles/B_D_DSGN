@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="format-detection" content="telephone=no">
+<title>Tempo</title>
+<meta name="description" content="An independent creative agency. We build brands and the systems that keep them consistent.">
+
+<!-- Arimo stands in for the source's Suisse Int'l. Only the weight axis is
+     requested, because that is all Arimo has. It is a metric clone of Arial,
+     so the skeleton sits close to a Swiss grotesque, but the width is fixed
+     and the wordmark has to be fitted by leading instead. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+</head>
+
+<body class="is-loading">
+
+<!-- The sheet the page assembles behind. It is removed from the flow once the
+     intro has run rather than left at opacity 0, so it cannot swallow a click
+     on a slow machine. -->
+<div class="intro-mask" id="intro-mask" aria-hidden="true"></div>
+
+<!-- The layer the reel card is moved into when it opens. It has to be a
+     direct child of body: the card's own ancestors are transformed by the
+     scroll scrub, and a transformed ancestor becomes the containing block
+     for `position: fixed` — so left in place, the full-screen frame would
+     land at the card's offset and then scroll away with the hero. -->
+<div class="cinema-layer" id="cinema-layer" aria-hidden="true"></div>
+
+<!-- ==================== Header ====================
+     Painted in difference blend mode, so it needs no scroll listener and no
+     second colour: white type over the white page resolves to black, and the
+     same type over the black reel card resolves to white. -->
+<header class="sh" id="site-header">
+  <div class="sh__inner site-grid">
+    <div class="sh__brand">
+      <a href="#top" aria-label="Home">
+        <svg class="sh__mark" viewBox="0 0 194 36" role="img" aria-label="Tempo">
+          <text x="0" y="28" font-family="Arimo, Helvetica, Arial, sans-serif"
+                font-size="36" font-weight="700"
+                letter-spacing="-1.6" textLength="180" lengthAdjust="spacing"
+                fill="currentColor">TEMPO</text>
+          <text x="184" y="12" font-family="Arimo, Helvetica, Arial, sans-serif"
+                font-size="10" font-weight="700" fill="currentColor">™</text>
+        </svg>
+      </a>
+    </div>
+
+    <!-- A running clock. The colon blinks on the second; the rest only
+         changes once a minute. The source names a city and shows that
+         city's time, which is the better version of this line if you have
+         a real address to put in it. -->
+    <div class="sh__time">
+      Local time
+      <span><span id="clock-h">00</span><span class="sh__dots">:</span><span id="clock-m">00</span> <span id="clock-p">am</span></span>
+    </div>
+
+    <nav class="sh__nav" id="site-nav" aria-label="Primary">
+      <a class="sh-link" href="#work">Projects,</a>
+      <a class="sh-link" href="#approach">Approach,</a>
+      <a class="sh-link" href="#studio">About,</a>
+      <a class="sh-link" href="#contact">Contact</a>
+
+      <!-- Below 650px the four links are replaced by one word that flips to
+           "Close" behind its own mask, and the links move into a full-screen
+           panel. The bar keeps its height either way. -->
+      <button class="menu-toggle" type="button" id="menu-toggle" aria-controls="mmenu" aria-expanded="false">
+        <div class="menu-toggle__text">Menu</div>
+        <div class="menu-toggle__text">Close</div>
+      </button>
+
+      <!-- Theme switch. The disc is the control; the pill behind it is only
+           drawn once you are close enough to use it. -->
+      <button class="dm-toggle" type="button" id="theme-toggle" aria-label="Dark mode" aria-pressed="false">
+        <div class="dm-toggle__ball"></div>
+        <div class="dm-toggle__back"></div>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- The phone menu. Inverted rather than translucent, so it reads as a
+     different surface instead of a layer over the page. -->
+<aside class="mmenu" id="mmenu" aria-hidden="true" inert>
+  <div class="mmenu__mask">
+    <ul>
+      <li><a class="mmenu-link is-active" href="#top">Home</a></li>
+      <li><a class="mmenu-link" href="#work">Projects</a></li>
+      <li><a class="mmenu-link" href="#approach">Approach</a></li>
+      <li><a class="mmenu-link" href="#studio">About</a></li>
+      <li><a class="mmenu-link" href="#contact">Contact</a></li>
+    </ul>
+  </div>
+  <div class="mmenu__foot">
+    <span>(20 projects)</span>
+    <span>hello@tempo.studio</span>
+  </div>
+</aside>
+
+<main id="top">
+
+<!-- ==================== Hero ====================
+     Two viewport heights tall on a pointer device. The first is sticky and
+     holds the wordmark; the second holds nothing but an empty 16:9 box. The
+     scroll between them is not reading distance — it is the scrub track for
+     the reel card flying into that box. -->
+<section class="hero" id="hero">
+  <div class="hero__stick" id="hero-stick">
+    <div class="hero__inner site-max">
+
+      <!-- Live text, not paths: the wordmark has to split per letter twice
+           over — once rising on entry, once leaving on scroll — and a font
+           does that for free at any size. -->
+      <div class="hero__logo" id="logo" role="img" aria-label="Tempo">
+        <span><i style="--i:0">T</i></span><span><i style="--i:1">E</i></span><span><i style="--i:2">M</i></span><span><i style="--i:3">P</i></span><span><i style="--i:4">O</i></span><span><i style="--i:5"><sup>&trade;</sup></i></span>
+      </div>
+
+      <!-- Desktop reel. Tracks the cursor, grows into the target box on
+           scroll, opens full screen on click. -->
+      <div>
+        <div class="reel" id="reel">
+          <div class="reel__box" id="reel-box">
+            <div class="reel__flip" id="reel-flip">
+              <div class="reel__inner">
+                <div class="reel__content js-mm" id="reel-content" role="button" tabindex="0" aria-label="Play showreel">
+                  <div class="uline reel__close" id="reel-close">Close</div>
+                  <img class="reel__poster" id="reel-poster" src="./assets/crowd-lights.webp" alt="" width="1080" height="810">
+                  <!-- The full frame. Held out of the layout until the card
+                       opens, then dissolved in half a second behind the
+                       looping one so the cut reads as a lift, not a swap. -->
+                  <img class="reel__full" src="./assets/crowd-lights.webp" alt="Tempo showcase" width="1080" height="810">
+                  <div class="reel__play" aria-hidden="true">
+                    <span><svg viewBox="0 0 17 20"><path fill="currentColor" fill-rule="evenodd" d="M15.527 11.955 4.081 19.434A2 2 0 0 1 .987 17.76V2.8A2 2 0 0 1 4.08 1.127l11.446 7.48a2 2 0 0 1 0 3.348Z"/></svg></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="reel__caption js-mm">
+              <div class="i-fade" style="--i:1">
+                <b>Tempo&trade; Showcase</b>
+                (Clients, 2019/2026)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__foot" id="hero-foot">
+        <div class="hero__claim">
+          <h1 class="h4 hero__title" id="hero-title">We work out what a brand is, then build what keeps it that way.</h1>
+          <a class="uline-double i-fade" style="--i:0" href="#approach">More on how we work</a>
+        </div>
+        <span class="hero__scroll i-fade" style="--i:2">(Scroll)</span>
+      </div>
+
+      <!-- Phone reel: the same card with none of the choreography. There is
+           no cursor to chase and no scrub track to build. -->
+      <div class="reel-mobile">
+        <div class="reel__caption">
+          <div><b>Tempo&trade; Showcase</b> (Clients, 2019/2026)</div>
+        </div>
+        <div class="reel__box">
+          <div class="reel__inner">
+            <div class="reel__content">
+              <img class="reel__poster" src="./assets/crowd-lights.webp" alt="Tempo showcase" width="1080" height="810">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- The landing box. It is never given a size of its own — the card is
+       flown to whatever this measures, so the geometry stays responsive. -->
+  <div class="hero__target-wrap site-max">
+    <div class="hero__target-inner">
+      <div class="stick-target" id="stick-target"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Approach ====================
+     A three-column gutter that holds nothing but an arrow, against a nine
+     column block. The empty third is the point: it is what makes the
+     paragraph read as an aside to the headline rather than as its body. -->
+<section class="approach site-grid" id="approach">
+  <div class="approach__arrow-col">
+    <div class="approach__arrows h3" aria-hidden="true">
+      <div>&rarr;</div>
+      <div>&rarr;</div>
+    </div>
+    <span class="approach__mobile-label">(Approach)</span>
+  </div>
+
+  <div class="approach__body">
+    <h2 class="h3 approach__title s-lines">We make brand identities and the systems around them, so every team works from the same rules.</h2>
+
+    <div class="approach__grid">
+      <h3 class="approach__label s-fade">(Approach)</h3>
+
+      <div class="approach__text s-fade">
+        <div class="txt">
+          <p><strong>Our work is the set of rules underneath how a brand behaves.</strong></p>
+          <p>Our identities and systems have to hold up across brand, product, marketing and events, so we build them that way from the start. Teams in different departments get one shared idea of how the brand works.</p>
+          <p>None of that holds unless someone decides what the brand is for. We start there, with the vocabulary a company's own culture already suggests, because that is the part a folder of files cannot supply.</p>
+        </div>
+        <a class="uline-double approach__cta" href="#approach">More on how we work</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Work ====================
+     The only section that abandons the page margin: cards run to within
+     1.6rem of the viewport edge while everything else sits at 5.8rem. That
+     is what makes two thumbnails read as a spread rather than as content. -->
+<section class="work" id="work">
+  <div class="work__head site-max">
+    <div class="work__meta">
+      <p>One campaign, or the system a whole company runs on.</p>
+      <span>(Case Studies)</span>
+    </div>
+
+    <!-- The box is shorter than the type in it, so the word is cropped top
+         and bottom and reads as a band. The crop is also what the
+         per-character reveal hides behind. -->
+    <h2 class="h1 work__title">
+      <div class="s-chars">Work</div>
+    </h2>
+  </div>
+
+  <div class="work__grid">
+    <article class="work-item">
+      <a class="work-item__link" href="#work">
+        <div class="work-item__frame radius-fix">
+          <div class="work-item__scale">
+            <figure class="work-item__media media-fill">
+              <div></div>
+              <img src="./assets/knitwear.webp" alt="Season One for Villa Picta" width="1080" height="1350" loading="lazy">
+            </figure>
+            <!-- The blurred copy is not decoration: it is what the loop plays
+                 against, so the frame behind never competes with it. -->
+            <figure class="work-item__blur media-fill">
+              <img src="./assets/knitwear.webp" alt="" width="1080" height="1350" loading="lazy">
+            </figure>
+          </div>
+          <div class="work-item__loop-wrap">
+            <img class="work-item__loop radius-fix" src="./assets/live-room.webp" alt="" width="1080" height="715" loading="lazy">
+          </div>
+        </div>
+        <h3 class="medium">Season One</h3>
+        <h4>(Villa Picta)</h4>
+      </a>
+    </article>
+
+    <article class="work-item">
+      <a class="work-item__link" href="#work">
+        <div class="work-item__frame radius-fix">
+          <div class="work-item__scale">
+            <figure class="work-item__media media-fill">
+              <div></div>
+              <img class="pos-lower" src="./assets/light-room.png" alt="Colour Field for Meridian" width="736" height="1104" loading="lazy">
+            </figure>
+            <figure class="work-item__blur media-fill">
+              <img class="pos-lower" src="./assets/light-room.png" alt="" width="736" height="1104" loading="lazy">
+            </figure>
+          </div>
+          <div class="work-item__loop-wrap">
+            <img class="work-item__loop radius-fix pos-upper" src="./assets/led-wall.webp" alt="" width="1080" height="1080" loading="lazy">
+          </div>
+        </div>
+        <h3 class="medium">Colour Field</h3>
+        <h4>(Meridian)</h4>
+      </a>
+    </article>
+  </div>
+
+  <div class="work__cta-row">
+    <div class="work__cta">
+      <a class="uline-double h3" href="#work">&rarr; See all projects<sup>(20)</sup></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Services ====================
+     Three words and one card. Pointing at a word swaps the card and slides it
+     down the column to sit level with that word, so the list doubles as the
+     card's position and nothing needs a connecting line. -->
+<section class="services" id="services">
+  <div class="services__head site-grid">
+    <h2 class="services__label">(Services)</h2>
+    <div class="services__intro">
+      <p>The groundwork, and the big set pieces built on top of it.</p>
+      <a class="uline-double" href="#approach">More on how we work</a>
+    </div>
+  </div>
+
+  <div class="site-grid">
+    <div class="services__card-col">
+      <div class="services__target" id="services-target">
+        <div class="services__card radius-fix" id="services-card">
+          <div class="services__ratio"></div>
+          <figure class="services__thumb is-active" data-thumb="0">
+            <img class="media-bleed" src="./assets/sound-stage.webp" alt="Identity" width="736" height="736" loading="lazy">
+          </figure>
+          <figure class="services__thumb" data-thumb="1">
+            <img class="media-bleed pos-upper" src="./assets/led-wall.webp" alt="Digital" width="1080" height="1080" loading="lazy">
+          </figure>
+          <figure class="services__thumb" data-thumb="2">
+            <img class="media-bleed" src="./assets/knitwear.webp" alt="Campaigns" width="1080" height="1350" loading="lazy">
+          </figure>
+        </div>
+
+        <div class="services__texts">
+          <div class="services__text is-active" data-text="0">We work out what a brand looks and sounds like, and write it down so it survives us.</div>
+          <div class="services__text" data-text="1">We design and build the sites, products and tools the brand actually lives on.</div>
+          <div class="services__text" data-text="2">We make the work that goes out, and keep it recognisable across every channel.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="services__list" id="services-list">
+      <button class="services__toggle h1 is-active" type="button" data-toggle="0">Identity</button>
+      <button class="services__toggle h1" type="button" data-toggle="1">Digital</button>
+      <button class="services__toggle h1" type="button" data-toggle="2">Campaigns</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Studio ====================
+     The picture is pulled 4.3rem left of its column so it breaks the grid on
+     one side only, and the text starts at column 8 of 12. The hole in the
+     middle is deliberate and the picture is not allowed to fill it. -->
+<div class="studio site-grid" id="studio">
+  <div class="studio__text">
+    <h2 class="h3 studio__title s-lines">Ten people. Very large rooms.</h2>
+
+    <div class="txt studio__copy s-fade">
+      <p>A system is only as good as the working relationship behind it, which is why we never grew. You deal with the people doing the work, so nothing gets handed down a chain and quietly loses half of what it meant on the way.</p>
+      <p>After a few months most clients stop treating us as a supplier and put us on the internal calendar.</p>
+    </div>
+
+    <div class="s-fade">
+      <a class="uline-double studio__cta" href="#studio">About the studio</a>
+    </div>
+  </div>
+
+  <div class="studio__media-col">
+    <figure class="studio__media radius-fix">
+      <div></div>
+      <img class="media-bleed" src="./assets/portrait-floral.webp" alt="Inside the studio" width="988" height="1235" loading="lazy">
+    </figure>
+  </div>
+</div>
+
+</main>
+
+<!-- ==================== Footer ==================== -->
+<footer class="foot" id="contact">
+  <hr class="foot__rule-top">
+
+  <div class="site-max">
+    <div class="foot__contact">
+      <h2 class="h3">Talk to us</h2>
+      <button class="h3 uline-double foot__mail" type="button" id="copy-mail" data-mail="hello@tempo.studio">
+        <span>hello@tempo.studio</span>
+        <span class="foot__bubble" id="copy-bubble">Click to copy</span>
+      </button>
+    </div>
+    <hr class="foot__rule-mid">
+  </div>
+
+  <div class="foot__nav site-grid">
+    <nav class="foot__cols" aria-label="Footer">
+      <div class="foot__col">
+        <span>Sitemap</span>
+        <ul>
+          <li><a class="site-link" href="#top">Home</a></li>
+          <li><a class="site-link" href="#work">Projects</a></li>
+          <li><a class="site-link" href="#approach">Approach</a></li>
+          <li><a class="site-link" href="#studio">About</a></li>
+          <li><a class="site-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <span>Socials</span>
+        <ul>
+          <li><a class="site-link" href="#contact">Instagram</a></li>
+          <li><a class="site-link" href="#contact">LinkedIn</a></li>
+          <li><a class="site-link" href="#contact">Behance</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <span>Info</span>
+        <ul>
+          <li><a class="site-link" href="#contact">Careers</a></li>
+          <li><a class="site-link" href="#contact">Privacy</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="foot__end site-grid">
+    <figure class="foot__mark">
+      <button type="button" class="back-to-top">Back to top &uarr;</button>
+      <div class="foot__wordmark" id="foot-wordmark" role="img" aria-label="Tempo">TEMPO<sup>&trade;</sup></div>
+    </figure>
+    <div class="foot__legal">
+      <button type="button" class="back-to-top">Back to top &uarr;</button>
+      <p>Copyright &copy; Tempo 2026</p>
+    </div>
+  </div>
+</footer>
+
+<script src="./main.js"></script>
+</body>
+</html>

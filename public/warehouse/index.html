@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Warehouse: structural and architectural glazing</title>
+    <meta
+      name="description"
+      content="Warehouse draws, makes and fits structural glazing for architects working on difficult buildings."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The source sets the whole page in Aeonik Pro and Aeonik Mono, which are
+         licensed and were not in the snapshot. Figtree stands in for the Pro
+         (both are neutral geometric grotesques with a single-storey g, the most
+         visible letter at 6.4rem display sizes); Roboto Mono stands in for the
+         Mono, which only ever appears as tracked uppercase at 12 to 14px. See the
+         README for the metric comparison. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&family=Roboto+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Split headings sit below their masks until script releases them, so
+         without script there would be no headings at all. -->
+    <noscript>
+      <style>
+        .base-heading .line,
+        .blockquote .line {
+          transform: none;
+        }
+        .reviews .block {
+          position: relative;
+          visibility: visible;
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body>
+    <!-- Follows the pointer on hover targets that declare a label. Suppressed
+         on coarse pointers, where there is no cursor to decorate. -->
+    <div class="cursor" aria-hidden="true"><div class="label">View</div></div>
+
+    <!-- The bottom bar. One 27.6rem pill that owns four slots: a left slot that
+         swaps the brandmark for a scroll-to-top arrow, a centre slot naming the
+         current page, a right slot that swaps the burger for a close, and a
+         blurred plate behind all three that widens when the menu opens. -->
+    <header class="header">
+      <a href="#top" class="logo" aria-label="Home">
+        <svg viewBox="0 0 42 42" fill="none" class="brandmark-svg" aria-hidden="true">
+          <path d="M0 42V13.5L21 1.5L42 13.5V42H33.6V18.6L21 11.4L8.4 18.6V42H0Z" fill="currentcolor" />
+          <path d="M14.7 42V26.4L21 22.8L27.3 26.4V42H14.7Z" fill="currentcolor" />
+        </svg>
+      </a>
+
+      <div class="title" aria-hidden="true">
+        <div class="title-inner">Home</div>
+      </div>
+
+      <button class="arrow" aria-label="Scroll to top">
+        <svg viewBox="0 0 11 12" fill="none" class="arrow-svg" aria-hidden="true">
+          <path
+            d="M4.96229 11.711V1.57966L0.620286 5.92166L0 5.37581L5.37581 0L10.7516 5.37581L10.1313 5.92166L5.78933 1.57966V11.711H4.96229Z"
+            fill="currentcolor"
+          />
+        </svg>
+      </button>
+
+      <button class="burger" aria-label="Menu" aria-expanded="false" aria-controls="menu">
+        <svg viewBox="0 0 20 11" fill="none" class="burger-svg" aria-hidden="true">
+          <path d="M0 0.5H20" stroke="currentcolor" stroke-width="1" />
+          <path d="M0 5.5H20" stroke="currentcolor" stroke-width="1" />
+          <path d="M0 10.5H20" stroke="currentcolor" stroke-width="1" />
+        </svg>
+      </button>
+
+      <button class="close" aria-label="Close menu">
+        <svg viewBox="0 0 13 13" fill="none" class="close-svg" aria-hidden="true">
+          <path d="M0.353516 11.6673L11.6672 0.353589" stroke="currentcolor" stroke-width="1" />
+          <path d="M0.353516 0.353577L11.6672 11.6673" stroke="currentcolor" stroke-width="1" />
+        </svg>
+      </button>
+
+      <div class="background"></div>
+    </header>
+
+    <div class="menu" id="menu" aria-hidden="true">
+      <nav class="nav" aria-label="Main">
+        <div class="title">Menu</div>
+        <ul class="main">
+          <li class="item is-active">
+            <div class="mask">
+              <a href="#top" class="link">
+                <div class="line">About</div>
+                <div class="line" aria-hidden="true">About</div>
+              </a>
+            </div>
+          </li>
+          <li class="item">
+            <div class="mask">
+              <a href="#collection" class="link">
+                <div class="line">Collection</div>
+                <div class="line" aria-hidden="true">Collection</div>
+              </a>
+            </div>
+          </li>
+          <li class="item">
+            <div class="mask">
+              <a href="#projects" class="link">
+                <div class="line">Projects</div>
+                <div class="line" aria-hidden="true">Projects</div>
+              </a>
+            </div>
+          </li>
+          <li class="item">
+            <div class="mask">
+              <a href="#approach" class="link">
+                <div class="line">Approach</div>
+                <div class="line" aria-hidden="true">Approach</div>
+              </a>
+            </div>
+          </li>
+          <li class="item">
+            <div class="mask">
+              <a href="#contact" class="link">
+                <div class="line">Contact</div>
+                <div class="line" aria-hidden="true">Contact</div>
+              </a>
+            </div>
+          </li>
+        </ul>
+
+        <ul class="sub">
+          <li class="mask"><a href="#news" class="link">News</a></li>
+          <li class="mask"><a href="#showroom" class="link">Showroom</a></li>
+          <li class="mask"><a href="tel:02081567290" class="link">020 8156 7290</a></li>
+          <li class="mask"><a href="mailto:sales@warehouse.glass" class="link">sales@warehouse.glass</a></li>
+        </ul>
+
+        <a href="#contact" class="base-button is-black">
+          <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+            <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+            <rect
+              x="9.18887"
+              y="2.2251"
+              width="5.56065"
+              height="5.56065"
+              transform="rotate(45 9.18887 2.2251)"
+              stroke="currentcolor"
+              stroke-width="1.2"
+            />
+          </svg>
+          <div class="label">
+            <span class="line" aria-hidden="true">Get a quote</span>
+            <span class="line">Get a quote</span>
+          </div>
+        </a>
+      </nav>
+      <div class="background"></div>
+    </div>
+
+    <main class="main">
+      <div class="scroll">
+        <div class="content">
+          <div class="home-page" id="top">
+            <!-- ============================ page header =========================== -->
+            <section class="page-header is-white">
+              <a href="#top" class="logo" aria-label="Warehouse, home">
+                <span class="wordmark">Warehouse</span>
+              </a>
+              <h1>Warehouse</h1>
+              <a href="#contact" class="base-button is-alpha">
+                <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                  <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                  <rect
+                    x="9.18887"
+                    y="2.2251"
+                    width="5.56065"
+                    height="5.56065"
+                    transform="rotate(45 9.18887 2.2251)"
+                    stroke="currentcolor"
+                    stroke-width="1.2"
+                  />
+                </svg>
+                <div class="label">
+                  <span class="line" aria-hidden="true">Get a quote</span>
+                  <span class="line">Get a quote</span>
+                </div>
+              </a>
+            </section>
+
+            <!-- ============================== hero =============================== -->
+            <section class="home-header">
+              <div class="container">
+                <div class="row">
+                  <p class="base-heading" data-reveal="load">
+                    <span class="line-mask"><span class="line">Structural glass for buildings </span></span>
+                    <span class="line-mask"><span class="line">that were difficult to draw.</span></span>
+                  </p>
+                  <div class="indicator" aria-hidden="true">Scroll to explore</div>
+                </div>
+                <div class="row">
+                  <h2 class="base-title">Structural glazing</h2>
+                  <p class="text">
+                    We draw, make and fit glass systems for projects where the detail matters more than the
+                    programme. Every junction is set out to the millimetre and checked on site.
+                  </p>
+                </div>
+              </div>
+              <div class="background">
+                <div class="asset" data-parallax="hero">
+                  <img
+                    class="base-image"
+                    src="assets/hero.jpg"
+                    width="1600"
+                    height="1373"
+                    alt=""
+                    fetchpriority="high"
+                  />
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================= text cta ============================ -->
+            <section class="text-cta">
+              <div class="container">
+                <h2 class="base-title">About Warehouse</h2>
+                <p class="base-heading" data-reveal>
+                  <span class="line-mask"><span class="line">We are the contractor architects </span></span>
+                  <span class="line-mask"><span class="line">call when the detail is hard and </span></span>
+                  <span class="line-mask"><span class="line">nobody else will quote it. That </span></span>
+                  <span class="line-mask"><span class="line">is most of what we do.</span></span>
+                </p>
+                <a href="#approach" class="base-button is-black">
+                  <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                    <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                    <rect
+                      x="9.18887"
+                      y="2.2251"
+                      width="5.56065"
+                      height="5.56065"
+                      transform="rotate(45 9.18887 2.2251)"
+                      stroke="currentcolor"
+                      stroke-width="1.2"
+                    />
+                  </svg>
+                  <div class="label">
+                    <span class="line" aria-hidden="true">Who we are</span>
+                    <span class="line">Who we are</span>
+                  </div>
+                </a>
+              </div>
+            </section>
+
+            <!-- ========================= product collection ====================== -->
+            <section class="product-collection" id="collection">
+              <div class="container">
+                <h2 class="base-title">The collection</h2>
+                <div class="content">
+                  <div class="richtext">
+                    <p>
+                      Every system in the range shares <strong>one sightline and one seal</strong>, so a door
+                      and a window in the same opening line through. We make the parts to suit the drawing,
+                      not the other way round.
+                    </p>
+                  </div>
+                  <a href="#collection" class="base-button is-black">
+                    <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                      <rect
+                        x="9.18887"
+                        y="2.2251"
+                        width="5.56065"
+                        height="5.56065"
+                        transform="rotate(45 9.18887 2.2251)"
+                        stroke="currentcolor"
+                        stroke-width="1.2"
+                      />
+                    </svg>
+                    <div class="label">
+                      <span class="line" aria-hidden="true">Product overview</span>
+                      <span class="line">Product overview</span>
+                    </div>
+                  </a>
+                </div>
+
+                <div class="blocks">
+                  <a href="#collection" class="block" data-cursor="View">
+                    <h3 class="title">Doors</h3>
+                    <img
+                      class="base-image"
+                      src="assets/collection-doors.jpg"
+                      width="430"
+                      height="530"
+                      loading="lazy"
+                      alt="A minimal sliding door with a hidden bottom rail"
+                    />
+                  </a>
+                  <a href="#collection" class="block" data-cursor="View" data-parallax="block-2">
+                    <h3 class="title">Windows</h3>
+                    <img
+                      class="base-image"
+                      src="assets/collection-windows.jpg"
+                      width="430"
+                      height="530"
+                      loading="lazy"
+                      alt="A slimline casement window in a rendered reveal"
+                    />
+                  </a>
+                  <a href="#collection" class="block" data-cursor="View" data-parallax="block-3">
+                    <h3 class="title">Additional</h3>
+                    <img
+                      class="base-image"
+                      src="assets/collection-additional.jpg"
+                      width="430"
+                      height="530"
+                      loading="lazy"
+                      alt="A recessed blind box above a glazed opening"
+                    />
+                  </a>
+                  <a href="#collection" class="block" data-cursor="View">
+                    <h3 class="title">Structural</h3>
+                    <img
+                      class="base-image"
+                      src="assets/collection-structural.jpg"
+                      width="430"
+                      height="530"
+                      loading="lazy"
+                      alt="A structurally glazed corner with no visible frame"
+                    />
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <!-- =========================== showroom banner ======================= -->
+            <section class="banner-showroom" id="showroom">
+              <h2 class="base-title">Showroom</h2>
+              <div class="container">
+                <div class="border" data-showroom="border"></div>
+                <div class="content">
+                  <div class="column" data-showroom="column-left">
+                    <p class="base-heading" data-reveal>
+                      <span class="line-mask"><span class="line">Come and put your hands </span></span>
+                      <span class="line-mask"><span class="line">on the sections.</span></span>
+                    </p>
+                  </div>
+                  <div class="column" data-showroom="column-right">
+                    <div class="address">
+                      <div class="title">Address</div>
+                      <p class="text">Orbital 25 Business Park, Unit 11<br />Watford WD18 9DA, UK</p>
+                    </div>
+                    <a href="#showroom" class="base-button is-white">
+                      <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                        <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                        <rect
+                          x="9.18887"
+                          y="2.2251"
+                          width="5.56065"
+                          height="5.56065"
+                          transform="rotate(45 9.18887 2.2251)"
+                          stroke="currentcolor"
+                          stroke-width="1.2"
+                        />
+                      </svg>
+                      <div class="label">
+                        <span class="line" aria-hidden="true">Showroom</span>
+                        <span class="line">Showroom</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+                <div class="background" data-showroom="background">
+                  <div class="icon">
+                    <svg viewBox="0 0 9 9" fill="none" class="play-svg" aria-hidden="true">
+                      <path d="M9 4.5L0 9V0L9 4.5Z" fill="currentcolor" />
+                    </svg>
+                  </div>
+                  <img class="base-image" src="assets/showroom.jpg" width="1600" height="900" loading="lazy" alt="" />
+                </div>
+              </div>
+            </section>
+
+            <!-- ========================== featured projects ====================== -->
+            <section class="featured-projects" id="projects">
+              <div class="container">
+                <h2 class="base-title">Featured projects</h2>
+                <div class="content">
+                  <p class="base-heading" data-reveal>
+                    <span class="line-mask"><span class="line">Five buildings we are still </span></span>
+                    <span class="line-mask"><span class="line">pleased with.</span></span>
+                  </p>
+                  <a href="#projects" class="base-button is-black">
+                    <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                      <rect
+                        x="9.18887"
+                        y="2.2251"
+                        width="5.56065"
+                        height="5.56065"
+                        transform="rotate(45 9.18887 2.2251)"
+                        stroke="currentcolor"
+                        stroke-width="1.2"
+                      />
+                    </svg>
+                    <div class="label">
+                      <span class="line" aria-hidden="true">View projects</span>
+                      <span class="line">View projects</span>
+                    </div>
+                  </a>
+                </div>
+
+                <div class="projects">
+                  <a href="#projects" class="project">
+                    <h3 class="title">Linden House</h3>
+                    <div class="products">
+                      <div class="product">Warehouse Timeless Window</div>
+                      <div class="product">Warehouse Timeless Door</div>
+                      <div class="product">Warehouse X Minimal Sliding</div>
+                      <div class="product">Warehouse X Vertical</div>
+                    </div>
+                    <div class="image">
+                      <img class="base-image" src="assets/project-orchard.jpg" width="236" height="296" loading="lazy" alt="" />
+                    </div>
+                    <svg viewBox="0 0 15 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path
+                        d="M9.35 0L8.66 0.69L12.98 5.01H0V6.0H12.98L8.66 10.31L9.35 11L15 5.5L9.35 0Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                  </a>
+                  <a href="#projects" class="project">
+                    <h3 class="title">Barrow Barn</h3>
+                    <div class="products">
+                      <div class="product">Warehouse Sliding Door</div>
+                      <div class="product">Warehouse Balustrade</div>
+                      <div class="product">Warehouse X Pivot Door</div>
+                      <div class="product">Warehouse Window</div>
+                    </div>
+                    <div class="image">
+                      <img class="base-image" src="assets/project-ashmead.jpg" width="236" height="296" loading="lazy" alt="" />
+                    </div>
+                    <svg viewBox="0 0 15 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path
+                        d="M9.35 0L8.66 0.69L12.98 5.01H0V6.0H12.98L8.66 10.31L9.35 11L15 5.5L9.35 0Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                  </a>
+                  <a href="#projects" class="project">
+                    <h3 class="title">Keeper's Lodge</h3>
+                    <div class="products">
+                      <div class="product">Warehouse Sliding Door</div>
+                      <div class="product">Warehouse Window</div>
+                      <div class="product">Warehouse X Vertical</div>
+                      <div class="product">Warehouse Ridgelight</div>
+                    </div>
+                    <div class="image">
+                      <img class="base-image" src="assets/project-keepers.jpg" width="236" height="296" loading="lazy" alt="" />
+                    </div>
+                    <svg viewBox="0 0 15 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path
+                        d="M9.35 0L8.66 0.69L12.98 5.01H0V6.0H12.98L8.66 10.31L9.35 11L15 5.5L9.35 0Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                  </a>
+                  <a href="#projects" class="project">
+                    <h3 class="title">Sea Reach</h3>
+                    <div class="products">
+                      <div class="product">Warehouse X Vertical</div>
+                      <div class="product">Warehouse X Minimal Sliding</div>
+                      <div class="product">Warehouse Window</div>
+                    </div>
+                    <div class="image">
+                      <img class="base-image" src="assets/project-seabreeze.jpg" width="236" height="296" loading="lazy" alt="" />
+                    </div>
+                    <svg viewBox="0 0 15 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path
+                        d="M9.35 0L8.66 0.69L12.98 5.01H0V6.0H12.98L8.66 10.31L9.35 11L15 5.5L9.35 0Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                  </a>
+                  <a href="#projects" class="project">
+                    <h3 class="title">Foundry House</h3>
+                    <div class="products">
+                      <div class="product">Warehouse Window</div>
+                      <div class="product">Warehouse X Vertical</div>
+                      <div class="product">Warehouse X Minimal Sliding</div>
+                    </div>
+                    <div class="image">
+                      <img class="base-image" src="assets/project-rusty.jpg" width="236" height="296" loading="lazy" alt="" />
+                    </div>
+                    <svg viewBox="0 0 15 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path
+                        d="M9.35 0L8.66 0.69L12.98 5.01H0V6.0H12.98L8.66 10.31L9.35 11L15 5.5L9.35 0Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================= assets duo ========================== -->
+            <section class="assets-duo">
+              <div class="container is-portrait-6">
+                <!-- Both are 2:3. The intrinsic size has to be declared or the
+                     lazy images reserve no box and the section collapses. -->
+                <div class="block is-image" data-parallax="duo">
+                  <img class="base-image" src="assets/duo-left.jpg" width="3200" height="4800" loading="lazy" alt="" />
+                </div>
+                <div class="block is-image">
+                  <img class="base-image" src="assets/duo-right.jpg" width="3200" height="4800" loading="lazy" alt="" />
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================== reviews ============================ -->
+            <section class="reviews" id="approach">
+              <div class="container">
+                <div class="head">
+                  <h2 class="base-title">Client stories</h2>
+                  <div class="indicator" aria-live="polite">01 / 05</div>
+                  <div class="arrow-nav">
+                    <button class="button" aria-label="Previous story">
+                      <svg viewBox="0 0 14 9" fill="none" class="arrow-svg" aria-hidden="true">
+                        <path d="M9.2 0L8.5 0.68L11.8 4.0H0V5.0H11.8L8.5 8.32L9.2 9L14 4.5L9.2 0Z" fill="currentcolor" />
+                      </svg>
+                    </button>
+                    <button class="button" aria-label="Next story">
+                      <svg viewBox="0 0 14 9" fill="none" class="arrow-svg" aria-hidden="true">
+                        <path d="M9.2 0L8.5 0.68L11.8 4.0H0V5.0H11.8L8.5 8.32L9.2 9L14 4.5L9.2 0Z" fill="currentcolor" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="blocks">
+                  <div class="block is-active">
+                    <svg viewBox="0 0 27 20" fill="none" class="quote-svg" aria-hidden="true">
+                      <path
+                        d="M0 20V12.6C0 5.9 3.7 1.2 10.6 0L11.6 3.4C7.5 4.4 5.4 6.6 5.4 9.6H10.2V20H0ZM15.4 20V12.6C15.4 5.9 19.1 1.2 26 0L27 3.4C22.9 4.4 20.8 6.6 20.8 9.6H25.6V20H15.4Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                    <blockquote class="blockquote">
+                      <div class="line-mask"><div class="line">They answered the questions our </div></div>
+                      <div class="line-mask"><div class="line">last supplier dodged, and the glass </div></div>
+                      <div class="line-mask"><div class="line">turned up on the day they said it </div></div>
+                      <div class="line-mask"><div class="line">would. Four projects together since.</div></div>
+                    </blockquote>
+                    <div class="content">
+                      <p class="author">
+                        <span class="quotee">Practice principal</span>
+                        <span class="function">Residential architects, London</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="block">
+                    <svg viewBox="0 0 27 20" fill="none" class="quote-svg" aria-hidden="true">
+                      <path
+                        d="M0 20V12.6C0 5.9 3.7 1.2 10.6 0L11.6 3.4C7.5 4.4 5.4 6.6 5.4 9.6H10.2V20H0ZM15.4 20V12.6C15.4 5.9 19.1 1.2 26 0L27 3.4C22.9 4.4 20.8 6.6 20.8 9.6H25.6V20H15.4Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                    <blockquote class="blockquote">
+                      <div class="line-mask"><div class="line">No supplier has ever sent me a </div></div>
+                      <div class="line-mask"><div class="line">revised setting-out drawing back </div></div>
+                      <div class="line-mask"><div class="line">the same afternoon before.</div></div>
+                    </blockquote>
+                    <div class="content">
+                      <p class="author">
+                        <span class="quotee">Project architect</span>
+                        <span class="function">Conservation practice, Bath</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="block">
+                    <svg viewBox="0 0 27 20" fill="none" class="quote-svg" aria-hidden="true">
+                      <path
+                        d="M0 20V12.6C0 5.9 3.7 1.2 10.6 0L11.6 3.4C7.5 4.4 5.4 6.6 5.4 9.6H10.2V20H0ZM15.4 20V12.6C15.4 5.9 19.1 1.2 26 0L27 3.4C22.9 4.4 20.8 6.6 20.8 9.6H25.6V20H15.4Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                    <blockquote class="blockquote">
+                      <div class="line-mask"><div class="line">We have finished a run of houses </div></div>
+                      <div class="line-mask"><div class="line">with them in London and two </div></div>
+                      <div class="line-mask"><div class="line">abroad. The install teams arrive </div></div>
+                      <div class="line-mask"><div class="line">when the programme says, which </div></div>
+                      <div class="line-mask"><div class="line">sounds like a low bar until you </div></div>
+                      <div class="line-mask"><div class="line">have worked with anyone else.</div></div>
+                    </blockquote>
+                    <div class="content">
+                      <p class="author">
+                        <span class="quotee">Founding partner</span>
+                        <span class="function">Multidisciplinary studio, Rotterdam</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="block">
+                    <svg viewBox="0 0 27 20" fill="none" class="quote-svg" aria-hidden="true">
+                      <path
+                        d="M0 20V12.6C0 5.9 3.7 1.2 10.6 0L11.6 3.4C7.5 4.4 5.4 6.6 5.4 9.6H10.2V20H0ZM15.4 20V12.6C15.4 5.9 19.1 1.2 26 0L27 3.4C22.9 4.4 20.8 6.6 20.8 9.6H25.6V20H15.4Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                    <blockquote class="blockquote">
+                      <div class="line-mask"><div class="line">Our architect specified them and </div></div>
+                      <div class="line-mask"><div class="line">we argued about the cost until the </div></div>
+                      <div class="line-mask"><div class="line">survey, when they found two things </div></div>
+                      <div class="line-mask"><div class="line">wrong with our opening that </div></div>
+                      <div class="line-mask"><div class="line">nobody else had spotted. The doors </div></div>
+                      <div class="line-mask"><div class="line">have not dropped a millimetre in </div></div>
+                      <div class="line-mask"><div class="line">three winters.</div></div>
+                    </blockquote>
+                    <div class="content">
+                      <p class="author">
+                        <span class="quotee">Homeowner</span>
+                        <span class="function">Private house, Hertfordshire</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="block">
+                    <svg viewBox="0 0 27 20" fill="none" class="quote-svg" aria-hidden="true">
+                      <path
+                        d="M0 20V12.6C0 5.9 3.7 1.2 10.6 0L11.6 3.4C7.5 4.4 5.4 6.6 5.4 9.6H10.2V20H0ZM15.4 20V12.6C15.4 5.9 19.1 1.2 26 0L27 3.4C22.9 4.4 20.8 6.6 20.8 9.6H25.6V20H15.4Z"
+                        fill="currentcolor"
+                      />
+                    </svg>
+                    <blockquote class="blockquote">
+                      <div class="line-mask"><div class="line">We went in expecting a sales </div></div>
+                      <div class="line-mask"><div class="line">pitch and got an hour with </div></div>
+                      <div class="line-mask"><div class="line">someone who actually builds </div></div>
+                      <div class="line-mask"><div class="line">the things. He talked us out of </div></div>
+                      <div class="line-mask"><div class="line">the system we came in for and </div></div>
+                      <div class="line-mask"><div class="line">into a cheaper one that suited </div></div>
+                      <div class="line-mask"><div class="line">the opening better.</div></div>
+                    </blockquote>
+                    <div class="content">
+                      <p class="author">
+                        <span class="quotee">Homeowner</span>
+                        <span class="function">Barn conversion, Suffolk</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rating">
+                  <a href="#approach" class="link">
+                    <svg viewBox="0 0 20 20" fill="none" class="google-svg" aria-hidden="true">
+                      <path
+                        d="M19.6 10.23c0-.82-.07-1.42-.22-2.04H10v3.7h5.51c-.11.92-.71 2.3-2.04 3.23l-.02.12 2.96 2.3.21.02c1.88-1.74 2.98-4.3 2.98-7.33Z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.15-2.44c-.84.59-1.97 1-3.47 1a6.02 6.02 0 0 1-5.7-4.16l-.11.01-3.08 2.38-.04.11A10 10 0 0 0 10 20Z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M4.3 11.98a6.16 6.16 0 0 1 0-3.96L4.3 7.9 1.18 5.48l-.1.05a10.01 10.01 0 0 0 0 8.94l3.22-2.49Z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M10 3.86c1.9 0 3.17.82 3.9 1.5l2.85-2.78A9.63 9.63 0 0 0 10 0 10 10 0 0 0 1.08 5.48L4.29 8.02A6.05 6.05 0 0 1 10 3.86Z"
+                        fill="#EB4335"
+                      />
+                    </svg>
+                    Google review score: 5.0 of 5
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================= banner cta ========================== -->
+            <section class="banner-cta" id="contact">
+              <div class="container">
+                <h2 class="base-title">Start with a drawing</h2>
+                <p class="base-heading" data-reveal>
+                  <span class="line-mask"><span class="line">Send us the section </span></span>
+                  <span class="line-mask"><span class="line">you are worried about.</span></span>
+                </p>
+                <div class="buttons">
+                  <a href="#approach" class="base-button is-black">
+                    <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                      <rect
+                        x="9.18887"
+                        y="2.2251"
+                        width="5.56065"
+                        height="5.56065"
+                        transform="rotate(45 9.18887 2.2251)"
+                        stroke="currentcolor"
+                        stroke-width="1.2"
+                      />
+                    </svg>
+                    <div class="label">
+                      <span class="line" aria-hidden="true">Our approach</span>
+                      <span class="line">Our approach</span>
+                    </div>
+                  </a>
+                  <a href="#contact" class="base-button is-alpha">
+                    <svg viewBox="0 0 14 11" fill="none" class="arrow-svg" aria-hidden="true">
+                      <path d="M0.600006 0V6H13.1" stroke="currentcolor" stroke-width="1.2" />
+                      <rect
+                        x="9.18887"
+                        y="2.2251"
+                        width="5.56065"
+                        height="5.56065"
+                        transform="rotate(45 9.18887 2.2251)"
+                        stroke="currentcolor"
+                        stroke-width="1.2"
+                      />
+                    </svg>
+                    <div class="label">
+                      <span class="line" aria-hidden="true">Get in touch</span>
+                      <span class="line">Get in touch</span>
+                    </div>
+                  </a>
+                </div>
+                <svg viewBox="0 0 428 610" fill="none" class="banner-cta-svg" aria-hidden="true">
+                  <path d="M239.6 -1.5L0.600098 118V610.5" stroke="currentcolor" stroke-width="1.2" />
+                  <path d="M428 60.5L189 180V610.5" stroke="currentcolor" stroke-width="1.2" />
+                </svg>
+              </div>
+            </section>
+
+            <!-- =============================== footer ============================ -->
+            <footer class="footer" id="news">
+              <div class="container" data-parallax="footer">
+                <a href="#top" class="logo" aria-label="Home">
+                  <svg viewBox="0 0 42 42" fill="none" class="brandmark-svg" aria-hidden="true">
+                    <path d="M0 42V13.5L21 1.5L42 13.5V42H33.6V18.6L21 11.4L8.4 18.6V42H0Z" fill="currentcolor" />
+                    <path d="M14.7 42V26.4L21 22.8L27.3 26.4V42H14.7Z" fill="currentcolor" />
+                  </svg>
+                </a>
+
+                <div class="bottom">
+                  <div class="copyright">©2026, Warehouse</div>
+                  <div class="nav">
+                    <ul class="social">
+                      <li class="item"><a href="#news" class="link">Instagram</a></li>
+                      <li class="item"><a href="#news" class="link">YouTube</a></li>
+                      <li class="item"><a href="#news" class="link">LinkedIn</a></li>
+                      <li class="item"><a href="#news" class="link">X</a></li>
+                    </ul>
+                    <ul class="legal">
+                      <li class="item"><a href="#news" class="link">Privacy policy</a></li>
+                      <li class="item"><a href="#news" class="link">Terms &amp; conditions</a></li>
+                    </ul>
+                  </div>
+                  <a href="#news" class="exo-ape link">Crafted in-house</a>
+                </div>
+
+                <div class="background">
+                  <!-- The photograph shows through the letterforms of the wordmark.
+                       The source masked a white plate with a traced SVG of its own
+                       name; this clips the same image to live text instead, so the
+                       effect survives the rename. -->
+                  <div class="wordmark" aria-hidden="true">Warehouse</div>
+                  <img class="base-image" src="assets/footer.jpg" width="1600" height="900" loading="lazy" alt="" />
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="main.js" type="module"></script>
+  </body>
+</html>

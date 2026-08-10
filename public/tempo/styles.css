@@ -1,0 +1,1820 @@
+/* ============================================================================
+   Tempo — motion studio landing page
+
+   Rebuilt from a saved-page snapshot of a Nuxt 2 / DatoCMS site running GSAP,
+   ScrollTrigger, Flip, SplitText and a Lottie logotype. This is plain CSS and
+   one script; every number below is measured off the snapshot's own
+   stylesheet, not eyeballed.
+
+   The one thing worth understanding before reading further: there is no
+   breakpoint in the type scale, because there is barely a type scale. The
+   root font size is a viewport ratio, so a single set of rem values drives
+   the entire page and the whole design zooms with the window.
+   ========================================================================= */
+
+/* ---------------------------------------------------------------------------
+   1. Tokens
+   ------------------------------------------------------------------------ */
+
+:root {
+  /* The divisor in the root font-size below. 390 is a phone; 1500 is the
+     width the desktop design was drawn at. Changing this one number rescales
+     the entire page, which is why nothing else in this file needs a query. */
+  --size: 390;
+
+  /* Two aliases, not two colours. Dark mode swaps what they point at, and
+     every rule on the page reads the alias — so the theme is two lines. */
+  --dark: #000;
+  --light: #fff;
+
+  --gray: #eee;         /* the placeholder field behind the studio film */
+  --gray-dark: #555;
+  --gray-text: #888a8b; /* body copy — never pure black */
+  --rule: #e2e3e6;
+
+  /* Easings. The source registers two CustomEase paths with GSAP; both are
+     reproduced here rather than approximated by eye.
+
+     `unmask` is a plain cubic — CustomEase "M0,0 C0.2,0 0,1 1,1" is exactly
+     cubic-bezier(.2, 0, 0, 1). It is the reveal curve: leaves instantly,
+     arrives slowly, which is what makes masked type look like it is being
+     uncovered rather than moved.
+
+     `snappy` is a three-segment path and has no cubic-bezier equivalent — it
+     overshoots its own midpoint early, stalls, then creeps. Sampled at 24
+     points into a linear() so the shape survives. */
+  --ease-unmask: cubic-bezier(0.2, 0, 0, 1);
+  --ease-snappy: linear(
+    0, 0.019, 0.0617, 0.1561, 0.3378, 0.5339, 0.6898, 0.8, 0.8687, 0.9121,
+    0.947, 0.9641, 0.9742, 0.981, 0.9859, 0.9896, 0.9924, 0.9946, 0.9963,
+    0.9976, 0.9985, 0.9992, 0.9997, 0.9999, 1
+  );
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);   /* the site's own CSS curve */
+  --ease-swing: cubic-bezier(0.785, 0.135, 0.15, 0.86); /* underline sweeps */
+
+  /* Reveal choreography. One duration and one stagger drive every masked
+     line, character and fade on the page. */
+  --reveal-duration: 1s;
+  --reveal-stagger: 0.1s;
+
+  --page-pad: 2.3rem;
+  --grid-gap: 0.5rem;
+  --grid-cols: 6;
+}
+
+@media (min-width: 650px) {
+  :root {
+    --size: 1500;
+    --page-pad: 5.8rem;
+    --grid-gap: 2.4rem;
+    --grid-cols: 12;
+  }
+}
+
+/* Dark mode is the two aliases changing places. Nothing else moves, because
+   nothing else on the page names a colour. */
+html.is-dark {
+  --dark: #fff;
+  --light: #000;
+  --gray: #1c1c1c;
+  --gray-text: #8b8d8e;
+  --rule: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------------------------------------------------------------------------
+   2. Reset and root scale
+   ------------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border: 0 solid;
+}
+
+/* The whole system. `clamp()` here is being used as min/max around a fixed
+   preferred value: below 1800px the third argument wins and the root is a
+   pure ratio of the viewport (1440px ÷ 1500 × 10 = 9.6px); above it the 12px
+   ceiling takes over so the page stops growing on a very large display. */
+html {
+  font-size: clamp(1px, 12px, 10 * 100vw / var(--size));
+  font-kerning: none;
+  font-feature-settings: 'kern' off;
+  line-height: 1.5;
+  -webkit-text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  background-color: var(--light);
+  color: var(--dark);
+  /* Arimo stands in for the source's Suisse Int'l. See the README: it is a
+     metric clone of Arial, which puts its skeleton close to the Swiss
+     grotesque the source uses, at the cost of having no width axis. */
+  font-family: 'Arimo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.8rem;
+  transition: background-color 0.6s ease-out, color 0.6s ease-out;
+}
+
+body.is-loading {
+  cursor: wait;
+}
+
+/* `hr` belongs in this list. Its default `margin: .5em auto` is half the
+   body size, and the footer rules are the only place the page draws one —
+   the stray 8.6px lands between the address block and the sitemap, where
+   every spacing value is otherwise an exact step. */
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, hr {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+ul, ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+button {
+  appearance: none;
+  background: none;
+  border-radius: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+img,
+svg,
+video {
+  display: block;
+  vertical-align: middle;
+}
+
+hr {
+  height: 0;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--dark);
+  opacity: 0.15;
+}
+
+::selection {
+  background: var(--dark);
+  color: var(--light);
+}
+
+/* Safari clips a rounded overflow container back to a rectangle the moment
+   anything inside it is transformed. Masking with a radial gradient forces
+   the corner clip back on. The source ships this fix; it is kept verbatim. */
+.radius-fix {
+  -webkit-mask-image: -webkit-radial-gradient(#fff, #000);
+}
+
+/* ---------------------------------------------------------------------------
+   3. Type scale
+
+   Four display steps and one body size. Weight does almost nothing here —
+   400 and 700 are the only two, and 700 appears only on the two uppercase
+   steps. Size, case and tracking carry the whole hierarchy.
+   ------------------------------------------------------------------------ */
+
+.h1 {
+  font-size: 8rem;
+  font-weight: 700;
+  line-height: 0.7;
+  letter-spacing: -0.02em;
+  /* Optical left-alignment: at this size the sidebearing of the first glyph
+     is visible as an indent, so the line is pulled back by a share of its
+     own em. It is a constant because it scales with the type. */
+  margin-left: -0.035em;
+  text-transform: uppercase;
+}
+
+.h1 * {
+  line-height: inherit;
+}
+
+.h2 {
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  margin-left: -0.035em;
+  text-transform: uppercase;
+}
+
+.h3 {
+  font-size: 3.4rem;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+}
+
+.h4 {
+  font-size: 3.2rem;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 650px) {
+  .h1 { font-size: 22rem; }
+  .h2 { font-size: 14rem; line-height: 1.025; }
+  .h3 { font-size: 5.75rem; line-height: 1.13; }
+  .h4 { font-size: 4.5rem; line-height: 1.17; }
+}
+
+/* Body copy blocks. The grey is deliberate: the page reserves pure ink for
+   headings and for the one sentence in each block that carries the claim. */
+.txt > :not(:last-child) {
+  margin-bottom: 2.5rem;
+}
+
+.txt p {
+  color: var(--gray-text);
+}
+
+.txt strong {
+  color: var(--dark);
+  font-weight: 400;
+}
+
+.label {
+  font-size: 1.8rem;
+}
+
+.small {
+  font-size: 1.9rem;
+  line-height: 1.21;
+}
+
+.medium { font-weight: 500; }
+
+/* ---------------------------------------------------------------------------
+   4. Grid
+
+   Six columns on a phone, twelve on a desktop, and the page padding doubles
+   and a half at the same moment. Both live in custom properties so a section
+   can opt out of the padding without redeclaring the column count.
+   ------------------------------------------------------------------------ */
+
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+}
+
+.site-max {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+}
+
+/* Media that fills its box. Used with a percentage-padding spacer to hold an
+   aspect ratio, which is what the source does and what keeps the reserved
+   space correct before an asset has decoded. */
+.media-fill > img,
+.media-fill > video,
+.media-fill > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Crop control. Every photograph is shipped at its original size and framed
+   by `object-fit: cover`, so the crop is a stylesheet decision rather than a
+   second export. These two shift the visible window off centre where the
+   subject is not in the middle of the frame. */
+.pos-upper { object-position: center 40%; }
+.pos-lower { object-position: center 58%; }
+
+/* A hairline seam appears between a scaled media element and its rounded
+   container on fractional device pixel ratios. Overhanging by a pixel on
+   every side hides it. */
+.media-bleed {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  max-width: calc(100% + 2px);
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------------------
+   5. Links
+
+   Two underline behaviours, and the difference between them is the whole
+   personality of the page's small type.
+   ------------------------------------------------------------------------ */
+
+/* Single: draws in from the left on hover, retracts to the right. */
+.uline {
+  position: relative;
+  display: inline-flex;
+  white-space: nowrap;
+  --bottom: -0.2em;
+}
+
+.uline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--bottom);
+  height: 0.05em;
+  min-height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.55s var(--ease-swing);
+}
+
+.uline:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Double: starts drawn. On hover the existing rule retracts to the right
+   while a second one draws in from the left behind it, staggered by .2s, so
+   the underline appears to be redrawn rather than switched. */
+.uline-double {
+  position: relative;
+  display: inline-flex;
+  white-space: nowrap;
+  --bottom: -0.2em;
+}
+
+.uline-double::before,
+.uline-double::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--bottom);
+  height: 0.05em;
+  min-height: 1px;
+  background-color: currentColor;
+}
+
+.uline-double::before {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.55s var(--ease-swing) 0.5s;
+}
+
+.uline-double::after {
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.55s var(--ease-swing) 0s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .uline-double:hover::before {
+    transform: scaleX(0);
+    transform-origin: right;
+    transition-delay: 0s;
+  }
+
+  .uline-double:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+    transition-delay: 0.2s;
+  }
+}
+
+/* Footer list links sit at 40% and only ever come up to 75%. They are
+   navigation of last resort and are styled to say so. */
+.site-link {
+  opacity: 0.4;
+  transition: opacity 0.5s ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-link:hover {
+    opacity: 0.75;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   6. Header
+
+   Fixed, and painted in difference blend mode. It is white type, so over the
+   white page it resolves to black and over the black reel card it resolves to
+   white — one element, no scroll listener, correct over anything.
+   ------------------------------------------------------------------------ */
+
+.sh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+.sh__inner {
+  padding-top: 2.5rem;
+  align-items: center;
+}
+
+@media (min-width: 650px) {
+  .sh__inner { padding-top: 3.5rem; }
+}
+
+.sh__brand {
+  grid-column: span 3;
+}
+
+.sh__mark {
+  width: 9.7rem;
+  height: auto;
+}
+
+.sh__time {
+  display: none;
+  position: relative;
+  grid-column: span 6;
+  overflow: hidden;
+  font-size: 2.2rem;
+}
+
+.sh__time span {
+  text-transform: lowercase;
+}
+
+/* The colon blinks on the second, which is the only thing on the page that
+   admits it is running in real time. */
+.sh__dots {
+  animation: sh-blink 1s infinite;
+}
+
+@keyframes sh-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.sh__nav {
+  grid-column: span 3;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.sh-link {
+  position: relative;
+  margin-right: 0.5rem;
+  font-size: 2.2rem;
+  transition: opacity 0.3s ease-out;
+}
+
+/* Hovering one link dims its neighbours rather than lighting itself. The
+   moved element is the set, not the target. */
+.sh__nav[data-hovering] .sh-link:not(:hover) {
+  opacity: 0.4;
+}
+
+.sh-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.2em;
+  height: 0.05em;
+  min-height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.75s var(--ease-expo);
+}
+
+.sh-link.is-active::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (min-width: 650px) {
+  .sh__brand { grid-column: span 2; }
+  .sh__time { display: block; }
+  .sh__nav { grid-column: span 4; justify-content: flex-start; }
+}
+
+@media (min-width: 1280px) {
+  .sh__time,
+  .sh-link { font-size: 1.8rem; }
+}
+
+/* The theme switch: a disc, and a pill behind it that is clipped to nothing
+   until you approach. Hovering opens the pill; the disc then slides its own
+   width along it. Two clip-path insets and a translate. */
+.dm-toggle {
+  position: relative;
+  margin-left: auto;
+}
+
+.dm-toggle__ball {
+  position: relative;
+  z-index: 2;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background-color: currentColor;
+  transition: transform 1s var(--ease-expo);
+}
+
+.dm-toggle__back {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.2rem;
+  width: 3.6rem;
+  height: 2rem;
+  border-radius: 999px;
+  background-color: #222;
+  clip-path: inset(0.2rem 0.2rem 0.2rem 50% round 1.6rem);
+  transition: clip-path 1s var(--ease-expo);
+}
+
+.dm-toggle:hover .dm-toggle__back {
+  clip-path: inset(0 0 0 0 round 1.6rem);
+}
+
+html.is-dark .dm-toggle__back {
+  background-color: #555;
+}
+
+html.is-dark .dm-toggle:hover .dm-toggle__ball {
+  transform: translateX(-100%);
+}
+
+/* Phone header: the links and the theme switch both go, and one word takes
+   their place. The bar's height does not change, so nothing below it moves. */
+.sh-link,
+.dm-toggle { display: none; }
+
+@media (min-width: 650px) {
+  .sh-link { display: inline-flex; }
+  .dm-toggle { display: block; }
+}
+
+.menu-toggle {
+  position: relative;
+  margin-left: auto;
+  overflow: hidden;
+}
+
+.menu-toggle__text {
+  position: relative;
+  transition: transform 0.75s var(--ease-expo);
+}
+
+.menu-toggle__text + .menu-toggle__text {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: auto;
+  text-align: right;
+}
+
+.menu-toggle.is-active .menu-toggle__text {
+  transform: translateY(-100%);
+}
+
+@media (min-width: 650px) {
+  .menu-toggle { display: none; }
+}
+
+/* The panel itself. `inert` and `aria-hidden` are written together by the
+   script, so the keyboard state and the screen-reader state cannot drift
+   apart — the usual failure of a menu that is only hidden with opacity. */
+.mmenu {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  overflow: hidden;
+  background-color: var(--dark);
+  color: var(--light);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s var(--ease-expo), visibility 0.5s;
+}
+
+html.is-menu .mmenu {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mmenu__mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mmenu__mask ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.mmenu-link {
+  display: block;
+  padding: 0.6rem 0;
+  font-size: 4.5rem;
+  line-height: 1.17;
+  letter-spacing: -0.01em;
+  opacity: 0.5;
+  transform: translateY(110%);
+  transition: opacity 0.3s ease-out, transform 0.75s var(--ease-snappy);
+}
+
+.mmenu-link.is-active { opacity: 1; }
+
+html.is-menu .mmenu-link { transform: translateY(0); }
+
+/* Opening staggers downward; closing throws every row up at once, which is
+   why the exit reads as the panel leaving rather than the list unbuilding. */
+html.is-menu .mmenu li:nth-child(1) .mmenu-link { transition-delay: 0.05s; }
+html.is-menu .mmenu li:nth-child(2) .mmenu-link { transition-delay: 0.1s; }
+html.is-menu .mmenu li:nth-child(3) .mmenu-link { transition-delay: 0.15s; }
+html.is-menu .mmenu li:nth-child(4) .mmenu-link { transition-delay: 0.2s; }
+html.is-menu .mmenu li:nth-child(5) .mmenu-link { transition-delay: 0.25s; }
+
+.mmenu__foot {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 2.3rem 4rem;
+  opacity: 0.5;
+}
+
+@media (min-width: 650px) {
+  .mmenu { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   7. Hero
+
+   Two screens tall on a pointer device, and the first of them is sticky. The
+   scroll through the second screen is not a scroll — it is the scrub track
+   for one transition, and nothing else on the page moves during it.
+   ------------------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  margin-bottom: 7.7rem;
+}
+
+.hero__stick {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: var(--light);
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--light);
+  padding-top: 8rem;
+  padding-bottom: 2.3rem;
+}
+
+@media (min-width: 650px) {
+  .hero__inner {
+    padding-top: 10rem;
+    padding-bottom: 10rem;
+  }
+}
+
+/* The wordmark. Set as live text rather than drawn as paths, so it can be
+   split per letter for the entrance and the exit without a second asset —
+   see the README on what the source does instead. `--fit` is written by the
+   script once the face has loaded; the fallback keeps it close before then. */
+.hero__logo {
+  display: block;
+  margin-bottom: 3.5rem;
+  mix-blend-mode: difference;
+  color: #fff;
+  font-size: var(--fit, 27vw);
+  font-weight: 700;
+  /* Leading, not width, is what shapes this lockup. The wordmark is fitted
+     to a fixed box, so with no width axis to reach for, the only way to stop
+     a filled-to-the-margins wordmark from arriving too tall is to close the
+     line box up. The source lockup runs 5.16 : 1 and this lands within a
+     couple of percent of it. */
+  line-height: 0.68;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Each letter is a mask with a letter inside it. The mask never moves; the
+   letter does. */
+.hero__logo span {
+  display: inline-block;
+  overflow: hidden;
+  /* Anything with a descender or an overshoot would be trimmed by a flush
+     mask, so the box is opened at the bottom and pulled back up. */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+/* Each letter carries an entrance offset and an exit offset in separate
+   properties, for the same reason the wordmark does: the two runs overlap on
+   a fast scroll and neither may cancel the other. */
+html.js .hero__logo i {
+  --in: 110%;
+  --exit: 0%;
+  display: inline-block;
+  font-style: normal;
+  transform: translate3d(0, calc(var(--in) + var(--exit)), 0);
+}
+
+.hero__logo sup {
+  font-size: 0.18em;
+  vertical-align: super;
+  letter-spacing: 0;
+}
+
+@media (min-width: 650px) {
+  .hero__logo {
+    margin-inline: -2rem;
+  }
+}
+
+.hero__foot {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: auto;
+}
+
+.hero__claim {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding-bottom: 15rem;
+}
+
+.hero__title {
+  width: 100%;
+  max-width: 30rem;
+}
+
+.hero__claim a { margin-top: 4rem; }
+
+.hero__scroll {
+  display: none;
+}
+
+@media (min-width: 650px) {
+  .hero__claim {
+    padding-top: 10rem;
+    padding-bottom: 10rem;
+  }
+  .hero__title { max-width: 72.5rem; }
+}
+
+/* The second screen. It holds nothing but an empty 16:9 box: the target the
+   reel card is flown into. Keeping it in the flow is what makes the geometry
+   responsive — the card is never given a size, only another element's. */
+.hero__target-wrap { display: none; }
+
+.stick-target {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 14rem);
+}
+
+/* Desktop-with-a-pointer only. On a phone the hero is one screen, the reel
+   sits in the flow underneath the claim, and none of the above applies —
+   there is no scrub track to build because there is no hover to reward. */
+@media (hover: hover) and (pointer: fine) and (min-width: 650px) {
+  .hero {
+    height: 200vh;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20rem;
+  }
+
+  .hero__stick {
+    position: sticky;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .hero__inner { padding-bottom: 6rem; }
+  .hero__logo { margin-bottom: 0; }
+  .hero__foot { margin-bottom: 0; }
+  .hero__claim { padding-block: 0; }
+  .hero__scroll { display: inline-flex; }
+
+  .hero__target-wrap {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .hero__target-inner {
+    position: relative;
+    display: flex;
+    width: 100%;
+    padding-top: 10rem;
+    padding-bottom: 4rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   8. The reel
+
+   A 27%-wide card that tracks the cursor horizontally, grows into the target
+   box as you scroll, and opens to full screen when clicked. Three behaviours
+   on one element, and they compose: the horizontal tracking is multiplied by
+   the inverse of the scroll progress, so the card stops chasing the mouse at
+   exactly the rate it starts obeying the scroll.
+   ------------------------------------------------------------------------ */
+
+.reel {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  max-width: 27%;
+  top: max(5rem, min(30rem, 21.25vh));
+}
+
+.reel__box {
+  position: relative;
+  padding-top: 56.25%;
+}
+
+.reel__flip {
+  position: absolute;
+  inset: 0;
+  transform-origin: bottom right;
+  will-change: transform, width, height;
+  z-index: 2;
+}
+
+.reel__inner {
+  position: absolute;
+  inset: 0;
+}
+
+.reel__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #000;
+  cursor: pointer;
+  pointer-events: auto;
+  /* Held as a clip-path rather than a border-radius because the intro opens
+     it from a slit and the cinema transition squares it off, and both of
+     those are the same property animating. */
+  clip-path: inset(0 0 0 0 round 1.2rem);
+}
+
+.reel__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  transition: opacity 0.5s ease-out;
+}
+
+/* Play affordance, in difference blend so it reads on any frame. */
+.reel__play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+.reel__play span {
+  display: flex;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.reel__content:hover .reel__play span { opacity: 1; }
+
+.reel__play svg { width: 2.5rem; height: auto; }
+
+.reel__close {
+  position: absolute;
+  top: 3rem;
+  right: 3rem;
+  z-index: 3;
+  color: #fff;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-out;
+}
+
+.reel__caption {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 30rem;
+  padding-top: 1.8rem;
+  font-size: 1.9rem;
+  line-height: 1.21;
+}
+
+.reel__caption b {
+  display: flex;
+  align-items: flex-start;
+  font-weight: 500;
+}
+
+/* Cinema.
+
+   The card is not re-parented. It is switched to fixed positioning and given
+   its own viewport geometry, which is measured on the way in and again on the
+   way out — so the same four numbers describe both directions and the card
+   never has to be handed between two coordinate systems mid-flight.
+
+   Width and height are animated rather than a scale, because a scale would
+   take the poster and the caption with it and the frame would arrive
+   stretched. */
+.reel__inner.is-flying {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  transition: width 1.25s var(--ease-snappy),
+              height 1.25s var(--ease-snappy),
+              transform 1.25s var(--ease-snappy);
+}
+
+.cinema-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Only the card inside it takes pointer events, so the rest of the screen
+   stays scrollable while the frame is open — which is what the source does. */
+.cinema-layer .reel__inner { pointer-events: auto; }
+
+html.is-cinema .reel__content {
+  clip-path: inset(0 0 0 0 round 0);
+  cursor: default;
+}
+
+html.is-cinema .reel__close {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+html.is-cinema .reel__play { display: none; }
+
+/* The looping frame fades out as the full one arrives half a second behind
+   it, so the cut is a dissolve rather than a swap. */
+html.is-cinema .reel__poster { opacity: 0; }
+
+.reel__full {
+  position: relative;
+  z-index: 2;
+  width: 75%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
+html.is-cinema .reel__full {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.5s;
+}
+
+/* Phone reel: same card, no chase, no scrub — it just sits in the column. */
+.reel-mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+.reel-mobile .reel__caption {
+  position: static;
+  width: 100%;
+  padding-top: 0;
+  margin-bottom: 1.8rem;
+  order: 2;
+}
+
+.reel-mobile .reel__box { order: 1; }
+
+@media (hover: hover) and (pointer: fine) and (min-width: 650px) {
+  .reel-mobile { display: none; }
+}
+
+@media not all and (min-width: 650px) {
+  .reel { display: none; }
+}
+
+@media (hover: none) {
+  .reel { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   9. Approach
+   ------------------------------------------------------------------------ */
+
+.approach {
+  margin-bottom: 16rem;
+}
+
+.approach__arrow-col {
+  grid-column: span 6;
+  margin-bottom: 3rem;
+}
+
+/* Two arrows in one masked box. On entry the first leaves to the right as
+   the second arrives from the left, a quarter-second behind — a single glyph
+   handing over to itself. */
+.approach__arrows {
+  position: relative;
+  display: none;
+  overflow: hidden;
+}
+
+.approach__arrows > :first-child {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-150%);
+}
+
+.approach__arrows > :last-child {
+  transform: translateX(0);
+}
+
+.approach.is-inview .approach__arrows > :first-child {
+  transform: translateX(0);
+  transition: transform 1s var(--ease-snappy) 0.75s;
+}
+
+.approach.is-inview .approach__arrows > :last-child {
+  transform: translateX(100%);
+  transition: transform 1s var(--ease-snappy) 0.5s;
+}
+
+.approach__body { grid-column: span 6; }
+
+.approach__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: 0.5rem;
+  margin-top: 6rem;
+}
+
+.approach__label,
+.approach__text { grid-column: span 6; }
+
+.approach__label { display: none; }
+
+.approach__text .txt { width: 100%; max-width: 50rem; }
+
+.approach__cta { margin-top: 8rem; }
+
+@media (min-width: 650px) {
+  .approach { margin-bottom: 40rem; }
+  .approach__arrow-col { grid-column: span 3; margin-bottom: 0; }
+  .approach__arrows { display: inline-flex; }
+  .approach__mobile-label { display: none; }
+  .approach__body { grid-column: span 9; }
+  .approach__title { padding-right: 10rem; }
+  .approach__grid {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    column-gap: 2.4rem;
+    margin-top: 15rem;
+  }
+  .approach__label { display: block; grid-column: span 3; }
+  .approach__text { grid-column: span 6; }
+}
+
+/* ---------------------------------------------------------------------------
+   10. Work
+
+   The one section that abandons the page margin. Cards run to within 1.6rem
+   of the viewport edge while every other block sits at 5.8rem, which is what
+   makes two thumbnails read as a spread rather than as content.
+   ------------------------------------------------------------------------ */
+
+.work {
+  position: relative;
+  margin-bottom: 15rem;
+}
+
+.work__head {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 3rem;
+}
+
+.work__meta { display: none; }
+
+/* The heading box is shorter than the type inside it — .8em against a 1.05
+   line — so the word is cropped top and bottom and reads as a band. The
+   overflow is also what the per-character reveal needs to hide behind. */
+.work__title {
+  position: relative;
+  width: 100%;
+  height: 0.8em;
+  overflow: hidden;
+  padding-right: 1rem;
+}
+
+.work__title > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  line-height: 1.05 !important;
+}
+
+.work__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.6rem;
+  row-gap: 4.5rem;
+  padding-inline: 2.3rem;
+}
+
+.work-item {
+  position: relative;
+  grid-column: span 2;
+}
+
+.work-item__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+/* The thumbnail rests zoomed in and un-zooms on hover, so the hover state is
+   the photograph's true framing and the resting state is a detail of it. */
+.work-item__scale {
+  position: relative;
+  transition: transform 1s var(--ease-expo);
+}
+
+.work-item__media {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.work-item__media > div { padding-top: 110%; }
+
+/* The blurred copy. The source ships a second, pre-blurred export of every
+   thumbnail; this derives it from the same file instead, which halves the
+   image payload and cannot drift out of sync with the sharp version. The
+   slight scale hides the soft edge a blur leaves at the frame. */
+.work-item__blur {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s;
+}
+
+.work-item__blur img {
+  filter: blur(2.4rem);
+  transform: scale(1.12);
+}
+
+.work-item__loop-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s;
+}
+
+.work-item__loop {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 10rem);
+  height: auto;
+  border-radius: 0.75rem;
+  transform: scale(0.85);
+  transition: transform 1s var(--ease-expo);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .work-item__scale { transform: scale(1.05); }
+
+  .work-item:hover .work-item__scale { transform: scale(1); }
+
+  .work-item:hover .work-item__blur,
+  .work-item:hover .work-item__loop-wrap {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .work-item:hover .work-item__loop { transform: scale(1); }
+}
+
+.work__cta-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.6rem;
+  padding-inline: 2.3rem;
+  margin-top: 8rem;
+}
+
+.work__cta {
+  grid-column: span 2;
+}
+
+/* Inline-flex, not flex: the double underline is drawn on the element's own
+   box, so a block-level link would rule the full column instead of the
+   words. */
+.work__cta a {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.work__cta sup {
+  display: none;
+  font-size: 0.35em;
+  vertical-align: baseline;
+}
+
+@media (min-width: 650px) {
+  .work { margin-bottom: 40rem; }
+
+  .work__head {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 6rem;
+  }
+
+  .work__meta {
+    order: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 56.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .work__meta p { width: 100%; max-width: 24rem; white-space: pre-line; }
+  .work__title { order: 1; }
+
+  .work__grid {
+    row-gap: 3.5rem;
+    padding-inline: 1.6rem;
+  }
+
+  .work-item { grid-column: span 1; }
+  .work-item__frame { margin-bottom: 1.5rem; }
+
+  .work__cta-row { padding-inline: 1.6rem; margin-top: 12.5rem; }
+  .work__cta { grid-column: 2 / span 1; }
+  .work__cta sup { display: inline; }
+}
+
+/* ---------------------------------------------------------------------------
+   11. Services
+
+   Three words and one card. Pointing at a word swaps the card, and the card
+   slides down the column to sit level with whichever word you are pointing
+   at — so the list doubles as the card's vertical position and nothing needs
+   a connecting line.
+   ------------------------------------------------------------------------ */
+
+.services {
+  position: relative;
+  margin-bottom: 30rem;
+}
+
+.services__head { margin-bottom: 15rem; }
+
+.services__label { grid-column: span 6; }
+
+.services__intro {
+  grid-column: span 6;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.services__intro p { width: 100%; max-width: 34rem; }
+
+.services__card-col { grid-column: span 3; }
+
+.services__target {
+  position: relative;
+  transition: transform 1s var(--ease-snappy);
+}
+
+.services__card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.services__card > .services__ratio { padding-top: 56.25%; }
+
+.services__thumb {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: #000;
+  transform-origin: bottom;
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.services__thumb.is-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform 1s var(--ease-snappy), opacity 0s;
+}
+
+/* Leaving is not the reverse of arriving: the outgoing card shrinks in place
+   rather than sliding back out, so the two never look like one card moving. */
+.services__thumb.is-leaving {
+  opacity: 1;
+  transform: scale(0.75);
+  transition: transform 0.75s var(--ease-snappy), opacity 0s linear 0.75s;
+}
+
+.services__texts {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+}
+
+.services__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.services__text.is-active {
+  opacity: 1;
+  transition-delay: 0.3s;
+}
+
+.services__list {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.services__toggle {
+  height: 1.05em;
+  overflow: hidden;
+  padding-right: 1rem;
+  line-height: 1 !important;
+  opacity: 0.3;
+  transition: opacity 0.3s ease-out;
+  text-align: left;
+}
+
+.services__toggle.is-active { opacity: 1; }
+
+@media (min-width: 650px) {
+  .services__label { grid-column: span 4; }
+  .services__intro { grid-column: span 8; }
+  .services__list { grid-column: 5 / span 8; }
+  .services__toggle { font-size: 12.5rem !important; }
+}
+
+@media (min-width: 2100px) {
+  .services__toggle { font-size: 15rem !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   12. Studio block
+
+   The image is pulled 4.3rem left of its column so it breaks the grid on one
+   side only. The text column starts at 8 of 12 — a deliberate hole in the
+   middle that the picture is not allowed to fill.
+   ------------------------------------------------------------------------ */
+
+.studio {
+  position: relative;
+  align-items: center;
+  margin-bottom: 11rem;
+}
+
+.studio__text {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 6rem;
+  order: 2;
+}
+
+.studio__title { width: 100%; max-width: 65rem; }
+
+.studio__copy {
+  width: 100%;
+  margin-top: 4rem;
+}
+
+.studio__cta { margin-top: 5rem; }
+
+.studio__media-col {
+  grid-column: span 6;
+  display: flex;
+  order: 1;
+}
+
+.studio__media {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 1rem;
+  background-color: var(--gray);
+}
+
+.studio__media > div { padding-top: 125%; }
+
+@media (min-width: 650px) {
+  .studio { margin-bottom: 25rem; }
+  .studio__text {
+    grid-column: 8 / span 5;
+    padding-bottom: 0;
+  }
+  .studio__copy { max-width: 41rem; margin-top: 7rem; }
+  .studio__cta { margin-top: 6rem; }
+  .studio__media-col { grid-column: span 6; }
+  .studio__media { margin-left: -4.3rem; }
+}
+
+@media (min-width: 2100px) {
+  .studio__text { grid-column: 9 / span 5; }
+}
+
+/* ---------------------------------------------------------------------------
+   13. Footer
+   ------------------------------------------------------------------------ */
+
+.foot { padding-bottom: 4rem; }
+
+.foot__rule-top { margin-bottom: 4.5rem; }
+
+.foot__contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.foot__contact h2 {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.foot__mail {
+  position: relative;
+  text-align: left;
+}
+
+/* A bubble that scales up out of nothing on hover and reports the result of
+   the click without moving anything else. */
+.foot__bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  padding: 2rem 3rem;
+  border-radius: 0.5rem;
+  background-color: var(--dark);
+  color: var(--light);
+  font-size: 1.9rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%) scale(0);
+  transition: transform 0.5s var(--ease-snappy);
+}
+
+.foot__mail:hover .foot__bubble { transform: translateX(-50%) scale(1); }
+
+.foot__rule-mid { margin-top: 5rem; }
+
+.foot__nav {
+  padding-top: 8.5rem;
+  row-gap: 8.5rem;
+}
+
+.foot__cols {
+  grid-column: span 6;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  row-gap: 7rem;
+}
+
+.foot__col {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.foot__col > span { margin-bottom: 2rem; }
+
+.foot__col ul {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: 0.3rem;
+}
+
+.foot__end {
+  align-items: flex-end;
+  padding-top: 17.5rem;
+}
+
+.foot__mark {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Same wordmark as the hero, at a fraction of the size and with none of the
+   animation — the page opens and closes on the same object. */
+.foot__wordmark {
+  width: 100%;
+  margin-top: 3rem;
+  font-size: var(--fit-foot, 16vw);
+  font-weight: 700;
+  /* Looser than the hero's 0.7 on purpose. The hero letters sit in masks
+     whose bottom padding adds to the box; this one is bare text, and without
+     the extra the footer mark would sit shorter than the same lockup
+     upstairs. */
+  line-height: 0.69;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.foot__wordmark sup {
+  font-size: 0.18em;
+  vertical-align: super;
+  letter-spacing: 0;
+}
+
+.foot__legal {
+  grid-column: span 6;
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.foot__legal button { display: none; }
+
+@media (min-width: 650px) {
+  .foot__rule-top { margin-bottom: 8.5rem; }
+  .foot__contact h2 { width: auto; max-width: 70rem; margin-bottom: 0; }
+  .foot__rule-mid { margin-top: 8.5rem; }
+  .foot__cols { grid-column: span 8; column-gap: 8rem; row-gap: 0; }
+  .foot__col { width: auto; }
+  .foot__end { padding-top: 20rem; }
+  .foot__mark { grid-column: span 8; flex-direction: row; align-items: flex-end; }
+  .foot__wordmark { max-width: 84rem; margin-top: 0; }
+  .foot__mark > button { display: none; }
+  .foot__legal {
+    grid-column: span 4;
+    justify-content: space-between;
+    margin-top: 0;
+  }
+  .foot__legal button { display: inline-flex; }
+}
+
+/* ---------------------------------------------------------------------------
+   14. Reveals
+
+   Three behaviours, one observer, one curve. A block opts in with a class and
+   the script does the splitting; nothing here needs a per-element rule.
+   ------------------------------------------------------------------------ */
+
+/* Masked lines and characters. The mask is a wrapper the script inserts; the
+   piece inside starts a full line below its own box. */
+.s-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.s-chars .s-mask {
+  display: inline-flex;
+  overflow: hidden;
+  padding-right: 1rem;
+}
+
+.s-chars .s-piece { display: inline-flex; }
+
+/* Block, not the inline default: a transform does nothing to a non-replaced
+   inline box, so the line would sit in its mask fully visible and the reveal
+   would silently do nothing. The character variant overrides this to
+   inline-flex, which is transformable for the same reason. */
+.s-piece {
+  display: block;
+}
+
+html.js .s-piece {
+  transform: translate3d(0, 100%, 0);
+}
+
+html.js .is-inview .s-piece,
+html.js .s-piece.is-inview {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--reveal-duration) var(--ease-unmask);
+  transition-delay: calc(var(--i, 0) * var(--reveal-stagger));
+}
+
+/* The plain fade. Three rem of travel, no mask, expo — used for supporting
+   copy that should arrive without announcing itself.
+
+   Every hidden starting state on this page is gated behind `html.js`, which
+   the script writes as its first statement. The page's body copy defaults to
+   `opacity: 0`; without the gate, a script that never runs would leave it
+   unreadable rather than merely unanimated. */
+html.js .s-fade {
+  opacity: 0;
+  transform: translateY(3rem);
+}
+
+html.js .s-fade.is-inview {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1s var(--ease-expo), transform 1s var(--ease-expo);
+}
+
+/* ---------------------------------------------------------------------------
+   15. Intro
+
+   A white sheet over everything, which lifts, and then the page assembles in
+   a fixed order: wordmark, then claim, then chrome, then the reel opening
+   from a horizontal slit. Every step below is a delay against one origin.
+   ------------------------------------------------------------------------ */
+
+html.js .intro-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: var(--light);
+  pointer-events: none;
+  transition: opacity 0.5s ease-out;
+}
+
+html.js.is-intro-out .intro-mask { opacity: 0; }
+
+/* The wordmark carries two independent translations — the entrance rise and
+   the scroll exit — so it composes them in one transform out of two custom
+   properties rather than letting the later rule win. The entrance animates
+   because substituting a changed var() still produces a new computed
+   transform, and transform is what is transitioned. */
+.hero__logo {
+  --logo-intro: 0px;
+  --logo-exit: 0px;
+  transform: translate3d(0, calc(var(--logo-intro) + var(--logo-exit)), 0);
+}
+
+html.is-intro .hero__logo {
+  --logo-intro: 0px;
+  transition: transform 1.5s var(--ease-snappy);
+}
+
+html.is-intro .hero__logo i {
+  --in: 0%;
+  transition: transform 1.25s var(--ease-unmask);
+  transition-delay: calc(var(--i, 0) * 0.045s);
+}
+
+/* Once the entrance is over the eases come off, so the scroll scrub can
+   drive the same two properties directly instead of chasing a 1.25s curve
+   on every frame. */
+html.is-ready .hero__logo,
+html.is-ready .hero__logo i {
+  transition: none;
+}
+
+html.js .i-fade {
+  opacity: 0;
+  transform: translateY(5rem);
+}
+
+html.js.is-intro .i-fade {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1.25s var(--ease-expo) calc(0.25s + var(--i, 0) * 0.1s),
+              transform 1.25s var(--ease-expo) calc(0.25s + var(--i, 0) * 0.1s);
+}
+
+html.js .sh { opacity: 0; }
+
+html.js.is-intro .sh {
+  opacity: 1;
+  transition: opacity 1.25s var(--ease-expo) 0.26s;
+}
+
+html.js .reel__content { clip-path: inset(50% 0 50% 0 round 0); }
+
+html.js.is-intro .reel__content {
+  clip-path: inset(0 0 0 0 round 1.2rem);
+  transition: clip-path 1s var(--ease-snappy) 0.25s;
+}
+
+/* Nothing on the page needs to move for it to be readable, so a reader who
+   has asked for less motion gets the finished state immediately. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+
+  .s-piece,
+  .hero__logo i { transform: none; }
+  .s-fade { opacity: 1; transform: none; }
+  .i-fade { opacity: 1; transform: none; }
+  .sh { opacity: 1; }
+  .intro-mask { display: none; }
+  .reel__content { clip-path: inset(0 0 0 0 round 1.2rem); }
+}
